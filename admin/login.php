@@ -8,4 +8,4 @@ include "../auth/koneksi.php"
         <input type="password" name="password" id="password" placeholder="password">
         <button type="submit">Login</button>
     </form>
-</section>
+</section> 

@@ -4,7 +4,7 @@ session_start();
 include "../auth/koneksi.php";
 
 $username = $_POST['nama'];
-$password = md5($_POST['password']);
+$password = md5($_POST['password']); 
 
 if (empty($username) || empty($password)){
     echo "Username dan Password wajib diisi.";
