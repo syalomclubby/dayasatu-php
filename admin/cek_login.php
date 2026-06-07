@@ -12,9 +12,9 @@ if (empty($username) || empty($password)){
 }
 $query = mysqli_query($conn, "SELECT * FROM users WHERE nama='$username' AND password='$password'");
 
-$num = mysqli_num_rows($query);
+$num = mysqli_num_rows($query); 
 
-if ($num > 0){
+if ($num > 0){ 
     $data = mysqli_fetch_assoc($query);
 
     $_SESSION['id'] = $data['id'];
