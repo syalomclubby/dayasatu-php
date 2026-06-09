@@ -1,5 +1,5 @@
 <?php
-include "../auth/koneksi.php"
+include "../config/koneksi.php"
 ?>
 
 <section>
