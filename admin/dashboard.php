@@ -17,6 +17,7 @@ $query_brand = mysqli_query($conn, $sql_brand);
 
 $sql_products = "SELECT *, 
 products.name AS products_name,
+products.description AS products_desc,
 brands.name AS brand_name,
 users.name AS user_name
 FROM products 
@@ -42,6 +43,7 @@ echo "Hello, ".$username . "!";
         <tr>
             <th>Category Id</th>
             <th>Name</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -54,7 +56,7 @@ echo "Hello, ".$username . "!";
         <tr>
             <td><?= $id; ?></td>
             <td><?= $name; ?></td>
-            <td> <a href="">Edit</a> | <a href="">Hapus</a></td>
+            <td> <a href="">Edit</a> | <a href="product/delete_category.php?category_id=<?= $id; ?>">Hapus</a></td>
     </tr>
     <?php
             $category++;
@@ -75,6 +77,7 @@ echo "Hello, ".$username . "!";
             <th>Category Id</th>
             <th>Name</th>
             <th>Description</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -91,7 +94,7 @@ echo "Hello, ".$username . "!";
             <td><?= $id2; ?></td>
             <td><?= $name; ?></td>
             <td><?= $description; ?></td>
-            <td> <a href="">Edit</a> | <a href="">Hapus</a></td>
+            <td> <a href="">Edit</a> | <a href="product/delete_brand.php?brand_id=<?= $id; ?>">Hapus</a></td>
     </tr>
     <?php
             $brand++;
@@ -125,7 +128,7 @@ echo "Hello, ".$username . "!";
             $product = 1;
         while($result = mysqli_fetch_array($query_product)){
             $name = $result['products_name'];
-            $description = $result['description'];
+            $description = $result['products_desc'];
             $price = $result['price'];
             $image = $result['image'];
             $followedby = $result['user_name'];
@@ -140,11 +143,11 @@ echo "Hello, ".$username . "!";
             <td><?= $name; ?></td>
             <td><?= $description; ?></td>
             <td><?= $price; ?></td>
-            <td><img src="../<?= $image; ?>" width="100px"></td>
+            <td><img src="../assets/images/products/<?= $image; ?>" width="100px"></td>
             <td><?= $followedby; ?></td>
             <td><?= $followedat; ?></td>
             <td><?= $created; ?></td>
-            <td> <a href="">Edit</a> | <a href="">Hapus</a></td>
+            <td> <a href="">Edit</a> | <a href="product/delete_product.php?product_id=<?= $id; ?>">Hapus</a></td>
     </tr>
     </tbody>
     <?php
