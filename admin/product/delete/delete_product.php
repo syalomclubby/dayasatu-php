@@ -1,6 +1,6 @@
  <?php
-include "../security.php";
-include "../../config/connection.php";
+include "../../security.php";
+include "../../../config/connection.php";
 
 $id = $_GET['product_id'] ?? '';
 
@@ -12,7 +12,7 @@ if ($id == '') {
 $sql = "delete from products where product_id='$id'";
 $query = mysqli_query($conn, $sql);
 
-header("Location: ../dashboard.php");
+header("Location: ../../dashboard.php");
 exit;
 
 ?>

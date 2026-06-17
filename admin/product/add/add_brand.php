@@ -1,20 +1,21 @@
 <?php
-include "../security.php";
-include "../../config/connection.php";
+include "../../security.php";
+include "../../../config/connection.php";
 
 if (isset($_POST['save'])) {
     $category_id = (int) $_POST['category_id'];
     $name = trim($_POST['name']);
+    $description = trim($_POST['description']);
 
 
-    if ($category_id == '' || $name == '') {
+    if ($category_id == '' || $name == '' || $description == "") {
         $error = "All Fields Required.";
     } else { 
-        $sql = "insert into categories (category_id, name) values('$category_id','$name')";
+        $sql = "insert into brands (category_id, name, description) values('$category_id','$name', '$description')";
         $query = mysqli_query($conn, $sql);
 
         if ($query) {
-            header("Location: ../dashboard.php");
+            header("Location: ../../dashboard.php");
             exit;
         } else {
             $error = "Data failed to save.";
@@ -26,13 +27,13 @@ if (isset($_POST['save'])) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Category</title>
+    <title>Add Brand</title>
 </head>
 <body>
 
-<h1>Add Category</h1>
+<h1>Add Brand</h1>
 
-<a href="../dashboard.php">Back</a>
+<a href="../../dashboard.php">Back</a>
 
 <br><br>
 
@@ -45,8 +46,12 @@ if (isset($_POST['save'])) {
     <input type="number" name="category_id">
     <br><br>
 
-    <label>Name</label><br>
+    <label>Brand Name</label><br>
     <input type="text" name="name">
+    <br><br>
+
+    <label>Description</label><br>
+    <textarea name="description" rows="5" cols="40"></textarea>
     <br><br>
 
     <button type="submit" name="save">Add</button>

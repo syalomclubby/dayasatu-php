@@ -1,6 +1,6 @@
 <?php
-include "../security.php";
-include "../../config/connection.php";
+include "../../security.php";
+include "../../../config/connection.php";
 
 if (isset($_POST['save'])) {
     $brand_id = (int) $_POST['brand_id'];
@@ -18,7 +18,7 @@ if (isset($_POST['save'])) {
         $query = mysqli_query($conn, $sql);
 
         if ($query) {
-            header("Location: ../dashboard.php");
+            header("Location: ../../dashboard.php");
             exit;
         } else {
             $error = "Data failed to save.";
@@ -36,7 +36,7 @@ if (isset($_POST['save'])) {
 
 <h1>Add Products</h1>
 
-<a href="../dashboard.php">Back</a>
+<a href="../../dashboard.php">Back</a>
 
 <br><br>
 

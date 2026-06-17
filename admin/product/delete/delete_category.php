@@ -1,6 +1,6 @@
  <?php
-include "../security.php";
-include "../../config/connection.php";
+include "../../security.php";
+include "../../../config/connection.php";
 
 $id = $_GET['category_id'] ?? '';
 
@@ -12,7 +12,7 @@ if ($id == '') {
 $sql = "delete from categories where category_id='$id'";
 $query = mysqli_query($conn, $sql);
 
-header("Location: ../dashboard.php");
+header("Location: ../../dashboard.php");
 exit;
 
 ?>

@@ -4,11 +4,22 @@ require_once __DIR__ . "/../config/connection.php";
 
 $page_title = "Dashboard";
 
-// Statistik
-$total_products = 0;
-$total_brands = 0;
-$total_categories = 0;
-$total_users = 0;
+
+//Statistik
+$sql = "SELECT 
+            (SELECT COUNT(*) FROM products) AS t_products,
+            (SELECT COUNT(*) FROM brands) AS t_brands,
+            (SELECT COUNT(*) FROM categories) AS t_categories,
+            (SELECT COUNT(*) FROM users) AS t_users";
+
+$result = $conn->query($sql);
+$data = $result->fetch_assoc();
+
+$total_products   = $data['t_products'] ?? 0;
+$total_brands     = $data['t_brands'] ?? 0;
+$total_categories = $data['t_categories'] ?? 0;
+$total_users      = $data['t_users'] ?? 0;
+
 
 // Ambil Data
 $sql_category = "SELECT * FROM categories";
@@ -277,7 +288,7 @@ $query_product = mysqli_query($conn, $sql_products);
                         </div>
                         <div class="card-body">
                             <div class="quick-actions">
-                                <a class="quick-action" href="product/add_product.php">
+                                <a class="quick-action" href="product/add/add_product.php">
                                     <div class="quick-action-left">
                                         <div class="quick-action-icon"><i class="fa-solid fa-plus"></i></div>
                                         <div>
@@ -287,7 +298,7 @@ $query_product = mysqli_query($conn, $sql_products);
                                     </div>
                                     <i class="fa-solid fa-arrow-right"></i>
                                 </a>
-                                <a class="quick-action" href="product/add_brand.php">
+                                <a class="quick-action" href="product/add/add_brand.php">
                                     <div class="quick-action-left">
                                         <div class="quick-action-icon"><i class="fa-solid fa-tags"></i></div>
                                         <div>
@@ -297,7 +308,7 @@ $query_product = mysqli_query($conn, $sql_products);
                                     </div>
                                     <i class="fa-solid fa-arrow-right"></i>
                                 </a>
-                                <a class="quick-action" href="product/add_category.php">
+                                <a class="quick-action" href="product/add/add_category.php">
                                     <div class="quick-action-left">
                                         <div class="quick-action-icon"><i class="fa-solid fa-layer-group"></i></div>
                                         <div>
