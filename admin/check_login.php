@@ -1,7 +1,7 @@
 <?php
 session_start();
  
-include "../config/connection.php";
+require_once __DIR__ . "/../config/connection.php";
 
 $username = $_POST['name'];
 $password = md5($_POST['password']); 
