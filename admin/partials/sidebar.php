@@ -92,7 +92,7 @@
                     </div>
 
                     <a href="logout.php" class="btn btn-danger">
-                        Logout
+                        Logout <i class="fa-solid fa-right-from-bracket"></i>
                     </a>
                 </div>
             </header>

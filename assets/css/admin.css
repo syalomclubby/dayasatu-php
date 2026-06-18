@@ -481,6 +481,10 @@ ul {
   transition: 0.3s;
 }
 
+.btn i {
+  margin-left: 7px;
+}
+
 .btn-primary {
   background: var(--primary);
   color: white;
