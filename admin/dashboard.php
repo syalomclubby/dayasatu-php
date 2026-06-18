@@ -251,7 +251,7 @@ $query_product = mysqli_query($conn, $sql_products);
 
                                         <div class="product-image">
                                             <img
-                                                src="../assets/images/products/<?= $row['image'] ?>"
+                                                src="../assets/images/products/<?= $row['image'] ?>.png"
                                                 alt="<?= $row['product_name'] ?>">
                                         </div>
 
@@ -267,7 +267,7 @@ $query_product = mysqli_query($conn, $sql_products);
                                             </div>
                                         </div>
 
-                                        <a href="product/edit_product.php?id=<?= $row['product_id'] ?>" class="product-action">
+                                        <a href="product/edit/edit_product.php?id=<?= $row['product_id'] ?>" class="product-action">
                                             <i class="fa-solid fa-arrow-up-right-from-square"></i>
                                         </a>
 
