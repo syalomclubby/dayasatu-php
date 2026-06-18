@@ -266,13 +266,13 @@ ul {
    ========================================================= */
 
 .topbar {
-  height: 88px;
+  height: 92px;
   background: white;
   border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 40px;
+  padding: 50px 40px;
 }
 
 .topbar-left h2 {
@@ -283,7 +283,6 @@ ul {
 
 .topbar-left p {
   color: var(--text-light);
-  margin-top: 4px;
 }
 
 .topbar-right {
