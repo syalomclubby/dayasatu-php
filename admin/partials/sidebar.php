@@ -41,28 +41,58 @@
                 Navigation
             </div>
 
+            <?php
+            $current_page = basename($_SERVER['PHP_SELF']);
+
+            $current_menu = '';
+
+            if (in_array($current_page, [
+                'products.php',
+                'create-product.php',
+                'edit-product.php'
+            ])) {
+                $current_menu = 'products';
+            } elseif (in_array($current_page, [
+                'brands.php',
+                'create-brand.php',
+                'edit-brand.php'
+            ])) {
+                $current_menu = 'brands';
+            } elseif (in_array($current_page, [
+                'categories.php',
+                'create-category.php',
+                'edit-category.php'
+            ])) {
+                $current_menu = 'categories';
+            } elseif ($current_page === 'dashboard.php') {
+                $current_menu = 'dashboard';
+            } elseif ($current_page === 'settings.php') {
+                $current_menu = 'settings';
+            }
+            ?>
+
             <nav class="menu">
-                <a href="<?= $base_url ?>admin/dashboard.php" class="active">
+                <a href="<?= $base_url ?>admin/dashboard.php" class="<?= $current_menu === 'dashboard' ? 'active' : '' ?>">
                     <i class="fa-solid fa-house"></i>
                     <span>Dashboard</span>
                 </a>
 
-                <a href="<?= $base_url ?>admin/product/products.php">
+                <a href="<?= $base_url ?>admin/product/products.php" class="<?= $current_menu === 'products' ? 'active' : '' ?>">
                     <i class="fa-solid fa-box"></i>
                     <span>Products</span>
                 </a>
 
-                <a href="<?= $base_url ?>admin/product/brands.php">
+                <a href="<?= $base_url ?>admin/product/brands.php" class="<?= $current_menu === 'brands' ? 'active' : '' ?>">
                     <i class="fa-solid fa-tags"></i>
                     <span>Brands</span>
                 </a>
 
-                <a href="<?= $base_url ?>admin/product/categories.php">
+                <a href="<?= $base_url ?>admin/product/categories.php" class="<?= $current_menu === 'categories' ? 'active' : '' ?>">
                     <i class="fa-solid fa-layer-group"></i>
                     <span>Categories</span>
                 </a>
 
-                <a href="settings.php">
+                <a href="<?= $base_url ?>admin/settings.php" class="<?= $current_menu === 'settings' ? 'active' : '' ?>">
                     <i class="fa-solid fa-gear"></i>
                     <span>Settings</span>
                 </a>

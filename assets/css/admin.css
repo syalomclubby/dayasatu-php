@@ -117,28 +117,20 @@ ul {
 .sidebar {
   width: 280px;
   background: var(--surface);
-
   border-right: 1px solid var(--border);
-
   position: fixed;
   top: 0;
   left: 0;
-
   height: 100vh;
-
   padding: 24px;
-
   display: flex;
   flex-direction: column;
-
   z-index: 1000;
 }
 
 .main {
   flex: 1;
-
   margin-left: 280px;
-
   min-height: 100vh;
 }
 
