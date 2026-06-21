@@ -43,218 +43,255 @@ ORDER BY products.product_id DESC
 LIMIT 5";
 $query_product = mysqli_query($conn, $sql_products);
 
+// Recent Activity
+$sql_activity = "SELECT
+products.product_id,
+products.name AS product_name,
+products.created_at,
+users.name AS user_name,
+brands.name AS brand_name,
+categories.name AS category_name
+FROM products
+INNER JOIN users ON products.followed_up_by = users.user_id
+INNER JOIN brands ON products.brand_id = brands.brand_id
+INNER JOIN categories ON brands.category_id = categories.category_id
+ORDER BY products.created_at DESC
+LIMIT 5";
+
+$query_activity = mysqli_query($conn, $sql_activity);
+
 ?>
 
-<?php include 'partials/sidebar.php'?>
+<?php include 'partials/sidebar.php' ?>
 
-        <!-- CONTENT -->
-        <section class="content">
+<!-- CONTENT -->
+<section class="content">
 
-            <!-- STATS -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <div class="stat-label">
-                            Products
-                        </div>
-
-                        <div class="stat-value">
-                            <?= $total_products ?>
-                        </div>
-                    </div>
-
-                    <div class="stat-icon stat-orange">
-                        <i class="fa-solid fa-box"></i>
-                    </div>
+    <!-- STATS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-content">
+                <div class="stat-label">
+                    Products
                 </div>
 
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <div class="stat-label">
-                            Brands
-                        </div>
-
-                        <div class="stat-value">
-                            <?= $total_brands ?>
-                        </div>
-                    </div>
-
-                    <div class="stat-icon stat-blue">
-                        <i class="fa-solid fa-tags"></i>
-                    </div>
+                <div class="stat-value">
+                    <?= $total_products ?>
                 </div>
-
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <div class="stat-label">
-                            Categories
-                        </div>
-
-                        <div class="stat-value">
-                            <?= $total_categories ?>
-                        </div>
-                    </div>
-
-                    <div class="stat-icon stat-green">
-                        <i class="fa-solid fa-layer-group"></i>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <div class="stat-label">
-                            Users
-                        </div>
-
-                        <div class="stat-value">
-                            <?= $total_users ?>
-                        </div>
-                    </div>
-
-                    <div class="stat-icon stat-purple">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                </div>
-
             </div>
 
-            <!-- QUICK ACTIONS -->
-            <div class="grid-2 mt-4">
+            <div class="stat-icon stat-orange">
+                <i class="fa-solid fa-box"></i>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div class="stat-label">
+                    Brands
+                </div>
+
+                <div class="stat-value">
+                    <?= $total_brands ?>
+                </div>
+            </div>
+
+            <div class="stat-icon stat-blue">
+                <i class="fa-solid fa-tags"></i>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div class="stat-label">
+                    Categories
+                </div>
+
+                <div class="stat-value">
+                    <?= $total_categories ?>
+                </div>
+            </div>
+
+            <div class="stat-icon stat-green">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div class="stat-label">
+                    Users
+                </div>
+
+                <div class="stat-value">
+                    <?= $total_users ?>
+                </div>
+            </div>
+
+            <div class="stat-icon stat-purple">
+                <i class="fa-solid fa-users"></i>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="grid-2 mt-4">
+        <div>
+            <div class="card welcome-banner">
+                <div class="card-body">
+                    <div class="welcome-top">
+                        <span class="banner-badge"><i class="fa-solid fa-sparkles"></i> Admin overview</span>
+                        <span class="banner-date"><?= date("l, d M Y") ?></span>
+                    </div>
+                    <h3 class="welcome-title">Welcome back, <?= ($_SESSION['name'] ?? 'Admin') ?>.</h3>
+                    <p class="welcome-text">Monitor products, brands, categories, and system activity from one dashboard.</p>
+                </div>
+            </div>
+
+            <div class="card latest-products-card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Latest Products</div>
+                        <div class="card-subtitle">Recently added products</div>
+                    </div>
+                    <a href="product/products.php" class="view-all-link">
+                        View All
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="latest-products-list">
+
+                    <?php while ($row = mysqli_fetch_assoc($query_product)): ?>
+
+                        <div class="latest-product-item">
+
+                            <div class="product-image">
+                                <img
+                                    src="../assets/images/products/<?= $row['image'] ?>.png"
+                                    alt="<?= $row['product_name'] ?>">
+                            </div>
+
+                            <div class="product-info">
+                                <div class="products-name">
+                                    <?= ($row['product_name']) ?>
+                                </div>
+
+                                <div class="product-meta">
+                                    <?= ($row['brand_name']) ?>
+                                    <span>•</span>
+                                    <?= ($row['category_name']) ?>
+                                </div>
+                            </div>
+
+                            <a href="product/edit/edit_product.php?id=<?= $row['product_id'] ?>" class="product-action">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+
+                        </div>
+
+                    <?php endwhile; ?>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card quick-actions-card">
+            <div class="card-header">
                 <div>
-                    <div class="card welcome-banner">
-                        <div class="card-body">
-                            <div class="welcome-top">
-                                <span class="banner-badge"><i class="fa-solid fa-sparkles"></i> Admin overview</span>
-                                <span class="banner-date"><?= date("l, d M Y") ?></span>
-                            </div>
-                            <h3 class="welcome-title">Welcome back, <?= ($_SESSION['name'] ?? 'Admin') ?>.</h3>
-                            <p class="welcome-text">Monitor products, brands, categories, and system activity from one dashboard.</p>
-                        </div>
-                    </div>
-
-                    <div class="card latest-products-card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title">Latest Products</div>
-                                <div class="card-subtitle">Recently added products</div>
-                            </div>
-                            <a href="product/products.php" class="view-all-link">
-                                View All
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                        </div>
-
-                        <div class="latest-products-list">
-
-                            <?php while ($row = mysqli_fetch_assoc($query_product)): ?>
-
-                                <div class="latest-product-item">
-
-                                    <div class="product-image">
-                                        <img
-                                            src="../assets/images/products/<?= $row['image'] ?>.png"
-                                            alt="<?= $row['product_name'] ?>">
-                                    </div>
-
-                                    <div class="product-info">
-                                        <div class="products-name">
-                                            <?= ($row['product_name']) ?>
-                                        </div>
-
-                                        <div class="product-meta">
-                                            <?= ($row['brand_name']) ?>
-                                            <span>•</span>
-                                            <?= ($row['category_name']) ?>
-                                        </div>
-                                    </div>
-
-                                    <a href="product/edit/edit_product.php?id=<?= $row['product_id'] ?>" class="product-action">
-                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                    </a>
-
-                                </div>
-
-                            <?php endwhile; ?>
-
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">Quick Actions</div>
-                            <div class="card-subtitle">Main tasks for daily operations</div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="quick-actions">
-                            <a class="quick-action" href="product/add/add_product.php">
-                                <div class="quick-action-left">
-                                    <div class="quick-action-icon"><i class="fa-solid fa-plus"></i></div>
-                                    <div>
-                                        <div class="quick-action-title">Add Product</div>
-                                        <div class="quick-action-desc">Insert a new product record</div>
-                                    </div>
-                                </div>
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                            <a class="quick-action" href="product/add/add_brand.php">
-                                <div class="quick-action-left">
-                                    <div class="quick-action-icon"><i class="fa-solid fa-tags"></i></div>
-                                    <div>
-                                        <div class="quick-action-title">Add Brand</div>
-                                        <div class="quick-action-desc">Register a new brand entry</div>
-                                    </div>
-                                </div>
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                            <a class="quick-action" href="product/add/add_category.php">
-                                <div class="quick-action-left">
-                                    <div class="quick-action-icon"><i class="fa-solid fa-layer-group"></i></div>
-                                    <div>
-                                        <div class="quick-action-title">Add Category</div>
-                                        <div class="quick-action-desc">Create a new product group</div>
-                                    </div>
-                                </div>
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                            <a class="quick-action" href="product/products.php">
-                                <div class="quick-action-left">
-                                    <div class="quick-action-icon"><i class="fa-solid fa-box"></i></div>
-                                    <div>
-                                        <div class="quick-action-title">View Products</div>
-                                        <div class="quick-action-desc">Open product management</div>
-                                    </div>
-                                </div>
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                            <a class="quick-action" href="product/brands.php">
-                                <div class="quick-action-left">
-                                    <div class="quick-action-icon"><i class="fa-solid fa-tags"></i></div>
-                                    <div>
-                                        <div class="quick-action-title">View Brands</div>
-                                        <div class="quick-action-desc">Open brand management</div>
-                                    </div>
-                                </div>
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                            <a class="quick-action" href="product/categories.php">
-                                <div class="quick-action-left">
-                                    <div class="quick-action-icon"><i class="fa-solid fa-layer-group"></i></div>
-                                    <div>
-                                        <div class="quick-action-title">View Categories</div>
-                                        <div class="quick-action-desc">Open category management</div>
-                                    </div>
-                                </div>
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
+                    <div class="card-title">Quick Actions</div>
+                    <div class="card-subtitle">Main tasks for daily operations</div>
                 </div>
             </div>
-        </section>
-    </main>
+            <div class="card-body">
+                <div class="quick-actions">
+                    <a class="quick-action" href="product/add/add_product.php">
+                        <div class="quick-action-left">
+                            <div class="quick-action-icon"><i class="fa-solid fa-plus"></i></div>
+                            <div>
+                                <div class="quick-action-title">Add Product</div>
+                                <div class="quick-action-desc">Insert a new product record</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <a class="quick-action" href="product/add/add_brand.php">
+                        <div class="quick-action-left">
+                            <div class="quick-action-icon"><i class="fa-solid fa-tags"></i></div>
+                            <div>
+                                <div class="quick-action-title">Add Brand</div>
+                                <div class="quick-action-desc">Register a new brand entry</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <a class="quick-action" href="product/add/add_category.php">
+                        <div class="quick-action-left">
+                            <div class="quick-action-icon"><i class="fa-solid fa-layer-group"></i></div>
+                            <div>
+                                <div class="quick-action-title">Add Category</div>
+                                <div class="quick-action-desc">Create a new product group</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php mysqli_data_seek($query_product, 0); ?>
+
+    <div class="grid-2 mt-4">
+        <div class="card activity-card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">Recent Activity</div>
+                    <div class="card-subtitle">Latest product updates</div>
+                </div>
+            </div>
+
+            <div class="activity-feed">
+
+                <?php while ($row = mysqli_fetch_assoc($query_activity)): ?>
+
+                    <div class="activity-row">
+
+                        <div class="activity-icon">
+                            <i class="fa-solid fa-box"></i>
+                        </div>
+
+                        <div class="activity-content">
+
+                            <div class="activity-label">
+                                Product Added
+                            </div>
+
+                            <div class="activity-title">
+                                <?= $row['product_name']; ?>
+                            </div>
+
+                            <div class="activity-meta">
+                                <?= $row['brand_name']; ?> • <?= $row['category_name']; ?>
+                            </div>
+
+                        </div>
+
+                        <div class="activity-date">
+                            <span><?= date('d M Y', strtotime($row['created_at'])); ?></span>
+                            <span><?= date('H:i', strtotime($row['created_at'])); ?></span>
+                        </div>
+
+                    </div>
+
+                <?php endwhile; ?>
+
+            </div>
+        </div>
+    </div>
+</section>
+</main>
 </div>
 
 </div>

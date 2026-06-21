@@ -667,6 +667,11 @@ ul {
   flex-shrink: 0;
 }
 
+.quick-actions-card {
+  align-self: start;
+  height: fit-content;
+}
+
 /* =========================================================
    LATEST PRODUCTS
 ========================================================= */
@@ -753,6 +758,148 @@ ul {
   font-size: 14px;
   font-weight: 600;
   color: var(--primary);
+}
+
+/* =========================================================
+   RECENT ACTIVITY
+========================================================= */
+
+.activity-card {
+  overflow: hidden;
+}
+
+.activity-feed {
+  padding: 24px;
+}
+
+.activity-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 0;
+}
+
+.activity-row:not(:last-child) {
+  border-bottom: 2px solid #f1f3f5;
+  margin-bottom: 4px;
+}
+
+.activity-icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+
+  background: #fff4f4;
+  color: var(--primary);
+
+  font-size: 18px;
+}
+
+.activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-label {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 6px 12px;
+  margin-bottom: 10px;
+
+  border-radius: 999px;
+
+  background: rgba(214, 31, 39, 0.08);
+  color: var(--primary);
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.activity-title {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.activity-meta {
+  margin-top: 8px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.activity-date {
+  flex-shrink: 0;
+
+  min-width: 120px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.activity-date::before {
+  content: "CREATED";
+
+  margin-bottom: 6px;
+
+  color: #b4bcc9;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.activity-date span:first-child {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.activity-date span:last-child {
+  margin-top: 2px;
+
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.activity-row:hover .activity-icon {
+  transform: scale(1.05);
+}
+
+.activity-icon {
+  transition: .25s ease;
+}
+
+@media (max-width: 768px) {
+  .activity-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .activity-date {
+    width: 100%;
+    min-width: unset;
+
+    margin-left: 74px;
+    margin-top: 10px;
+
+    align-items: flex-start;
+  }
 }
 
 /* =========================================================
