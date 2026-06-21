@@ -779,6 +779,10 @@ ul {
   padding: 22px 0;
 }
 
+.activity-row:first-child {
+  padding-top: 0;
+}
+
 .activity-row:not(:last-child) {
   border-bottom: 2px solid #f1f3f5;
   margin-bottom: 4px;
