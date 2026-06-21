@@ -1,10 +1,12 @@
-<?php 
+<?php
 session_start();
 
-$username = $_SESSION['name'];
+require_once __DIR__ . '/../config/connection.php';
 
-if ($username == ""){
-    header("Location: login.php");
+if (
+    !isset($_SESSION['user_id']) ||
+    empty($_SESSION['user_id'])
+) {
+    header("Location: {$base_url}admin/login.php");
     exit;
-} 
-?> 
+}
