@@ -97,9 +97,11 @@
                     <span>Settings</span>
                 </a>
 
-                <a href="<?= $base_url ?>admin/logout.php" class="btn btn-danger"">
-                    Logout <i class="fa-solid fa-right-from-bracket"></i>
-                </a>
+                <div class="sidebar-footer">
+                    <a href="<?= $base_url ?>admin/logout.php" class="btn btn-danger">
+                        Logout <i class="fa-solid fa-right-from-bracket"></i>
+                    </a>
+                </div>
             </nav>
         </aside>
 

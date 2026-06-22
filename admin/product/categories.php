@@ -26,7 +26,7 @@ $query_category = mysqli_query($conn, $sql_category);
         <table class="table">
             <thead>
                 <tr>
-                    <th>Id</th>
+                    <th>No</th>
                     <th>Name</th>
                     <th class="table-actions-head"></th>
                 </tr>

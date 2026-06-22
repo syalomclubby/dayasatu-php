@@ -28,7 +28,7 @@ $query_brand = mysqli_query($conn, $sql_brand);
         <table class="table">
             <thead>
                 <tr>
-                    <th>Id</th>
+                    <th>No</th>
                     <th>Category</th>
                     <th>Name</th>
                     <th>Description</th>

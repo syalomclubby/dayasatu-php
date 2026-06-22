@@ -32,8 +32,8 @@ $query_product = mysqli_query($conn, $sql_products);
         <table class="table">
             <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>Brand Id</th>
+                    <th>No</th>
+                    <th>Brand</th>
                     <th>Name</th>
                     <th>Description</th>
                     <th>Price</th>
