@@ -134,7 +134,7 @@ ul {
   flex: 1;
   margin-left: 280px;
   min-height: 100vh;
-  min-width: 0; 
+  min-width: 0;
   overflow-x: hidden;
 }
 
@@ -581,12 +581,12 @@ ul {
 }
 
 .btn-danger {
-  background: #ef4444;
-  color: white;
+  background: #ef4444 !important;
+  color: white !important;
 }
 
 .btn-danger:hover {
-  background: #dc2626;
+  background: #dc2626 !important;
 }
 
 /* =========================================================
@@ -2695,4 +2695,71 @@ select.form-control {
   .auth-note {
     text-align: center;
   }
+}
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+/* Layout Header Tombol */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+/* --- BUTTONS REFRESHED --- */
+
+/* Tombol Back: Warna Abu-abu Gelap & Elegan */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 20px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.3s;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-back:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.btn-back i {
+  margin-right: 8px;
+}
+
+/* Tombol Add: Warna Merah Primary yang Solid */
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 16px;
+  background: var(--danger);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.3s;
+  border: none;
+}
+
+.btn-add:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(214, 31, 39, 0.3);
+}
+
+.btn-add i {
+  margin-left: 10px;
 }

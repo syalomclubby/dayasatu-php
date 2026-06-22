@@ -12,9 +12,16 @@ $query_category = mysqli_query($conn, $sql_category);
 
 <div class="content">
 
-    <a href="../dashboard.php">Back to Dashboard</a>
+    <div class="page-header">
+        <a href="../dashboard.php" class="btn-back">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </a>
 
-    <br><br>
+        <a href="add_products.php" class="btn-add">
+            Add Category <i class="fa-solid fa-plus"></i>
+        </a>
+    </div>
+
     <div class="table-responsive table-card">
         <table class="table">
             <thead>

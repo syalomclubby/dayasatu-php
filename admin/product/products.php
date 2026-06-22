@@ -18,9 +18,16 @@ $query_product = mysqli_query($conn, $sql_products);
 
 <div class="content">
 
-    <a href="../dashboard.php">Back to Dashboard</a>
-    <br>
-    <br>
+    <div class="page-header">
+        <a href="../dashboard.php" class="btn-back">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </a>
+
+        <a href="add_products.php" class="btn-add">
+            Add Product <i class="fa-solid fa-plus"></i>
+        </a>
+    </div>
+
     <div class="table-responsive table-card">
         <table class="table">
             <thead>

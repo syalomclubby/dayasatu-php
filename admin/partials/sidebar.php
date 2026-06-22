@@ -96,6 +96,10 @@
                     <i class="fa-solid fa-gear"></i>
                     <span>Settings</span>
                 </a>
+
+                <a href="<?= $base_url ?>admin/logout.php" class="btn btn-danger"">
+                    Logout <i class="fa-solid fa-right-from-bracket"></i>
+                </a>
             </nav>
         </aside>
 
@@ -120,9 +124,5 @@
                     <div class="admin-pill">
                         <?= htmlspecialchars($_SESSION['name']) ?>
                     </div>
-
-                    <a href="<?= $base_url ?>admin/logout.php" class="btn btn-danger">
-                        Logout <i class="fa-solid fa-right-from-bracket"></i>
-                    </a>
                 </div>
             </header>
