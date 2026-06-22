@@ -3,7 +3,12 @@
 require_once __DIR__ . "/../security.php";
 require_once __DIR__ . "/../../config/connection.php";
 
-$sql_category = "SELECT * FROM categories";
+$sql_category = "SELECT *,
+categories.name AS category_name,
+users.name AS user_name
+FROM categories
+INNER JOIN users ON categories.followed_up_by = users.user_id
+";
 $query_category = mysqli_query($conn, $sql_category);
 
 ?>
@@ -46,6 +51,9 @@ $query_category = mysqli_query($conn, $sql_category);
                 <tr>
                     <th>No</th>
                     <th>Name</th>
+                    <th>Followed Up By</th>
+                    <th>Followed Up At</th>
+                    <th>Created At</th>
                     <th class="table-actions-head"></th>
                 </tr>
             </thead>
@@ -53,7 +61,7 @@ $query_category = mysqli_query($conn, $sql_category);
                 <?php
                 $category = 1;
                 while ($result = mysqli_fetch_array($query_category)) {
-                    $name = $result['name'];
+                    $name = $result['category_name'];
                     $id = $result['category_id'];
                 ?>
                     <tr>
@@ -67,9 +75,21 @@ $query_category = mysqli_query($conn, $sql_category);
                             </div>
                         </td>
 
+                        <td class="table-muted">
+                            <?= $result['user_name']; ?>
+                        </td>
+
+                        <td class="table-muted">
+                            <?= $result['followed_up_at']; ?>
+                        </td>
+
+                        <td class="table-muted">
+                            <?= $result['created_at']; ?>
+                        </td>
+
                         <td>
                             <div class="table-actions">
-                                <a href="" class="table-action" aria-label="Edit">
+                                <a href="edit/edit_category.php?category_id=<?= $id; ?>" class="table-action" aria-label="Edit">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
                                 <a

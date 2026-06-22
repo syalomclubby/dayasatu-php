@@ -15,7 +15,7 @@ $sql_product = "
         products.image,
         brands.name AS brand_name
     FROM products
-    INNER JOIN brands
+    LEFT JOIN brands
         ON products.brand_id = brands.brand_id
     WHERE products.product_id = ?
     LIMIT 1

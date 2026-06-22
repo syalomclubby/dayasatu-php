@@ -4,6 +4,7 @@ require_once __DIR__ . "/../../config/connection.php";
 
 $sql_products = "SELECT *, 
 products.name AS products_name,
+products.followed_up_at AS products_at,
 brands.name AS brand_name,
 users.name AS user_name
 FROM products 
@@ -102,7 +103,7 @@ $query_product = mysqli_query($conn, $sql_products);
                         </td>
 
                         <td class="table-muted">
-                            <?= $result['followed_up_at']; ?>
+                            <?= $result['products_at']; ?>
                         </td>
 
                         <td class="table-muted">
@@ -111,7 +112,7 @@ $query_product = mysqli_query($conn, $sql_products);
 
                         <td>
                             <div class="table-actions">
-                                <a href="" class="table-action" aria-label="Edit">
+                                <a href="edit/edit_product.php?product_id=<?= $result['product_id']; ?>" class="table-action" aria-label="Edit">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
                                 <a
@@ -156,6 +157,10 @@ $query_product = mysqli_query($conn, $sql_products);
                 },
 
                 buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
             });
 
         });

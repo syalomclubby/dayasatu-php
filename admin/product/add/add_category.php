@@ -6,6 +6,26 @@ require_once __DIR__ . "/../../../config/connection.php";
 $errors = [];
 $name = '';
 
+$current_user_id = (int) ($_SESSION['user_id'] ?? 0);
+$current_user_name = '';
+
+if ($current_user_id > 0) {
+    $sql_current_user = "SELECT name FROM users WHERE user_id = ? LIMIT 1";
+    $stmt_current_user = mysqli_prepare($conn, $sql_current_user);
+
+    if ($stmt_current_user) {
+        mysqli_stmt_bind_param($stmt_current_user, "i", $current_user_id);
+        mysqli_stmt_execute($stmt_current_user);
+        $result_current_user = mysqli_stmt_get_result($stmt_current_user);
+
+        if ($row_current_user = mysqli_fetch_assoc($result_current_user)) {
+            $current_user_name = $row_current_user['name'] ?? '';
+        }
+
+        mysqli_stmt_close($stmt_current_user);
+    }
+}
+
 if (isset($_POST['save'])) {
 
     $name = trim($_POST['name'] ?? '');
@@ -14,16 +34,20 @@ if (isset($_POST['save'])) {
         $errors[] = 'Category name is required.';
     }
 
+    if ($current_user_id <= 0) {
+        $errors[] = 'Logged in user not found.';
+    }
+
     if (empty($errors)) {
 
         $sql = "
             INSERT INTO categories
             (
-                name
+                name, followed_up_by
             )
             VALUES
             (
-                ?
+                ?, ?
             )
         ";
 
@@ -33,21 +57,21 @@ if (isset($_POST['save'])) {
 
             mysqli_stmt_bind_param(
                 $stmt,
-                "s",
-                $name
+                "si",
+                $name,
+                $current_user_id
             );
 
-            if (mysqli_stmt_execute($stmt)) {
-
+            if (mysqli_stmt_execute($stmt)) {   
                 mysqli_stmt_close($stmt);
-
                 header("Location: ../categories.php");
                 exit;
             }
 
+            $errors[] = 'Data failed to save.';
             mysqli_stmt_close($stmt);
 
-            $errors[] = 'Data failed to save.';
+           
         } else {
             $errors[] = 'Query failed to prepare.';
         }
@@ -87,9 +111,8 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                 <div class="card-title">
                     Category Information
                 </div>
-
                 <div class="card-subtitle">
-                    Lengkapi data category di bawah ini.
+                    Data followed up by akan otomatis memakai akun login saat ini: <strong><?= htmlspecialchars($current_user_name ?: 'Current User', ENT_QUOTES, 'UTF-8'); ?></strong>
                 </div>
             </div>
 

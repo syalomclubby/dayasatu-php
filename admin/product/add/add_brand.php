@@ -9,6 +9,26 @@ $category_id = '';
 $name = '';
 $description = '';
 
+$current_user_id = (int) ($_SESSION['user_id'] ?? 0);
+$current_user_name = '';
+
+if ($current_user_id > 0) {
+    $sql_current_user = "SELECT name FROM users WHERE user_id = ? LIMIT 1";
+    $stmt_current_user = mysqli_prepare($conn, $sql_current_user);
+
+    if ($stmt_current_user) {
+        mysqli_stmt_bind_param($stmt_current_user, "i", $current_user_id);
+        mysqli_stmt_execute($stmt_current_user);
+        $result_current_user = mysqli_stmt_get_result($stmt_current_user);
+
+        if ($row_current_user = mysqli_fetch_assoc($result_current_user)) {
+            $current_user_name = $row_current_user['name'] ?? '';
+        }
+
+        mysqli_stmt_close($stmt_current_user);
+    }
+}
+
 $sql_categories = "SELECT * FROM categories ORDER BY name ASC";
 $query_categories = mysqli_query($conn, $sql_categories);
 
@@ -37,10 +57,12 @@ if (isset($_POST['save'])) {
             (
                 category_id,
                 name,
-                description
+                description,
+                followed_up_by
             )
             VALUES
             (
+                ?,
                 ?,
                 ?,
                 ?
@@ -53,10 +75,11 @@ if (isset($_POST['save'])) {
 
             mysqli_stmt_bind_param(
                 $stmt,
-                "iss",
+                "issi",
                 $category_id,
                 $name,
-                $description
+                $description,
+                $current_user_id
             );
 
             if (mysqli_stmt_execute($stmt)) {

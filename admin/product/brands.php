@@ -4,8 +4,11 @@ require_once __DIR__ . "/../../config/connection.php";
 
 $sql_brand = "SELECT *,
 categories.name AS category_name,
-brands.name AS brand_name
+brands.name AS brand_name,
+brands.followed_up_at AS brands_at,
+users.name AS user_name
 FROM brands
+INNER JOIN users ON brands.followed_up_by = users.user_id
 INNER JOIN categories ON brands.category_id = categories.category_id
  ";
 $query_brand = mysqli_query($conn, $sql_brand);
@@ -51,6 +54,9 @@ $query_brand = mysqli_query($conn, $sql_brand);
                     <th>Category</th>
                     <th>Name</th>
                     <th>Description</th>
+                    <th>Followed Up By</th>
+                    <th>Followed Up At</th>
+                    <th>Created At</th>
                     <th class="table-actions-head"></th>
                 </tr>
             </thead>
@@ -84,9 +90,21 @@ $query_brand = mysqli_query($conn, $sql_brand);
                             </div>
                         </td>
 
+                        <td class="table-muted">
+                            <?= $result['user_name']; ?>
+                        </td>
+
+                        <td class="table-muted">
+                            <?= $result['brands_at']; ?>
+                        </td>
+
+                        <td class="table-muted">
+                            <?= $result['created_at']; ?>
+                        </td>
+
                         <td>
                             <div class="table-actions">
-                                <a href="" class="table-action" aria-label="Edit">
+                                <a href="edit/edit_brand.php?brand_id=<?= $brand_id; ?>" class="table-action" aria-label="Edit">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
                                 <a
