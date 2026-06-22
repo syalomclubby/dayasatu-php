@@ -16,7 +16,7 @@ unset($_SESSION['login_error']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Admin - CV Daya Satu</title>
+    <title>Admin Login - CV Daya Satu</title>
     <link rel="icon" href="<?= $base_url ?>assets/images/logo.ico">
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -32,7 +32,7 @@ unset($_SESSION['login_error']);
             <div class="auth-head">
                 <p class="auth-kicker">Admin Dashboard Access</p>
                 <h1>Welcome Back</h1>
-                <p class="auth-subtitle">Silakan masuk untuk melanjutkan ke dashboard admin.</p>
+                <p class="auth-subtitle">Please log in to continue to the admin dashboard.</p>
             </div>
 
             <?php if (!empty($error)): ?>
@@ -50,7 +50,7 @@ unset($_SESSION['login_error']);
                         name="name"
                         id="name"
                         class="field-input"
-                        placeholder="Masukkan username"
+                        placeholder="Enter your username"
                         required
                         autofocus>
                 </div>
@@ -62,12 +62,12 @@ unset($_SESSION['login_error']);
                         name="password"
                         id="password"
                         class="field-input"
-                        placeholder="Masukkan password"
+                        placeholder="Enter your password"
                         required>
                 </div>
 
                 <div class="auth-bottom">
-                    <span class="auth-note">Akses terbatas untuk administrator.</span>
+                    <span class="auth-note">Restricted access for administrators only.</span>
                     <button type="submit" class="btn-auth">
                         Login <i class="fa-solid fa-right-to-bracket"></i>
                     </button>

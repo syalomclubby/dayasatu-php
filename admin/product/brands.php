@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once __DIR__ . "/../security.php";
 require_once __DIR__ . "/../../config/connection.php";
 
@@ -12,42 +12,71 @@ $query_brand = mysqli_query($conn, $sql_brand);
 
 ?>
 
-<?php include '../partials/sidebar.php'?>
+<?php include '../partials/sidebar.php' ?>
 
 <div class="content">
     <a href="../dashboard.php">Back to Dashboard</a>
     <br>
     <br>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Brand Id</th>
-                <th>Category Id</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-          <?php
+    <div class="table-responsive table-card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Category</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th class="table-actions-head"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
                 $brand = 1;
-            while($result = mysqli_fetch_array($query_brand)){
-                $name = $result['brand_name'];
-                $description = $result['description'];
-                $id = $result['brand_id'];
-                $id2 = $result['category_name'];
-            ?>
-            <tr>
-                <td><?= $id; ?></td>
-                <td><?= $id2; ?></td>
-                <td><?= $name; ?></td>
-                <td><?= $description; ?></td>
-                <td> <a href="">Edit</a> | <a href="delete/delete_brand.php?brand_id=<?= $id; ?>">Hapus</a></td>
-        </tr>
-        <?php
-                $brand++;
-            }
-            ?>
-        </tbody>
-    </table>
+                while ($result = mysqli_fetch_array($query_brand)) {
+                    $name = $result['brand_name'];
+                    $description = $result['description'];
+                    $id = $result['brand_id'];
+                    $id2 = $result['category_name'];
+                ?>
+                    <tr>
+                        <td>
+                            <span class="table-id">#<?= $brand++; ?></span>
+                        </td>
+
+                        <td class="table-muted">
+                            <?= $id2; ?>
+                        </td>
+
+                        <td>
+                            <div class="table-name">
+                                <?= $name; ?>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="table-description">
+                                <?= $description; ?>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="table-actions">
+                                <a href="" class="table-action" aria-label="Edit">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                <a href="delete/delete_brand.php?brand_id=<?= $id; ?>"
+                                    class="table-action table-action-danger"
+                                    aria-label="Delete"
+                                    onclick="return confirm('Hapus brand ini?');">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                <?php
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
 </div>
