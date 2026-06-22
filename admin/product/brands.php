@@ -15,12 +15,31 @@ $query_brand = mysqli_query($conn, $sql_brand);
 <?php include '../partials/sidebar.php' ?>
 
 <div class="content">
+
+    <?php if (isset($_GET['error']) && $_GET['error'] === 'brand_has_products') : ?>
+        <div class="alert alert-danger">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>
+                Brand tidak dapat dihapus karena masih memiliki produk.
+            </span>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['success']) && $_GET['success'] === 'deleted') : ?>
+        <div class="alert alert-success">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>
+                Brand berhasil dihapus.
+            </span>
+        </div>
+    <?php endif; ?>
+
     <div class="page-header">
         <a href="../dashboard.php" class="btn-back">
             <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
         </a>
 
-        <a href="add_products.php" class="btn-add">
+        <a href="add/add_brand.php" class="btn-add">
             Add Brands <i class="fa-solid fa-plus"></i>
         </a>
     </div>
@@ -39,10 +58,10 @@ $query_brand = mysqli_query($conn, $sql_brand);
                 <?php
                 $brand = 1;
                 while ($result = mysqli_fetch_array($query_brand)) {
-                    $name = $result['brand_name'];
+                    $brand_name = $result['brand_name'];
                     $description = $result['description'];
-                    $id = $result['brand_id'];
-                    $id2 = $result['category_name'];
+                    $brand_id = $result['brand_id'];
+                    $category_name = $result['category_name'];
                 ?>
                     <tr>
                         <td>
@@ -50,18 +69,18 @@ $query_brand = mysqli_query($conn, $sql_brand);
                         </td>
 
                         <td class="table-muted">
-                            <?= $id2; ?>
+                            <?= htmlspecialchars($category_name); ?>
                         </td>
 
                         <td>
                             <div class="table-name">
-                                <?= $name; ?>
+                                <?= htmlspecialchars($brand_name); ?>
                             </div>
                         </td>
 
                         <td>
                             <div class="table-description">
-                                <?= $description; ?>
+                                <?= htmlspecialchars($description); ?>
                             </div>
                         </td>
 
@@ -70,10 +89,10 @@ $query_brand = mysqli_query($conn, $sql_brand);
                                 <a href="" class="table-action" aria-label="Edit">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
-                                <a href="delete/delete_brand.php?brand_id=<?= $id; ?>"
-                                    class="table-action table-action-danger"
-                                    aria-label="Delete"
-                                    onclick="return confirm('Hapus brand ini?');">
+                                <a
+                                    href="delete/delete_brand.php?brand_id=<?= $brand_id; ?>"
+                                    class="table-action table-action-danger btn-delete-brand"
+                                    aria-label="Delete">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
                             </div>
@@ -86,3 +105,44 @@ $query_brand = mysqli_query($conn, $sql_brand);
         </table>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.btn-delete-brand').forEach((button) => {
+
+        button.addEventListener('click', function(event) {
+
+            event.preventDefault();
+
+            const url = this.getAttribute('href');
+
+            Swal.fire({
+                title: 'Delete Brand?',
+                text: 'Brand yang dihapus tidak dapat dikembalikan.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete Brand',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+
+                customClass: {
+                    popup: 'swal-popup',
+                    title: 'swal-title',
+                    htmlContainer: 'swal-text',
+                    confirmButton: 'swal-btn-delete',
+                    cancelButton: 'swal-btn-cancel'
+                },
+
+                buttonsStyling: false
+
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+
+            });
+
+        });
+
+    });
+</script>

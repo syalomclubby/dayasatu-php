@@ -1,61 +1,274 @@
 <?php
-include "../../security.php";
-include "../../../config/connection.php";
+
+require_once __DIR__ . "/../../security.php";
+require_once __DIR__ . "/../../../config/connection.php";
+
+$errors = [];
+
+$category_id = '';
+$name = '';
+$description = '';
+
+$sql_categories = "SELECT * FROM categories ORDER BY name ASC";
+$query_categories = mysqli_query($conn, $sql_categories);
 
 if (isset($_POST['save'])) {
-    $category_id = (int) $_POST['category_id'];
-    $name = trim($_POST['name']);
-    $description = trim($_POST['description']);
 
+    $category_id = (int) ($_POST['category_id'] ?? 0);
+    $name = trim($_POST['name'] ?? '');
+    $description = trim($_POST['description'] ?? '');
 
-    if ($category_id == '' || $name == '' || $description == "") {
-        $error = "All Fields Required.";
-    } else { 
-        $sql = "insert into brands (category_id, name, description) values('$category_id','$name', '$description')";
-        $query = mysqli_query($conn, $sql);
+    if ($category_id <= 0) {
+        $errors[] = 'Category is required.';
+    }
 
-        if ($query) {
-            header("Location: ../../dashboard.php");
-            exit;
+    if ($name === '') {
+        $errors[] = 'Brand name is required.';
+    }
+
+    if ($description === '') {
+        $errors[] = 'Description is required.';
+    }
+
+    if (empty($errors)) {
+
+        $sql = "
+            INSERT INTO brands
+            (
+                category_id,
+                name,
+                description
+            )
+            VALUES
+            (
+                ?,
+                ?,
+                ?
+            )
+        ";
+
+        $stmt = mysqli_prepare($conn, $sql);
+
+        if ($stmt) {
+
+            mysqli_stmt_bind_param(
+                $stmt,
+                "iss",
+                $category_id,
+                $name,
+                $description
+            );
+
+            if (mysqli_stmt_execute($stmt)) {
+                header("Location: ../brands.php");
+                exit;
+            }
+
+            $errors[] = 'Data failed to save.';
+            mysqli_stmt_close($stmt);
         } else {
-            $error = "Data failed to save.";
+            $errors[] = 'Query failed to prepare.';
         }
     }
 }
+
+require_once __DIR__ . "/../../partials/sidebar.php";
+
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Brand</title>
-</head>
-<body>
+<div class="content">
 
-<h1>Add Brand</h1>
+    <div class="page-header">
+        <div>
+            <div class="page-title">Add Brand</div>
+            <div class="page-description">
+                Tambahkan brand baru ke sistem.
+            </div>
+        </div>
 
-<a href="../../dashboard.php">Back</a>
+        <a href="../brands.php" class="btn-back">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Brands
+        </a>
+    </div>
 
-<br><br>
+    <div class="card">
 
-<?php if (isset($error)) : ?>
-    <p style="color:red;"><?= $error; ?></p>
-<?php endif; ?>
+        <div class="card-header">
+            <div>
+                <div class="card-title">
+                    Brand Information
+                </div>
 
-<form method="POST">
-    <label>Category Id</label><br>
-    <input type="number" name="category_id">
-    <br><br>
+                <div class="card-subtitle">
+                    Lengkapi data brand di bawah ini.
+                </div>
+            </div>
+        </div>
 
-    <label>Brand Name</label><br>
-    <input type="text" name="name">
-    <br><br>
+        <div class="card-body">
 
-    <label>Description</label><br>
-    <textarea name="description" rows="5" cols="40"></textarea>
-    <br><br>
+            <?php if (!empty($errors)) : ?>
+                <div class="alert alert-danger">
+                    <i class="fa-solid fa-circle-exclamation"></i>
 
-    <button type="submit" name="save">Add</button>
-</form>
+                    <div>
+                        <?php foreach ($errors as $error) : ?>
+                            <div><?= htmlspecialchars($error); ?></div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
 
-</body>
-</html>
+            <form method="POST">
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Category
+                    </label>
+
+                    <div class="custom-select" data-custom-select>
+
+                        <input
+                            type="hidden"
+                            name="category_id"
+                            id="category_id"
+                            value="<?= htmlspecialchars($category_id); ?>">
+
+                        <button
+                            type="button"
+                            class="custom-select-trigger"
+                            data-custom-select-trigger>
+
+                            <span data-custom-select-label>
+
+                                <?=
+                                $category_id
+                                    ? 'Selected Category'
+                                    : 'Select Category';
+                                ?>
+
+                            </span>
+
+                            <i class="fa-solid fa-chevron-down"></i>
+
+                        </button>
+
+                        <div
+                            class="custom-select-menu"
+                            data-custom-select-menu>
+
+                            <?php
+                            mysqli_data_seek($query_categories, 0);
+
+                            while ($category = mysqli_fetch_assoc($query_categories)) :
+                            ?>
+
+                                <button
+                                    type="button"
+                                    class="custom-select-option"
+                                    data-value="<?= $category['category_id']; ?>"
+                                    data-label="<?= htmlspecialchars($category['name']); ?>">
+
+                                    <?= htmlspecialchars($category['name']); ?>
+
+                                </button>
+
+                            <?php endwhile; ?>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Brand Name
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        class="form-control"
+                        value="<?= htmlspecialchars($name); ?>"
+                        placeholder="Enter brand name"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Description
+                    </label>
+
+                    <textarea
+                        name="description"
+                        class="form-control"
+                        rows="6"
+                        placeholder="Enter brand description"
+                        required><?= htmlspecialchars($description); ?></textarea>
+                </div>
+
+                <div class="action-group">
+                    <button
+                        type="submit"
+                        name="save"
+                        class="btn-add">
+
+                        Add Brand
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+    (() => {
+
+        const customSelect = document.querySelector('[data-custom-select]');
+
+        if (!customSelect) return;
+
+        const trigger = customSelect.querySelector('[data-custom-select-trigger]');
+        const menu = customSelect.querySelector('[data-custom-select-menu]');
+        const hiddenInput = customSelect.querySelector('#category_id');
+        const label = customSelect.querySelector('[data-custom-select-label]');
+        const options = customSelect.querySelectorAll('.custom-select-option');
+
+        trigger.addEventListener('click', () => {
+            customSelect.classList.toggle('open');
+        });
+
+        options.forEach(option => {
+
+            option.addEventListener('click', () => {
+
+                hiddenInput.value = option.dataset.value;
+                label.textContent = option.dataset.label;
+
+                options.forEach(item => {
+                    item.classList.remove('is-selected');
+                });
+
+                option.classList.add('is-selected');
+
+                customSelect.classList.remove('open');
+
+            });
+
+        });
+
+        document.addEventListener('click', (event) => {
+
+            if (!customSelect.contains(event.target)) {
+                customSelect.classList.remove('open');
+            }
+
+        });
+
+    })();
+</script>

@@ -1,56 +1,150 @@
 <?php
-include "../../security.php";
-include "../../../config/connection.php";
+
+require_once __DIR__ . "/../../security.php";
+require_once __DIR__ . "/../../../config/connection.php";
+
+$errors = [];
+$name = '';
 
 if (isset($_POST['save'])) {
-    $category_id = (int) $_POST['category_id'];
-    $name = trim($_POST['name']);
 
+    $name = trim($_POST['name'] ?? '');
 
-    if ($category_id == '' || $name == '') {
-        $error = "All Fields Required.";
-    } else { 
-        $sql = "insert into categories (category_id, name) values('$category_id','$name')";
-        $query = mysqli_query($conn, $sql);
+    if ($name === '') {
+        $errors[] = 'Category name is required.';
+    }
 
-        if ($query) {
-            header("Location: ../../dashboard.php");
-            exit;
+    if (empty($errors)) {
+
+        $sql = "
+            INSERT INTO categories
+            (
+                name
+            )
+            VALUES
+            (
+                ?
+            )
+        ";
+
+        $stmt = mysqli_prepare($conn, $sql);
+
+        if ($stmt) {
+
+            mysqli_stmt_bind_param(
+                $stmt,
+                "s",
+                $name
+            );
+
+            if (mysqli_stmt_execute($stmt)) {
+
+                mysqli_stmt_close($stmt);
+
+                header("Location: ../categories.php");
+                exit;
+            }
+
+            mysqli_stmt_close($stmt);
+
+            $errors[] = 'Data failed to save.';
         } else {
-            $error = "Data failed to save.";
+            $errors[] = 'Query failed to prepare.';
         }
     }
 }
+
+require_once __DIR__ . "/../../partials/sidebar.php";
+
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Category</title>
-</head>
-<body>
+<div class="content">
 
-<h1>Add Category</h1>
+    <div class="page-header">
 
-<a href="../../dashboard.php">Back</a>
+        <div>
+            <div class="page-title">
+                Add Category
+            </div>
 
-<br><br>
+            <div class="page-description">
+                Tambahkan category baru ke sistem.
+            </div>
+        </div>
 
-<?php if (isset($error)) : ?>
-    <p style="color:red;"><?= $error; ?></p>
-<?php endif; ?>
+        <a href="../categories.php" class="btn-back">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Categories
+        </a>
 
-<form method="POST">
-    <label>Category Id</label><br>
-    <input type="number" name="category_id">
-    <br><br>
+    </div>
 
-    <label>Name</label><br>
-    <input type="text" name="name">
-    <br><br>
+    <div class="card">
 
-    <button type="submit" name="save">Add</button>
-</form>
+        <div class="card-header">
 
-</body>
-</html>
+            <div>
+                <div class="card-title">
+                    Category Information
+                </div>
+
+                <div class="card-subtitle">
+                    Lengkapi data category di bawah ini.
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card-body">
+
+            <?php if (!empty($errors)) : ?>
+                <div class="alert alert-danger">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    <div>
+                        <?php foreach ($errors as $error) : ?>
+                            <div><?= htmlspecialchars($error); ?></div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST">
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Category Name
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        class="form-control"
+                        value="<?= htmlspecialchars($name); ?>"
+                        placeholder="Enter category name"
+                        required>
+
+                </div>
+
+                <div class="action-group">
+
+                    <button
+                        type="submit"
+                        name="save"
+                        class="btn-add">
+
+                        Add Category
+                        <i class="fa-solid fa-plus"></i>
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

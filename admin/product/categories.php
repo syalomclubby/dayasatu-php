@@ -12,12 +12,30 @@ $query_category = mysqli_query($conn, $sql_category);
 
 <div class="content">
 
+    <?php if (isset($_GET['error']) && $_GET['error'] === 'category_has_brands') : ?>
+        <div class="alert alert-danger">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>
+                Category tidak dapat dihapus karena masih memiliki brand.
+            </span>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['success']) && $_GET['success'] === 'deleted') : ?>
+        <div class="alert alert-success">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>
+                Category berhasil dihapus.
+            </span>
+        </div>
+    <?php endif; ?>
+
     <div class="page-header">
         <a href="../dashboard.php" class="btn-back">
             <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
         </a>
 
-        <a href="add_products.php" class="btn-add">
+        <a href="add/add_category.php" class="btn-add">
             Add Category <i class="fa-solid fa-plus"></i>
         </a>
     </div>
@@ -45,7 +63,7 @@ $query_category = mysqli_query($conn, $sql_category);
 
                         <td>
                             <div class="table-name">
-                                <?= $name; ?>
+                                <?= htmlspecialchars($name); ?>
                             </div>
                         </td>
 
@@ -54,10 +72,10 @@ $query_category = mysqli_query($conn, $sql_category);
                                 <a href="" class="table-action" aria-label="Edit">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
-                                <a href="delete/delete_category.php?category_id=<?= $id; ?>"
-                                    class="table-action table-action-danger"
-                                    aria-label="Delete"
-                                    onclick="return confirm('Yakin ingin menghapus data ini?');">
+                                <a
+                                    href="delete/delete_category.php?category_id=<?= $id; ?>"
+                                    class="table-action table-action-danger btn-delete-category"
+                                    aria-label="Delete">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
                             </div>
@@ -70,3 +88,44 @@ $query_category = mysqli_query($conn, $sql_category);
         </table>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.btn-delete-category').forEach((button) => {
+
+        button.addEventListener('click', function(event) {
+
+            event.preventDefault();
+
+            const url = this.getAttribute('href');
+
+            Swal.fire({
+                title: 'Delete Category?',
+                text: 'Category yang dihapus tidak dapat dikembalikan.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete Category',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+
+                customClass: {
+                    popup: 'swal-popup',
+                    title: 'swal-title',
+                    htmlContainer: 'swal-text',
+                    confirmButton: 'swal-btn-delete',
+                    cancelButton: 'swal-btn-cancel'
+                },
+
+                buttonsStyling: false
+
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+
+            });
+
+        });
+
+    });
+</script>

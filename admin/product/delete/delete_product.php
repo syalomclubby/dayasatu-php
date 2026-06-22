@@ -1,18 +1,75 @@
- <?php
-include "../../security.php";
-include "../../../config/connection.php";
+<?php
 
-$id = $_GET['product_id'] ?? '';
+require_once __DIR__ . "/../../security.php";
+require_once __DIR__ . "/../../../config/connection.php";
 
-if ($id == '') {
-    header("Location: ../dashboard.php");
+$product_id = filter_input(INPUT_GET, 'product_id', FILTER_VALIDATE_INT);
+
+if (!$product_id) {
+    header("Location: ../products.php");
     exit;
-} 
+}
 
-$sql = "delete from products where product_id='$id'";
-$query = mysqli_query($conn, $sql);
+$sql_product = "
+    SELECT
+        products.image,
+        brands.name AS brand_name
+    FROM products
+    INNER JOIN brands
+        ON products.brand_id = brands.brand_id
+    WHERE products.product_id = ?
+    LIMIT 1
+";
 
-header("Location: ../../dashboard.php");
+$stmt_product = mysqli_prepare($conn, $sql_product);
+
+if (!$stmt_product) {
+    header("Location: ../products.php");
+    exit;
+}
+
+mysqli_stmt_bind_param($stmt_product, "i", $product_id);
+mysqli_stmt_execute($stmt_product);
+
+$result_product = mysqli_stmt_get_result($stmt_product);
+$product = mysqli_fetch_assoc($result_product);
+
+mysqli_stmt_close($stmt_product);
+
+if (!$product) {
+    header("Location: ../products.php");
+    exit;
+}
+
+$brand_folder = strtolower(trim($product['brand_name']));
+
+$image_path =
+    __DIR__
+    . "/../../../assets/images/products/"
+    . $brand_folder
+    . "/"
+    . $product['image']
+    . ".png";
+
+$sql_delete = "DELETE FROM products WHERE product_id = ?";
+$stmt_delete = mysqli_prepare($conn, $sql_delete);
+
+if ($stmt_delete) {
+
+    mysqli_stmt_bind_param($stmt_delete, "i", $product_id);
+
+    if (mysqli_stmt_execute($stmt_delete)) {
+
+        if (
+            !empty($product['image']) &&
+            file_exists($image_path)
+        ) {
+            unlink($image_path);
+        }
+    }
+
+    mysqli_stmt_close($stmt_delete);
+}
+
+header("Location: ../products.php?success=deleted");
 exit;
-
-?>

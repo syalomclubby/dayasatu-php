@@ -18,17 +18,26 @@ $query_product = mysqli_query($conn, $sql_products);
 
 <div class="content">
 
+    <?php if (isset($_GET['success']) && $_GET['success'] === 'deleted') : ?>
+        <div class="alert alert-success">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>
+                Product berhasil dihapus.
+            </span>
+        </div>
+    <?php endif; ?>
+
     <div class="page-header">
         <a href="../dashboard.php" class="btn-back">
             <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
         </a>
 
-        <a href="add_products.php" class="btn-add">
+        <a href="add/add_product.php" class="btn-add">
             Add Product <i class="fa-solid fa-plus"></i>
         </a>
     </div>
 
-    <div class="table-responsive table-card">
+    <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
@@ -78,9 +87,13 @@ $query_product = mysqli_query($conn, $sql_products);
                         </td>
 
                         <td>
+                            <?php
+                            $brand_folder = strtolower(trim($result['brand_name']));
+                            ?>
+
                             <img
-                                src="../../assets/images/products/<?= $result['image']; ?>.png"
-                                alt="<?= $result['products_name']; ?>"
+                                src="../../assets/images/products/<?= htmlspecialchars($brand_folder); ?>/<?= htmlspecialchars($result['image']); ?>.png"
+                                alt="<?= htmlspecialchars($result['products_name']); ?>"
                                 class="table-image">
                         </td>
 
@@ -102,10 +115,9 @@ $query_product = mysqli_query($conn, $sql_products);
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
                                 <a
-                                    href="delete/delete_products.php?product_id=<?= $result['product_id']; ?>"
-                                    class="table-action table-action-danger"
-                                    aria-label="Delete"
-                                    onclick="return confirm('Hapus produk ini?');">
+                                    href="delete/delete_product.php?product_id=<?= $result['product_id']; ?>"
+                                    class="table-action table-action-danger btn-delete-product"
+                                    aria-label="Delete">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
                             </div>
@@ -116,3 +128,37 @@ $query_product = mysqli_query($conn, $sql_products);
         </table>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.btn-delete-product').forEach((button) => {
+
+        button.addEventListener('click', function(event) {
+
+            event.preventDefault();
+
+            const url = this.getAttribute('href');
+
+            Swal.fire({
+                title: 'Delete Product?',
+                text: 'Produk yang dihapus tidak dapat dikembalikan.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete Product',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+
+                customClass: {
+                    popup: 'swal-popup',
+                    title: 'swal-title',
+                    htmlContainer: 'swal-text',
+                    confirmButton: 'swal-btn-delete',
+                    cancelButton: 'swal-btn-cancel'
+                },
+
+                buttonsStyling: false
+            });
+
+        });
+
+    });
+</script>

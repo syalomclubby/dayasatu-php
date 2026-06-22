@@ -160,3 +160,4 @@ lightbox.addEventListener("click", (e) => {
     lightbox.classList.remove("show");
   }
 });
+
