@@ -48,27 +48,32 @@
             $current_menu = '';
 
             if (in_array($current_page, [
+                'dashboard.php',
+            ])) {
+                $current_menu = 'dashboard';
+            } elseif (in_array($current_page, [
                 'products.php',
-                'create-product.php',
-                'edit-product.php'
+                'add_product.php',
+                'edit_product.php',
+                'delete_product.php',
             ])) {
                 $current_menu = 'products';
             } elseif (in_array($current_page, [
                 'brands.php',
-                'create-brand.php',
-                'edit-brand.php'
+                'add_brand.php',
+                'edit_brand.php',
+                'delete_brand.php',
             ])) {
                 $current_menu = 'brands';
             } elseif (in_array($current_page, [
                 'categories.php',
-                'create-category.php',
-                'edit-category.php'
+                'add_category.php',
+                'edit_category.php',
+                'delete_category.php',
             ])) {
                 $current_menu = 'categories';
-            } elseif ($current_page === 'dashboard.php') {
-                $current_menu = 'dashboard';
-            } elseif ($current_page === 'settings.php') {
-                $current_menu = 'settings';
+            } else {
+                $current_menu = '';
             }
             ?>
 
@@ -93,9 +98,11 @@
                     <span>Categories</span>
                 </a>
 
-                <a href="<?= $base_url ?>index.php" class="<?= $current_menu === 'settings' ? 'active' : '' ?>">
-                    <i class="fa-solid fa-gear"></i>
-                    <span>Beranda</span>
+                <a href="<?= $base_url ?>index.php" class="visit-site-link" target="_blank" rel="noopener">
+                    <span class="visit-site-icon">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </span>
+                    <span>Visit Site</span>
                 </a>
 
                 <div class="sidebar-footer">

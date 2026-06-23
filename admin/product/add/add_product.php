@@ -235,7 +235,7 @@ if (isset($_POST['save'])) {
             );
 
             if (mysqli_stmt_execute($stmt)) {
-                header("Location: ../products.php");
+                header("Location: ../products.php?success=added");
                 exit;
             }
 

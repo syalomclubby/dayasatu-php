@@ -21,6 +21,24 @@ $query_product = mysqli_query($conn, $sql_products);
 
 <div class="content">
 
+    <?php if (isset($_GET['success'])) : ?>
+
+        <?php if ($_GET['success'] === 'added') : ?>
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Product successfully added.</span>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($_GET['success'] === 'updated') : ?>
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Product successfully updated.</span>
+            </div>
+        <?php endif; ?>
+
+    <?php endif; ?>
+
     <?php if (isset($_GET['success']) && $_GET['success'] === 'deleted') : ?>
         <div class="alert alert-success">
             <i class="fa-solid fa-circle-check"></i>
@@ -108,7 +126,7 @@ $query_product = mysqli_query($conn, $sql_products);
                         <td class="table-muted">
                             <?= $result['user_name']; ?>
                         </td>
-                
+
                         <td class="table-muted">
                             <?= $result['products_at'] ?? '-'; ?>
                         </td>

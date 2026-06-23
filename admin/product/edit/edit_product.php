@@ -6,6 +6,11 @@ require_once __DIR__ . "/../../../config/connection.php";
 $errors = [];
 $success = false;
 
+$sql_categories = "SELECT category_id, name FROM categories ORDER BY name ASC";
+$query_categories = mysqli_query($conn, $sql_categories);
+
+$category_id = '';
+
 $product_id = filter_input(INPUT_GET, 'product_id', FILTER_VALIDATE_INT);
 
 $product_data = null;
@@ -46,6 +51,8 @@ $old_image = '';
 $old_brand_folder = '';
 $brand_name_label = 'Select brand';
 
+$category_name_label = 'Select category';
+
 $sql_get_product = "SELECT * FROM products WHERE product_id = ? LIMIT 1";
 $stmt_get_product = mysqli_prepare($conn, $sql_get_product);
 
@@ -63,6 +70,23 @@ if ($stmt_get_product) {
 
     if (!isset($_POST['save'])) {
         $brand_id    = $product_data['brand_id'];
+        $category_id = $product_data['category_id'];
+        $sql_old_category = "SELECT name FROM categories WHERE category_id = ? LIMIT 1";
+        $stmt_old_category = mysqli_prepare($conn, $sql_old_category);
+
+        if ($stmt_old_category) {
+            mysqli_stmt_bind_param($stmt_old_category, "i", $category_id);
+            mysqli_stmt_execute($stmt_old_category);
+
+            $res_oc = mysqli_stmt_get_result($stmt_old_category);
+
+            if ($row_oc = mysqli_fetch_assoc($res_oc)) {
+                $category_name_label = $row_oc['name'];
+            }
+
+            mysqli_stmt_close($stmt_old_category);
+        }
+
         $name        = $product_data['name'];
         $description = $product_data['description'];
         $price       = $product_data['price'];
@@ -167,19 +191,66 @@ function save_product_image(array $file, string $baseName, string $uploadDir): a
 }
 
 if (isset($_POST['save'])) {
-    $brand_id    = trim($_POST['brand_id'] ?? '');
+    $brand_id    =
+        ($_POST['brand_id'] ?? '');
+    $category_id = trim($_POST['category_id'] ?? '');
+    if ($category_id !== '') {
+
+        $sql_category_name = "
+        SELECT name
+        FROM categories
+        WHERE category_id = ?
+        LIMIT 1
+    ";
+
+        $stmt_category_name = mysqli_prepare(
+            $conn,
+            $sql_category_name
+        );
+
+        if ($stmt_category_name) {
+
+            mysqli_stmt_bind_param(
+                $stmt_category_name,
+                "i",
+                $category_id
+            );
+
+            mysqli_stmt_execute($stmt_category_name);
+
+            $result_category_name =
+                mysqli_stmt_get_result($stmt_category_name);
+
+            if ($row_category_name =
+                mysqli_fetch_assoc($result_category_name)
+            ) {
+
+                $category_name_label =
+                    $row_category_name['name'];
+            }
+
+            mysqli_stmt_close($stmt_category_name);
+        }
+    }
+
     $name        = trim($_POST['name'] ?? '');
     $description = trim($_POST['description'] ?? '');
     $price       = trim($_POST['price'] ?? '');
 
-    if ($brand_id === '') $errors[] = 'Brand is required.';
-    if ($name === '') $errors[] = 'Name is required.';
-    if ($description === '') $errors[] = 'Description is required.';
+    if ($brand_id === '') {
+        $errors[] = 'Brand is required.';
+    }
 
-    if ($price === '') {
-        $errors[] = 'Price is required.';
-    } elseif (!is_numeric($price)) {
-        $errors[] = 'Price must be numeric.';
+    if ($category_id === '') {
+        $errors[] = 'Category is required.';
+    }
+
+    if ($name === '') {
+        $errors[] = 'Name is required.';
+    }
+
+    if ($description === '') {
+        $errors[] = 'Description is required.';
     }
 
     if ($current_user_id <= 0) {
@@ -216,7 +287,7 @@ if (isset($_POST['save'])) {
                 $image_base = $savedBaseName;
 
                 if (!empty($product_data['image'])) {
-                    $oldBrandFolder = strtolower(trim($brandData['name'])); // Asumsi folder sama
+                    $oldBrandFolder = strtolower(trim($brandData['name']));
                     $oldFilePath = __DIR__ . '/../../../assets/images/products/' . $oldBrandFolder . '/' . $product_data['image'] . '.png';
                     if (file_exists($oldFilePath)) {
                         @unlink($oldFilePath);
@@ -228,7 +299,7 @@ if (isset($_POST['save'])) {
 
     if (empty($errors)) {
         $sql = "UPDATE products 
-                SET brand_id = ?, name = ?, description = ?, price = ?, image = ?, followed_up_at = NOW(), followed_up_by = ?
+                SET brand_id = ?, category_id = ?, name = ?, description = ?, price = ?, image = ?, followed_up_at = NOW(), followed_up_by = ?
                 WHERE product_id = ?";
 
         $stmt = mysqli_prepare($conn, $sql);
@@ -236,8 +307,9 @@ if (isset($_POST['save'])) {
         if ($stmt) {
             mysqli_stmt_bind_param(
                 $stmt,
-                "isssssi",
+                "iissssii",
                 $brand_id,
+                $category_id,
                 $name,
                 $description,
                 $price,
@@ -336,6 +408,54 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label">Category</label>
+
+                        <div class="custom-select" data-custom-select>
+
+                            <input
+                                type="hidden"
+                                name="category_id"
+                                id="category_id"
+                                value="<?= htmlspecialchars($category_id, ENT_QUOTES, 'UTF-8'); ?>">
+
+                            <button
+                                type="button"
+                                class="custom-select-trigger"
+                                data-custom-select-trigger>
+
+                                <span data-custom-select-label>
+                                    <?= htmlspecialchars($category_name_label, ENT_QUOTES, 'UTF-8'); ?>
+                                </span>
+
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </button>
+
+                            <div class="custom-select-menu" data-custom-select-menu>
+                                <button type="button" class="custom-select-option is-placeholder" data-value="">
+                                    Select Category
+                                </button>
+
+                                <?php if ($query_categories) : ?>
+                                    <?php
+                                    mysqli_data_seek($query_categories, 0);
+                                    while ($category = mysqli_fetch_assoc($query_categories)) :
+                                        $selected_class = ($category['category_id'] == $category_id) ? 'is-selected' : '';
+                                    ?>
+                                        <button
+                                            type="button"
+                                            class="custom-select-option <?= $selected_class; ?>"
+                                            data-value="<?= $category['category_id']; ?>"
+                                            data-label="<?= htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>">
+                                            <?= htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                        </button>
+                                    <?php endwhile; ?>
+                                <?php endif; ?>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label for="price" class="form-label">Price</label>
                         <input
                             type="text"
@@ -418,3 +538,73 @@ require_once __DIR__ . "/../../partials/sidebar.php";
 </div>
 
 <script>
+    (() => {
+        document.querySelectorAll('[data-custom-select]').forEach((customSelect) => {
+            const trigger = customSelect.querySelector('[data-custom-select-trigger]');
+            const hiddenInput = customSelect.querySelector('input[type="hidden"]');
+            const label = customSelect.querySelector('[data-custom-select-label]');
+            const options = customSelect.querySelectorAll('.custom-select-option');
+
+            if (!trigger || !hiddenInput || !label || !options.length) return;
+
+            const closeMenu = () => customSelect.classList.remove('open');
+
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                customSelect.classList.toggle('open');
+            });
+
+            options.forEach((option) => {
+                option.addEventListener('click', () => {
+                    const value = option.dataset.value || '';
+                    const text = option.dataset.label || option.textContent.trim();
+
+                    hiddenInput.value = value;
+                    label.textContent = value === '' ? 'Select option' : text;
+
+                    options.forEach((item) => item.classList.remove('is-selected'));
+                    option.classList.add('is-selected');
+
+                    closeMenu();
+                });
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!customSelect.contains(event.target)) {
+                    closeMenu();
+                }
+            });
+        });
+    })();
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const imageInput = document.getElementById('image_file');
+        const preview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('imagePreviewImg');
+
+        if (!imageInput || !preview || !previewImg) {
+            return;
+        }
+
+        imageInput.addEventListener('change', function() {
+
+            const file = this.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                preview.classList.remove('is-hidden');
+            };
+
+            reader.readAsDataURL(file);
+
+        });
+
+    });
+</script>

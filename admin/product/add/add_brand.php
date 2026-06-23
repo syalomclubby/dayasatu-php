@@ -5,7 +5,6 @@ require_once __DIR__ . "/../../../config/connection.php";
 
 $errors = [];
 
-$category_id = '';
 $name = '';
 $description = '';
 
@@ -34,13 +33,8 @@ $query_categories = mysqli_query($conn, $sql_categories);
 
 if (isset($_POST['save'])) {
 
-    $category_id = (int) ($_POST['category_id'] ?? 0);
     $name = trim($_POST['name'] ?? '');
     $description = trim($_POST['description'] ?? '');
-
-    if ($category_id <= 0) {
-        $errors[] = 'Category is required.';
-    }
 
     if ($name === '') {
         $errors[] = 'Brand name is required.';
@@ -55,14 +49,12 @@ if (isset($_POST['save'])) {
         $sql = "
             INSERT INTO brands
             (
-                category_id,
                 name,
                 description,
                 followed_up_by
             )
             VALUES
             (
-                ?,
                 ?,
                 ?,
                 ?
@@ -72,18 +64,16 @@ if (isset($_POST['save'])) {
         $stmt = mysqli_prepare($conn, $sql);
 
         if ($stmt) {
-
             mysqli_stmt_bind_param(
                 $stmt,
-                "issi",
-                $category_id,
+                "ssi",
                 $name,
                 $description,
                 $current_user_id
             );
 
             if (mysqli_stmt_execute($stmt)) {
-                header("Location: ../brands.php");
+                header("Location: ../brands.php?success=added");
                 exit;
             }
 
@@ -147,65 +137,6 @@ require_once __DIR__ . "/../../partials/sidebar.php";
 
                 <div class="form-group">
                     <label class="form-label">
-                        Category
-                    </label>
-
-                    <div class="custom-select" data-custom-select>
-
-                        <input
-                            type="hidden"
-                            name="category_id"
-                            id="category_id"
-                            value="<?= htmlspecialchars($category_id); ?>">
-
-                        <button
-                            type="button"
-                            class="custom-select-trigger"
-                            data-custom-select-trigger>
-
-                            <span data-custom-select-label>
-
-                                <?=
-                                $category_id
-                                    ? 'Selected Category'
-                                    : 'Select Category';
-                                ?>
-
-                            </span>
-
-                            <i class="fa-solid fa-chevron-down"></i>
-
-                        </button>
-
-                        <div
-                            class="custom-select-menu"
-                            data-custom-select-menu>
-
-                            <?php
-                            mysqli_data_seek($query_categories, 0);
-
-                            while ($category = mysqli_fetch_assoc($query_categories)) :
-                            ?>
-
-                                <button
-                                    type="button"
-                                    class="custom-select-option"
-                                    data-value="<?= $category['category_id']; ?>"
-                                    data-label="<?= htmlspecialchars($category['name']); ?>">
-
-                                    <?= htmlspecialchars($category['name']); ?>
-
-                                </button>
-
-                            <?php endwhile; ?>
-
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">
                         Brand Name
                     </label>
 
@@ -258,7 +189,6 @@ require_once __DIR__ . "/../../partials/sidebar.php";
 
         const trigger = customSelect.querySelector('[data-custom-select-trigger]');
         const menu = customSelect.querySelector('[data-custom-select-menu]');
-        const hiddenInput = customSelect.querySelector('#category_id');
         const label = customSelect.querySelector('[data-custom-select-label]');
         const options = customSelect.querySelectorAll('.custom-select-option');
 

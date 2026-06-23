@@ -934,8 +934,6 @@ ul {
 }
 
 .activity-date::before {
-  content: "CREATED";
-
   margin-bottom: 6px;
 
   color: #b4bcc9;
@@ -943,6 +941,18 @@ ul {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
+}
+
+.activity-date.created::before {
+  content: "CREATED";
+}
+
+.activity-date.updated::before {
+  content: "UPDATED";
+}
+
+.activity-date.deleted::before {
+  content: "DELETED";
 }
 
 .activity-date span:first-child {
@@ -964,6 +974,21 @@ ul {
 
 .activity-icon {
   transition: 0.25s ease;
+}
+
+.activity-icon.activity-brand {
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+}
+
+.activity-icon.activity-category {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+}
+
+.activity-icon.activity-user {
+  background: rgba(168, 85, 247, 0.12);
+  color: #a855f7;
 }
 
 @media (max-width: 768px) {
@@ -2849,7 +2874,7 @@ select.form-control {
 }
 
 .custom-select-option.is-selected {
-  background: rgba(245, 158, 11, 0.10);
+  background: rgba(245, 158, 11, 0.1);
   color: #c2410c;
   font-weight: 700;
 }
@@ -2949,7 +2974,10 @@ select.form-control {
   line-height: 1.5;
 }
 
-/* POPUP MODAL */
+/* =========================================================
+   CONFIRMATION POPUP (SWAL)
+========================================================= */
+
 .swal-popup {
   width: 430px;
   border-radius: 24px;
@@ -3003,4 +3031,92 @@ select.form-control {
 
 .swal-btn-cancel:hover {
   background: #f1f5f9;
+}
+
+/* =========================================================
+   VISIT SITE LINK
+========================================================= */
+
+.visit-site-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 8px; /* Menyesuaikan kebulatan menu active dashboard kamu */
+
+  /* HAPUS BORDER & BACKGROUND KAKU */
+  background: transparent;
+  border: 1px solid transparent;
+  color: #64748b; /* Warna abu-abu slate tipis, presisi dengan menu navigasi lain */
+
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  letter-spacing: -0.1px;
+
+  transition: all 0.2s ease;
+}
+
+.visit-site-link:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.visit-site-icon {
+  width: auto;
+  height: auto;
+  background: transparent;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.visit-site-link:hover .visit-site-icon {
+  color: #0f172a;
+}
+
+.visit-site-link i {
+  font-size: 14px;
+}
+
+.visit-site-link::before {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.visit-site-link::after {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  background: rgba(34, 197, 94, 0.4);
+  border-radius: 50%;
+  transform: translateY(-50%) scale(1);
+  z-index: 1;
+  animation: pulseCenteredAbsolute 2s infinite;
+}
+
+@keyframes pulseCenteredAbsolute {
+  0% {
+    transform: translateY(-50%) scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-50%) scale(3.5);
+    opacity: 0;
+  }
 }

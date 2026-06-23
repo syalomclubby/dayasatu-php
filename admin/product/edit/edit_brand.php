@@ -32,13 +32,8 @@ if ($current_user_id > 0) {
     }
 }
 
-$sql_categories = "SELECT * FROM categories ORDER BY name ASC";
-$query_categories = mysqli_query($conn, $sql_categories);
-
-$category_id = '';
 $name = '';
 $description = '';
-$category_name_label = 'Select Category';
 
 $sql_get_brand = "SELECT * FROM brands WHERE brand_id = ? LIMIT 1";
 $stmt_get_brand = mysqli_prepare($conn, $sql_get_brand);
@@ -56,34 +51,15 @@ if ($stmt_get_brand) {
     }
 
     if (!isset($_POST['save'])) {
-        $category_id = $brand_data['category_id'];
         $name        = $brand_data['name'];
         $description = $brand_data['description'];
-
-        // Cari tahu nama kategori lamanya untuk label select menu
-        $sql_old_cat = "SELECT name FROM categories WHERE category_id = ? LIMIT 1";
-        $stmt_old_cat = mysqli_prepare($conn, $sql_old_cat);
-        if ($stmt_old_cat) {
-            mysqli_stmt_bind_param($stmt_old_cat, "i", $category_id);
-            mysqli_stmt_execute($stmt_old_cat);
-            $res_oc = mysqli_stmt_get_result($stmt_old_cat);
-            if ($row_oc = mysqli_fetch_assoc($res_oc)) {
-                $category_name_label = $row_oc['name'];
-            }
-            mysqli_stmt_close($stmt_old_cat);
-        }
     }
 }
 
 if (isset($_POST['save'])) {
 
-    $category_id = (int) ($_POST['category_id'] ?? 0);
     $name = trim($_POST['name'] ?? '');
     $description = trim($_POST['description'] ?? '');
-
-    if ($category_id <= 0) {
-        $errors[] = 'Category is required.';
-    }
 
     if ($name === '') {
         $errors[] = 'Brand name is required.';
@@ -96,8 +72,7 @@ if (isset($_POST['save'])) {
     if (empty($errors)) {
         $sql = "
             UPDATE brands
-            SET category_id = ?,
-                name = ?,
+            SET name = ?,
                 description = ?,
                 followed_up_by = ?,
                 followed_up_at = NOW()
@@ -109,8 +84,7 @@ if (isset($_POST['save'])) {
         if ($stmt) {
             mysqli_stmt_bind_param(
                 $stmt,
-                "issii",
-                $category_id,
+                "ssii",
                 $name,
                 $description,
                 $current_user_id,
@@ -123,10 +97,10 @@ if (isset($_POST['save'])) {
                 exit;
             }
 
-            $errors[] = 'Data failed to update. Error: ' . mysqli_stmt_error($stmt);
+            $errors[] = 'Data failed to update.';
             mysqli_stmt_close($stmt);
         } else {
-            $errors[] = 'Query failed to prepare. Error: ' . mysqli_error($conn);
+            $errors[] = 'Query failed to prepare.';
         }
     }
 }
@@ -178,56 +152,6 @@ require_once __DIR__ . "/../../partials/sidebar.php";
             <?php endif; ?>
 
             <form method="POST">
-
-                <div class="form-group">
-                    <label class="form-label">
-                        Category
-                    </label>
-
-                    <div class="custom-select" data-custom-select>
-
-                        <input
-                            type="hidden"
-                            name="category_id"
-                            id="category_id"
-                            value="<?= htmlspecialchars($category_id, ENT_QUOTES, 'UTF-8'); ?>">
-
-                        <button
-                            type="button"
-                            class="custom-select-trigger"
-                            data-custom-select-trigger>
-
-                            <span data-custom-select-label>
-                                <?= htmlspecialchars($category_name_label, ENT_QUOTES, 'UTF-8'); ?>
-                            </span>
-
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </button>
-
-                        <div class="custom-select-menu" data-custom-select-menu>
-                            <button type="button" class="custom-select-option is-placeholder" data-value="">
-                                Select Category
-                            </button>
-
-                            <?php if ($query_categories) : ?>
-                                <?php
-                                mysqli_data_seek($query_categories, 0);
-                                while ($category = mysqli_fetch_assoc($query_categories)) :
-                                    $selected_class = ($category['category_id'] == $category_id) ? 'is-selected' : '';
-                                ?>
-                                    <button
-                                        type="button"
-                                        class="custom-select-option <?= $selected_class; ?>"
-                                        data-value="<?= $category['category_id']; ?>"
-                                        data-label="<?= htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>">
-                                        <?= htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>
-                                    </button>
-                                <?php endwhile; ?>
-                            <?php endif; ?>
-                        </div>
-
-                    </div>
-                </div>
 
                 <div class="form-group">
                     <label class="form-label">

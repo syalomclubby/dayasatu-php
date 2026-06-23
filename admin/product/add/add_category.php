@@ -64,7 +64,7 @@ if (isset($_POST['save'])) {
 
             if (mysqli_stmt_execute($stmt)) {   
                 mysqli_stmt_close($stmt);
-                header("Location: ../categories.php");
+                header("Location: ../categories.php?success=added");
                 exit;
             }
 

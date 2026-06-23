@@ -17,6 +17,24 @@ $query_category = mysqli_query($conn, $sql_category);
 
 <div class="content">
 
+    <?php if (isset($_GET['success'])) : ?>
+
+        <?php if ($_GET['success'] === 'added') : ?>
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Category successfully added.</span>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($_GET['success'] === 'updated') : ?>
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Category successfully updated.</span>
+            </div>
+        <?php endif; ?>
+
+    <?php endif; ?>
+
     <?php if (isset($_GET['error']) && $_GET['error'] === 'category_has_brands') : ?>
         <div class="alert alert-danger">
             <i class="fa-solid fa-circle-exclamation"></i>

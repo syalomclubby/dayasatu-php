@@ -20,42 +20,88 @@ $total_brands     = $data['t_brands'] ?? 0;
 $total_categories = $data['t_categories'] ?? 0;
 $total_users      = $data['t_users'] ?? 0;
 
-
 // Ambil Data
 $sql_category = "SELECT * FROM categories";
 $query_category = mysqli_query($conn, $sql_category);
 
-$sql_brand = "SELECT *,
-categories.name AS category_name,
-brands.name AS brand_name
-FROM brands
-INNER JOIN categories ON brands.category_id = categories.category_id";
+$sql_brand = "SELECT *
+FROM brands";
 $query_brand = mysqli_query($conn, $sql_brand);
 
-$sql_products = "SELECT *,
+$sql_products = "SELECT
+products.*,
 products.name AS product_name,
 brands.name AS brand_name,
 categories.name AS category_name
 FROM products
-INNER JOIN brands ON products.brand_id = brands.brand_id
-INNER JOIN categories ON brands.category_id = categories.category_id
+INNER JOIN brands
+ON products.brand_id = brands.brand_id
+INNER JOIN categories
+ON products.category_id = categories.category_id
 ORDER BY products.product_id DESC
 LIMIT 5";
 $query_product = mysqli_query($conn, $sql_products);
 
 // Recent Activity
 $sql_activity = "SELECT
-products.product_id,
-products.name AS product_name,
-products.created_at,
-users.name AS user_name,
-brands.name AS brand_name,
-categories.name AS category_name
-FROM products
-INNER JOIN users ON products.followed_up_by = users.user_id
-INNER JOIN brands ON products.brand_id = brands.brand_id
-INNER JOIN categories ON brands.category_id = categories.category_id
-ORDER BY products.created_at DESC
+    activity_type,
+    item_id,
+    item_name,
+    meta_text,
+    performed_by,
+    activity_at,
+    activity_label
+FROM (
+    SELECT
+        'product' AS activity_type,
+        p.product_id AS item_id,
+        p.name AS item_name,
+        CONCAT(b.name, ' • ', c.name) AS meta_text,
+        u.name AS performed_by,
+        COALESCE(p.followed_up_at, p.created_at) AS activity_at,
+        CASE
+            WHEN p.followed_up_at IS NULL THEN 'Product Added'
+            ELSE 'Product Updated'
+        END AS activity_label
+    FROM products p
+    LEFT JOIN users u ON p.followed_up_by = u.user_id
+    INNER JOIN brands b ON p.brand_id = b.brand_id
+    INNER JOIN categories c ON p.category_id = c.category_id
+
+    UNION ALL
+
+    SELECT
+        'brand' AS activity_type,
+        b.brand_id AS item_id,
+        b.name AS item_name,
+        'Brand' AS meta_text,
+        u.name AS performed_by,
+        COALESCE(b.followed_up_at, b.created_at) AS activity_at,
+        CASE
+            WHEN b.followed_up_at IS NULL THEN 'Brand Added'
+            ELSE 'Brand Updated'
+        END AS activity_label
+    FROM brands b
+    LEFT JOIN users u ON b.followed_up_by = u.user_id
+
+    UNION ALL
+
+    SELECT
+        'category' AS activity_type,
+        c.category_id AS item_id,
+        c.name AS item_name,
+        'Category' AS meta_text,
+        u.name AS performed_by,
+        COALESCE(c.followed_up_at, c.created_at) AS activity_at,
+        CASE
+            WHEN c.followed_up_at IS NULL THEN 'Category Added'
+            ELSE 'Category Updated'
+        END AS activity_label
+    FROM categories c
+    LEFT JOIN users u ON c.followed_up_by = u.user_id
+) AS all_activity
+WHERE activity_at IS NOT NULL
+ORDER BY activity_at DESC
 LIMIT 5";
 
 $query_activity = mysqli_query($conn, $sql_activity);
@@ -169,15 +215,15 @@ $query_activity = mysqli_query($conn, $sql_activity);
 
                             <div class="product-image">
                                 <?php
-                                    $brand_folder = strtolower(trim($row['brand_name']));
+                                $brand_folder = strtolower(trim($row['brand_name']));
                                 ?>
-                                 <img
+                                <img
                                     src="../assets/images/products/<?= ($brand_folder) ?>/<?= $row['image'] ?>.png"
                                     alt="<?= $row['product_name'] ?>">
                             </div>
 
                             <div class="product-info">
-                                <div class="products-name"> 
+                                <div class="products-name">
                                     <?= ($row['product_name']) ?>
                                 </div>
 
@@ -188,7 +234,7 @@ $query_activity = mysqli_query($conn, $sql_activity);
                                 </div>
                             </div>
 
-                                <a href="product/edit/edit_product.php?product_id=<?= $row['product_id']; ?>" class="table-action" aria-label="Edit">
+                            <a href="product/edit/edit_product.php?product_id=<?= $row['product_id']; ?>" class="table-action" aria-label="Edit">
                                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
                             </a>
 
@@ -259,33 +305,64 @@ $query_activity = mysqli_query($conn, $sql_activity);
 
                 <?php while ($row = mysqli_fetch_assoc($query_activity)): ?>
 
-                    <div class="activity-row">
+                    <?php
+                    $icon_map = [
+                        'product'  => 'fa-box',
+                        'brand'    => 'fa-tags',
+                        'category' => 'fa-layer-group',
+                    ];
 
-                        <div class="activity-icon">
-                            <i class="fa-solid fa-box"></i>
+                    $activity_class = match ($row['activity_type']) {
+                        'product'  => 'activity-product',
+                        'brand'    => 'activity-brand',
+                        'category' => 'activity-category',
+                        'user'     => 'activity-user',
+                        default    => 'activity-product'
+                    };
+
+                    $icon = $icon_map[$row['activity_type']] ?? 'fa-box';
+                    ?>
+
+                    <div class="activity-row">
+                        <div class="activity-icon <?= $activity_class ?>">
+                            <i class="fa-solid <?= $icon ?>"></i>
                         </div>
 
                         <div class="activity-content">
-
                             <div class="activity-label">
-                                Product Added
+                                <?= htmlspecialchars($row['activity_label']) ?>
                             </div>
 
                             <div class="activity-title">
-                                <?= $row['product_name']; ?>
+                                <?= htmlspecialchars($row['item_name']) ?>
                             </div>
 
                             <div class="activity-meta">
-                                <?= $row['brand_name']; ?> • <?= $row['category_name']; ?>
+                                <?= htmlspecialchars($row['meta_text']) ?>
+                                <?php if (!empty($row['performed_by'])): ?>
+                                    • <?= htmlspecialchars($row['performed_by']) ?>
+                                <?php endif; ?>
                             </div>
-
                         </div>
 
-                        <div class="activity-date">
-                            <span><?= date('d M Y', strtotime($row['created_at'])); ?></span>
-                            <span><?= date('H:i', strtotime($row['created_at'])); ?></span>
-                        </div>
+                        <?php
 
+                        $status_class = 'created';
+
+                        if (stripos($row['activity_label'], 'Updated') !== false) {
+                            $status_class = 'updated';
+                        }
+
+                        if (stripos($row['activity_label'], 'Deleted') !== false) {
+                            $status_class = 'deleted';
+                        }
+
+                        ?>
+
+                        <div class="activity-date <?= $status_class ?>">
+                            <span><?= date('d M Y', strtotime($row['activity_at'])); ?></span>
+                            <span><?= date('H:i', strtotime($row['activity_at'])); ?></span>
+                        </div>
                     </div>
 
                 <?php endwhile; ?>
