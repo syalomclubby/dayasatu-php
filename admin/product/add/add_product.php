@@ -301,9 +301,6 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                             </button>
 
                             <div class="custom-select-menu" data-custom-select-menu>
-                                <button type="button" class="custom-select-option is-placeholder" data-value="">
-                                    Select brand
-                                </button>
 
                                 <?php if ($query_brand) : ?>
                                     <?php while ($brand = mysqli_fetch_assoc($query_brand)) : ?>
@@ -321,63 +318,63 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                     </div>
 
                     <div class="form-group">
-                    <label class="form-label">
-                        Category
-                    </label>
+                        <label class="form-label">
+                            Category
+                        </label>
 
-                    <div class="custom-select" data-custom-select>
+                        <div class="custom-select" data-custom-select>
 
-                        <input
-                            type="hidden"
-                            name="category_id"
-                            id="category_id"
-                            value="<?= htmlspecialchars($category_id); ?>">
+                            <input
+                                type="hidden"
+                                name="category_id"
+                                id="category_id"
+                                value="<?= htmlspecialchars($category_id); ?>">
 
-                        <button
-                            type="button"
-                            class="custom-select-trigger"
-                            data-custom-select-trigger>
+                            <button
+                                type="button"
+                                class="custom-select-trigger"
+                                data-custom-select-trigger>
 
-                            <span data-custom-select-label>
+                                <span data-custom-select-label>
 
-                                <?=
-                                $category_id
-                                    ? 'Selected Category'
-                                    : 'Select Category';
+                                    <?=
+                                    $category_id
+                                        ? 'Selected Category'
+                                        : 'Select Category';
+                                    ?>
+
+                                </span>
+
+                                <i class="fa-solid fa-chevron-down"></i>
+
+                            </button>
+
+                            <div
+                                class="custom-select-menu"
+                                data-custom-select-menu>
+
+                                <?php
+                                mysqli_data_seek($query_categories, 0);
+
+                                while ($category = mysqli_fetch_assoc($query_categories)) :
                                 ?>
 
-                            </span>
+                                    <button
+                                        type="button"
+                                        class="custom-select-option"
+                                        data-value="<?= $category['category_id']; ?>"
+                                        data-label="<?= htmlspecialchars($category['name']); ?>">
 
-                            <i class="fa-solid fa-chevron-down"></i>
+                                        <?= htmlspecialchars($category['name']); ?>
 
-                        </button>
+                                    </button>
 
-                        <div
-                            class="custom-select-menu"
-                            data-custom-select-menu>
+                                <?php endwhile; ?>
 
-                            <?php
-                            mysqli_data_seek($query_categories, 0);
-
-                            while ($category = mysqli_fetch_assoc($query_categories)) :
-                            ?>
-
-                                <button
-                                    type="button"
-                                    class="custom-select-option"
-                                    data-value="<?= $category['category_id']; ?>"
-                                    data-label="<?= htmlspecialchars($category['name']); ?>">
-
-                                    <?= htmlspecialchars($category['name']); ?>
-
-                                </button>
-
-                            <?php endwhile; ?>
+                            </div>
 
                         </div>
-
                     </div>
-                </div>
 
                     <div class="form-group">
                         <label for="price" class="form-label">Price</label>
@@ -459,58 +456,41 @@ require_once __DIR__ . "/../../partials/sidebar.php";
 
 <script>
     (() => {
-        const customSelect = document.querySelector('[data-custom-select]');
-        if (!customSelect) return;
+        document.querySelectorAll('[data-custom-select]').forEach((customSelect) => {
+            const trigger = customSelect.querySelector('[data-custom-select-trigger]');
+            const hiddenInput = customSelect.querySelector('input[type="hidden"]');
+            const label = customSelect.querySelector('[data-custom-select-label]');
+            const options = customSelect.querySelectorAll('.custom-select-option');
 
-        const trigger = customSelect.querySelector('[data-custom-select-trigger]');
-        const menu = customSelect.querySelector('[data-custom-select-menu]');
-        const hiddenInput = customSelect.querySelector('#brand_id');
-        const hiddenInput2 = customSelect.querySelector('#category_id');
-        const label = customSelect.querySelector('[data-custom-select-label]');
-        const options = customSelect.querySelectorAll('[data-custom-select-menu] .custom-select-option');
+            if (!trigger || !hiddenInput || !label || !options.length) return;
 
-        const closeMenu = () => customSelect.classList.remove('open');
-        const openMenu = () => customSelect.classList.add('open');
-        const toggleMenu = () => customSelect.classList.toggle('open');
+            const closeMenu = () => customSelect.classList.remove('open');
 
-        trigger.addEventListener('click', () => {
-            toggleMenu();
-        });
-
-        options.forEach((option) => {
-            option.addEventListener('click', () => {
-                const value = option.dataset.value || '';
-                const text = option.dataset.label || option.textContent.trim();
-
-                hiddenInput.value = value;
-                label.textContent = value === '' ? 'Select brand' : text;
-
-                options.forEach((item) => item.classList.remove('is-selected'));
-                option.classList.add('is-selected');
-
-                closeMenu();
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                customSelect.classList.toggle('open');
             });
-        });
-                                
-        // options.forEach((option) => {
-        //     option.addEventListener('click', () => {
-        //         const value = option.dataset.value || '';
-        //         const text = option.dataset.label || option.textContent.trim();
 
-        //         hiddenInput2.value = value;
-        //         label.textContent = value === '' ? 'Select category' : text;
+            options.forEach((option) => {
+                option.addEventListener('click', () => {
+                    const value = option.dataset.value || '';
+                    const text = option.dataset.label || option.textContent.trim();
 
-        //         options.forEach((item) => item.classList.remove('is-selected'));
-        //         option.classList.add('is-selected');
+                    hiddenInput.value = value;
+                    label.textContent = value === '' ? 'Select option' : text;
 
-        //         closeMenu();
-        //     });
-        // });
+                    options.forEach((item) => item.classList.remove('is-selected'));
+                    option.classList.add('is-selected');
 
-        document.addEventListener('click', (event) => {
-            if (!customSelect.contains(event.target)) {
-                closeMenu();
-            }
+                    closeMenu();
+                });
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!customSelect.contains(event.target)) {
+                    closeMenu();
+                }
+            });
         });
     })();
     (() => {
