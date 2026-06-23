@@ -57,13 +57,18 @@ unset($_SESSION['login_error']);
 
                 <div class="field">
                     <label for="password" class="field-label">Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        id="password"
-                        class="field-input"
-                        placeholder="Enter your password"
-                        required>
+                    <div class="password-wrapper">
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            class="field-input"
+                            placeholder="Enter your password"
+                            required>
+                        <button type="button" id="togglePassword" class="toggle-password-btn" aria-label="Toggle password visibility">
+                            <i class="fa-solid fa-eye-slash" id="toggleIcon"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="auth-bottom">
@@ -75,6 +80,23 @@ unset($_SESSION['login_error']);
             </form>
         </section>
     </main>
+
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            }
+        });
+    </script>
 </body>
 
 </html>
