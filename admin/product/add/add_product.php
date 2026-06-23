@@ -25,10 +25,14 @@ if ($current_user_id > 0) {
     }
 }
 
+$sql_categories = "SELECT * FROM categories ORDER BY name ASC";
+$query_categories = mysqli_query($conn, $sql_categories);
+
 $sql_brand = "SELECT brand_id, name FROM brands ORDER BY name ASC";
 $query_brand = mysqli_query($conn, $sql_brand);
 
 $brand_id = '';
+$category_id = '';
 $name = '';
 $description = '';
 $price = '';
@@ -136,12 +140,17 @@ function save_product_image(array $file, string $baseName, string $uploadDir): a
 
 if (isset($_POST['save'])) {
     $brand_id = trim($_POST['brand_id'] ?? '');
+    $category_id = trim($_POST['category_id'] ?? '');
     $name = trim($_POST['name'] ?? '');
     $description = trim($_POST['description'] ?? '');
     $price = trim($_POST['price'] ?? '');
 
     if ($brand_id === '') {
         $errors[] = 'Brand is required.';
+    }
+
+    if ($category_id === '') {
+        $errors[] = 'Category is required.';
     }
 
     if ($name === '') {
@@ -207,16 +216,17 @@ if (isset($_POST['save'])) {
     }
 
     if (empty($errors)) {
-        $sql = "INSERT INTO products (brand_id, name, description, price, image, followed_up_by)
-                VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO products (brand_id, category_id, name, description, price, image, followed_up_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = mysqli_prepare($conn, $sql);
 
         if ($stmt) {
             mysqli_stmt_bind_param(
                 $stmt,
-                "issssi",
+                "iissssi",
                 $brand_id,
+                $category_id,
                 $name,
                 $description,
                 $price,
@@ -311,6 +321,65 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                     </div>
 
                     <div class="form-group">
+                    <label class="form-label">
+                        Category
+                    </label>
+
+                    <div class="custom-select" data-custom-select>
+
+                        <input
+                            type="hidden"
+                            name="category_id"
+                            id="category_id"
+                            value="<?= htmlspecialchars($category_id); ?>">
+
+                        <button
+                            type="button"
+                            class="custom-select-trigger"
+                            data-custom-select-trigger>
+
+                            <span data-custom-select-label>
+
+                                <?=
+                                $category_id
+                                    ? 'Selected Category'
+                                    : 'Select Category';
+                                ?>
+
+                            </span>
+
+                            <i class="fa-solid fa-chevron-down"></i>
+
+                        </button>
+
+                        <div
+                            class="custom-select-menu"
+                            data-custom-select-menu>
+
+                            <?php
+                            mysqli_data_seek($query_categories, 0);
+
+                            while ($category = mysqli_fetch_assoc($query_categories)) :
+                            ?>
+
+                                <button
+                                    type="button"
+                                    class="custom-select-option"
+                                    data-value="<?= $category['category_id']; ?>"
+                                    data-label="<?= htmlspecialchars($category['name']); ?>">
+
+                                    <?= htmlspecialchars($category['name']); ?>
+
+                                </button>
+
+                            <?php endwhile; ?>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                    <div class="form-group">
                         <label for="price" class="form-label">Price</label>
                         <input
                             type="text"
@@ -396,6 +465,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
         const trigger = customSelect.querySelector('[data-custom-select-trigger]');
         const menu = customSelect.querySelector('[data-custom-select-menu]');
         const hiddenInput = customSelect.querySelector('#brand_id');
+        const hiddenInput2 = customSelect.querySelector('#category_id');
         const label = customSelect.querySelector('[data-custom-select-label]');
         const options = customSelect.querySelectorAll('[data-custom-select-menu] .custom-select-option');
 
@@ -421,6 +491,21 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                 closeMenu();
             });
         });
+                                
+        // options.forEach((option) => {
+        //     option.addEventListener('click', () => {
+        //         const value = option.dataset.value || '';
+        //         const text = option.dataset.label || option.textContent.trim();
+
+        //         hiddenInput2.value = value;
+        //         label.textContent = value === '' ? 'Select category' : text;
+
+        //         options.forEach((item) => item.classList.remove('is-selected'));
+        //         option.classList.add('is-selected');
+
+        //         closeMenu();
+        //     });
+        // });
 
         document.addEventListener('click', (event) => {
             if (!customSelect.contains(event.target)) {
