@@ -3,13 +3,11 @@ require_once __DIR__ . "/../security.php";
 require_once __DIR__ . "/../../config/connection.php";
 
 $sql_brand = "SELECT *,
-categories.name AS category_name,
 brands.name AS brand_name,
 brands.followed_up_at AS brands_at,
 users.name AS user_name
 FROM brands
 INNER JOIN users ON brands.followed_up_by = users.user_id
-INNER JOIN categories ON brands.category_id = categories.category_id
  ";
 $query_brand = mysqli_query($conn, $sql_brand);
 
@@ -51,7 +49,6 @@ $query_brand = mysqli_query($conn, $sql_brand);
             <thead>
                 <tr>
                     <th>No</th>
-                    <th>Category</th>
                     <th>Name</th>
                     <th>Description</th>
                     <th>Followed Up By</th>
@@ -67,15 +64,10 @@ $query_brand = mysqli_query($conn, $sql_brand);
                     $brand_name = $result['brand_name'];
                     $description = $result['description'];
                     $brand_id = $result['brand_id'];
-                    $category_name = $result['category_name'];
                 ?>
                     <tr>
                         <td>
                             <span class="table-id">#<?= $brand++; ?></span>
-                        </td>
-
-                        <td class="table-muted">
-                            <?= htmlspecialchars($category_name); ?>
                         </td>
 
                         <td>

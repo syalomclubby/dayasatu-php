@@ -6,10 +6,12 @@ $sql_products = "SELECT *,
 products.name AS products_name,
 products.followed_up_at AS products_at,
 brands.name AS brand_name,
-users.name AS user_name
+users.name AS user_name,
+categories.name AS category_name
 FROM products 
 INNER JOIN users ON products.followed_up_by = users.user_id
 INNER JOIN brands ON products.brand_id = brands.brand_id
+INNER JOIN categories ON products.category_id = categories.category_id
 ";
 
 $query_product = mysqli_query($conn, $sql_products);
@@ -44,6 +46,7 @@ $query_product = mysqli_query($conn, $sql_products);
                 <tr>
                     <th>No</th>
                     <th>Brand</th>
+                    <th>Cateory</th>
                     <th>Name</th>
                     <th>Description</th>
                     <th>Price</th>
@@ -67,6 +70,10 @@ $query_product = mysqli_query($conn, $sql_products);
 
                         <td class="table-muted">
                             <?= $result['brand_name']; ?>
+                        </td>
+
+                        <td class="table-muted">
+                            <?= $result['category_name']; ?>
                         </td>
 
                         <td>

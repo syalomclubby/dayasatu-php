@@ -93,9 +93,9 @@
                     <span>Categories</span>
                 </a>
 
-                <a href="<?= $base_url ?>admin/settings.php" class="<?= $current_menu === 'settings' ? 'active' : '' ?>">
+                <a href="<?= $base_url ?>index.php" class="<?= $current_menu === 'settings' ? 'active' : '' ?>">
                     <i class="fa-solid fa-gear"></i>
-                    <span>Settings</span>
+                    <span>Beranda</span>
                 </a>
 
                 <div class="sidebar-footer">
