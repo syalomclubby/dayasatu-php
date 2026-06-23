@@ -8,6 +8,8 @@ $success = false;
 
 $product_id = filter_input(INPUT_GET, 'product_id', FILTER_VALIDATE_INT);
 
+$product_data = null;
+
 if (!$product_id) {
     header("Location: ../products.php");
     exit;
@@ -40,7 +42,8 @@ $brand_id = '';
 $name = '';
 $description = '';
 $price = '';
-$old_image = ''; 
+$old_image = '';
+$old_brand_folder = '';
 $brand_name_label = 'Select brand';
 
 $sql_get_product = "SELECT * FROM products WHERE product_id = ? LIMIT 1";
@@ -73,6 +76,7 @@ if ($stmt_get_product) {
             $res_ob = mysqli_stmt_get_result($stmt_old_brand);
             if ($row_ob = mysqli_fetch_assoc($res_ob)) {
                 $brand_name_label = $row_ob['name'];
+                $old_brand_folder = strtolower(trim($row_ob['name']));
             }
             mysqli_stmt_close($stmt_old_brand);
         }
@@ -171,7 +175,7 @@ if (isset($_POST['save'])) {
     if ($brand_id === '') $errors[] = 'Brand is required.';
     if ($name === '') $errors[] = 'Name is required.';
     if ($description === '') $errors[] = 'Description is required.';
-    
+
     if ($price === '') {
         $errors[] = 'Price is required.';
     } elseif (!is_numeric($price)) {
@@ -182,7 +186,7 @@ if (isset($_POST['save'])) {
         $errors[] = 'Logged in user not found.';
     }
 
-    $image_base = $product_data['image']; 
+    $image_base = $product_data['image'];
     $has_new_image = isset($_FILES['image_file']) && !empty($_FILES['image_file']['name']);
 
     if (empty($errors)) {
@@ -210,7 +214,7 @@ if (isset($_POST['save'])) {
                 $errors[] = $uploadError;
             } else {
                 $image_base = $savedBaseName;
-                
+
                 if (!empty($product_data['image'])) {
                     $oldBrandFolder = strtolower(trim($brandData['name'])); // Asumsi folder sama
                     $oldFilePath = __DIR__ . '/../../../assets/images/products/' . $oldBrandFolder . '/' . $product_data['image'] . '.png';
@@ -313,9 +317,9 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                                 </button>
 
                                 <?php if ($query_brand) : ?>
-                                    <?php 
+                                    <?php
                                     mysqli_data_seek($query_brand, 0);
-                                    while ($brand = mysqli_fetch_assoc($query_brand)) : 
+                                    while ($brand = mysqli_fetch_assoc($query_brand)) :
                                         $selected_class = ($brand['brand_id'] == $brand_id) ? 'is-selected' : '';
                                     ?>
                                         <button
@@ -389,10 +393,12 @@ require_once __DIR__ . "/../../partials/sidebar.php";
 
                     <div class="form-group">
                         <label class="form-label">Preview</label>
-                        <?php 
-                        $has_old_img = !empty($old_image);
-                        $old_brand_folder = isset($brandData) ? strtolower(trim($brandData['name'])) : '';
-                        $old_img_src = $has_old_img ? "../../../assets/images/products/" . $old_brand_folder . "/" . $old_image . ".png" : "";
+                        <?php
+                        $has_old_img = !empty($old_image) && !empty($old_brand_folder);
+
+                        $old_img_src = $has_old_img
+                            ? "../../../assets/images/products/" . $old_brand_folder . "/" . $old_image . ".png"
+                            : "";
                         ?>
                         <div class="image-preview <?= $has_old_img ? '' : 'is-hidden'; ?>" id="imagePreview">
                             <img id="imagePreviewImg" src="<?= $old_img_src; ?>" alt="Image Preview">
