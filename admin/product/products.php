@@ -101,9 +101,9 @@ $query_product = mysqli_query($conn, $sql_products);
                         <td class="table-muted">
                             <?= $result['user_name']; ?>
                         </td>
-
+                
                         <td class="table-muted">
-                            <?= $result['products_at']; ?>
+                            <?= $result['products_at'] ?? '-'; ?>
                         </td>
 
                         <td class="table-muted">

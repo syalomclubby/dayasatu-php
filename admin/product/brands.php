@@ -95,7 +95,7 @@ $query_brand = mysqli_query($conn, $sql_brand);
                         </td>
 
                         <td class="table-muted">
-                            <?= $result['brands_at']; ?>
+                            <?= $result['brands_at'] ?? '-'; ?>
                         </td>
 
                         <td class="table-muted">

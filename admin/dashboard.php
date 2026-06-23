@@ -168,13 +168,16 @@ $query_activity = mysqli_query($conn, $sql_activity);
                         <div class="latest-product-item">
 
                             <div class="product-image">
-                                <img
-                                    src="../assets/images/products/<?= $row['image'] ?>.png"
+                                <?php
+                                    $brand_folder = strtolower(trim($row['brand_name']));
+                                ?>
+                                 <img
+                                    src="../assets/images/products/<?= ($brand_folder) ?>/<?= $row['image'] ?>.png"
                                     alt="<?= $row['product_name'] ?>">
                             </div>
 
                             <div class="product-info">
-                                <div class="products-name">
+                                <div class="products-name"> 
                                     <?= ($row['product_name']) ?>
                                 </div>
 
@@ -185,7 +188,7 @@ $query_activity = mysqli_query($conn, $sql_activity);
                                 </div>
                             </div>
 
-                            <a href="product/edit/edit_product.php?id=<?= $row['product_id'] ?>" class="product-action">
+                                <a href="product/edit/edit_product.php?product_id=<?= $row['product_id']; ?>" class="table-action" aria-label="Edit">
                                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
                             </a>
 

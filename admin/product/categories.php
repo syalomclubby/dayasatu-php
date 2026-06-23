@@ -80,7 +80,7 @@ $query_category = mysqli_query($conn, $sql_category);
                         </td>
 
                         <td class="table-muted">
-                            <?= $result['followed_up_at']; ?>
+                            <?= $result['followed_up_at'] ?? '-'; ?>
                         </td>
 
                         <td class="table-muted">
