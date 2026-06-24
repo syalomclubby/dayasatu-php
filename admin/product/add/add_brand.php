@@ -159,7 +159,8 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                         class="form-control"
                         rows="6"
                         placeholder="Enter brand description"
-                        required><?= htmlspecialchars($description); ?></textarea>
+                        required><?= htmlspecialchars($description); ?>
+                    </textarea>
                 </div>
 
                 <div class="action-group">

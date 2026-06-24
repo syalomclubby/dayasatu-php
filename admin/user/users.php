@@ -34,7 +34,7 @@ $query_user = mysqli_query($conn, $sql_user);
         <div class="alert alert-success">
             <i class="fa-solid fa-circle-check"></i>
             <span>
-                User berhasil dihapus.
+                User successfully deleted.
             </span>
         </div>
     <?php endif; ?>
@@ -67,6 +67,9 @@ $query_user = mysqli_query($conn, $sql_user);
                     $name = $result['name'];
                     $id = $result['user_id'];
                     $role = $result['role'];
+
+
+                    $logged_in_id = $_SESSION['user_id'];
                 ?>
                     <tr>
                         <td>
@@ -89,15 +92,21 @@ $query_user = mysqli_query($conn, $sql_user);
 
                         <td>
                             <div class="table-actions">
-                                <a href="edit/edit_category.php?category_id=<?= $id; ?>" class="table-action" aria-label="Edit">
+                                <a href="edit_user.php?user_id=<?= $id; ?>" class="table-action" aria-label="Edit">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
+                                <?php if ($id != $logged_in_id) : ?>
                                 <a
-                                    href="delete/delete_category.php?category_id=<?= $id; ?>"
-                                    class="table-action table-action-danger btn-delete-category"
+                                    href="delete_user.php?user_id=<?= $id; ?>"
+                                    class="table-action table-action-danger btn-delete-user"
                                     aria-label="Delete">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
+                                    <?php else : ?>
+                                        <span class="table-muted" style="font-size: 12px; font-style: italic; color: var(--text-light);">
+                                            <i class="fa-solid fa-lock"></i> You
+                                        </span>
+                                <?php endif; ?>
                             </div>
                         </td>
                     </tr>
@@ -110,7 +119,7 @@ $query_user = mysqli_query($conn, $sql_user);
 </div>
 
 <script>
-    document.querySelectorAll('.btn-delete-category').forEach((button) => {
+    document.querySelectorAll('.btn-delete-user').forEach((button) => {
 
         button.addEventListener('click', function(event) {
 
@@ -119,11 +128,11 @@ $query_user = mysqli_query($conn, $sql_user);
             const url = this.getAttribute('href');
 
             Swal.fire({
-                title: 'Delete Category?',
-                text: 'Category yang dihapus tidak dapat dikembalikan.',
+                title: 'Delete User?',
+                text: 'User yang dihapus tidak dapat dikembalikan.',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Delete Category',
+                confirmButtonText: 'Delete User',
                 cancelButtonText: 'Cancel',
                 reverseButtons: true,
 
