@@ -46,7 +46,6 @@ $query_brand = mysqli_query($conn, $sql_brand);
 $brand_id = '';
 $name = '';
 $description = '';
-$price = '';
 $old_image = '';
 $old_brand_folder = '';
 $brand_name_label = 'Select brand';
@@ -89,7 +88,6 @@ if ($stmt_get_product) {
 
         $name        = $product_data['name'];
         $description = $product_data['description'];
-        $price       = $product_data['price'];
         $old_image   = $product_data['image'];
 
         $sql_old_brand = "SELECT name FROM brands WHERE brand_id = ? LIMIT 1";
@@ -235,7 +233,6 @@ if (isset($_POST['save'])) {
 
     $name        = trim($_POST['name'] ?? '');
     $description = trim($_POST['description'] ?? '');
-    $price       = trim($_POST['price'] ?? '');
 
     if ($brand_id === '') {
         $errors[] = 'Brand is required.';
@@ -299,7 +296,7 @@ if (isset($_POST['save'])) {
 
     if (empty($errors)) {
         $sql = "UPDATE products 
-                SET brand_id = ?, category_id = ?, name = ?, description = ?, price = ?, image = ?, followed_up_at = NOW(), followed_up_by = ?
+                SET brand_id = ?, category_id = ?, name = ?, description = ?, image = ?, followed_up_at = NOW(), followed_up_by = ?
                 WHERE product_id = ?";
 
         $stmt = mysqli_prepare($conn, $sql);
@@ -312,7 +309,6 @@ if (isset($_POST['save'])) {
                 $category_id,
                 $name,
                 $description,
-                $price,
                 $image_base,
                 $current_user_id,
                 $product_id
@@ -455,17 +451,6 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="price" class="form-label">Price</label>
-                        <input
-                            type="text"
-                            name="price"
-                            id="price"
-                            class="form-control"
-                            value="<?= htmlspecialchars($price, ENT_QUOTES, 'UTF-8'); ?>"
-                            placeholder="Enter price"
-                            required>
-                    </div>
                 </div>
 
                 <div class="form-group">

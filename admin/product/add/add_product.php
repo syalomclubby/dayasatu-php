@@ -35,7 +35,6 @@ $brand_id = '';
 $category_id = '';
 $name = '';
 $description = '';
-$price = '';
 
 function slugify_filename(string $text): string
 {
@@ -143,7 +142,6 @@ if (isset($_POST['save'])) {
     $category_id = trim($_POST['category_id'] ?? '');
     $name = trim($_POST['name'] ?? '');
     $description = trim($_POST['description'] ?? '');
-    $price = trim($_POST['price'] ?? '');
 
     if ($brand_id === '') {
         $errors[] = 'Brand is required.';
@@ -159,12 +157,6 @@ if (isset($_POST['save'])) {
 
     if ($description === '') {
         $errors[] = 'Description is required.';
-    }
-
-    if ($price === '') {
-        $errors[] = 'Price is required.';
-    } elseif (!is_numeric($price)) {
-        $errors[] = 'Price must be numeric.';
     }
 
     if ($current_user_id <= 0) {
@@ -216,8 +208,8 @@ if (isset($_POST['save'])) {
     }
 
     if (empty($errors)) {
-        $sql = "INSERT INTO products (brand_id, category_id, name, description, price, image, followed_up_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO products (brand_id, category_id, name, description, image, followed_up_by)
+                VALUES (?, ?, ?, ?, ?, ?)";
 
         $stmt = mysqli_prepare($conn, $sql);
 
@@ -229,7 +221,6 @@ if (isset($_POST['save'])) {
                 $category_id,
                 $name,
                 $description,
-                $price,
                 $image_base,
                 $current_user_id
             );
@@ -376,17 +367,6 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="price" class="form-label">Price</label>
-                        <input
-                            type="text"
-                            name="price"
-                            id="price"
-                            class="form-control"
-                            value="<?= htmlspecialchars($price, ENT_QUOTES, 'UTF-8'); ?>"
-                            placeholder="Enter price"
-                            required>
-                    </div>
                 </div>
 
                 <div class="form-group">

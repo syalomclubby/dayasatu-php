@@ -67,7 +67,6 @@ $query_product = mysqli_query($conn, $sql_products);
                     <th>Cateory</th>
                     <th>Name</th>
                     <th>Description</th>
-                    <th>Price</th>
                     <th>Image</th>
                     <th>Followed Up By</th>
                     <th>Followed Up At</th>
@@ -106,11 +105,6 @@ $query_product = mysqli_query($conn, $sql_products);
                             </div>
                         </td>
 
-                        <td>
-                            <span class="table-price">
-                                <?= $result['price']; ?>
-                            </span>
-                        </td>
 
                         <td>
                             <?php
