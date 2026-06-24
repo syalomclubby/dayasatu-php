@@ -72,6 +72,13 @@
                 'delete_category.php',
             ])) {
                 $current_menu = 'categories';
+            } elseif (in_array($current_page, [
+                'users.php',
+                'add_user.php',
+                'edit_user.php',
+                'delete_user.php',
+            ])) {
+                $current_menu = 'users';
             } else {
                 $current_menu = '';
             }
@@ -96,6 +103,11 @@
                 <a href="<?= $base_url ?>admin/product/categories.php" class="<?= $current_menu === 'categories' ? 'active' : '' ?>">
                     <i class="fa-solid fa-layer-group"></i>
                     <span>Categories</span>
+                </a>
+
+                <a href="<?= $base_url ?>admin/user/users.php" class="<?= $current_menu === 'users' ? 'active' : '' ?>">
+                    <i class="fa-solid fa-user"></i>
+                    <span>User</span>
                 </a>
 
                 <a href="<?= $base_url ?>index.php" class="visit-site-link" target="_blank" rel="noopener">
