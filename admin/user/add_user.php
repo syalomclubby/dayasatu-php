@@ -142,14 +142,63 @@ require_once __DIR__ . "/../partials/sidebar.php";
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">
-                        User Role
-                    </label>
-                    <select name="role" class="form-control" required>
-                        <option value="">-- Select Role --</option>
-                        <option value="1" <?= $role == '1' ? 'selected' : ''; ?>>Superadmin</option>
-                        <option value="2" <?= $role == '2' ? 'selected' : ''; ?>>Admin</option>
-                    </select>
+                        <label class="form-label">
+                            Role
+                        </label>
+
+                        <div class="custom-select" data-custom-select>
+
+                            <input
+                                type="hidden"
+                                name="role"
+                                id="role"
+                                value="<?= htmlspecialchars($role); ?>"
+                                required>
+
+                            <button
+                                type="button"
+                                class="custom-select-trigger"
+                                data-custom-select-trigger>
+
+                                <span data-custom-select-label>
+                                    <?php
+                                if ($role == '1') {
+                                    echo 'Superadmin';
+                                } elseif ($role == '2') {
+                                    echo 'Admin';
+                                } else {
+                                    echo 'Select Role';
+                                }
+                                ?>
+                            </span>
+
+                            <i class="fa-solid fa-chevron-down"></i>
+
+                        </button>
+
+                        <div
+                            class="custom-select-menu"
+                            data-custom-select-menu>
+
+                            <button
+                                type="button"
+                                class="custom-select-option"
+                                data-value="1"
+                                data-label="Superadmin">
+                                Super Admin
+                            </button>
+
+                            <button
+                                type="button"
+                                class="custom-select-option"
+                                data-value="2"
+                                data-label="Admin">
+                                Admin
+                            </button>
+
+                        </div>
+
+                    </div>
                 </div>
 
                 <div class="action-group">
@@ -169,3 +218,44 @@ require_once __DIR__ . "/../partials/sidebar.php";
     </div>
 
 </div>
+
+<script>
+(() => {
+        document.querySelectorAll('[data-custom-select]').forEach((customSelect) => {
+            const trigger = customSelect.querySelector('[data-custom-select-trigger]');
+            const hiddenInput = customSelect.querySelector('input[type="hidden"]');
+            const label = customSelect.querySelector('[data-custom-select-label]');
+            const options = customSelect.querySelectorAll('.custom-select-option');
+
+            if (!trigger || !hiddenInput || !label || !options.length) return;
+
+            const closeMenu = () => customSelect.classList.remove('open');
+
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                customSelect.classList.toggle('open');
+            });
+
+            options.forEach((option) => {
+                option.addEventListener('click', () => {
+                    const value = option.dataset.value || '';
+                    const text = option.dataset.label || option.textContent.trim();
+
+                    hiddenInput.value = value;
+                    label.textContent = value === '' ? 'Select option' : text;
+
+                    options.forEach((item) => item.classList.remove('is-selected'));
+                    option.classList.add('is-selected');
+
+                    closeMenu();
+                });
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!customSelect.contains(event.target)) {
+                    closeMenu();
+                }
+            });
+        });
+    })();
+    </script>
