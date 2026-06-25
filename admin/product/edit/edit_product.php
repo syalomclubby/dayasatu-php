@@ -304,7 +304,7 @@ if (isset($_POST['save'])) {
         if ($stmt) {
             mysqli_stmt_bind_param(
                 $stmt,
-                "iissssii",
+                "iisssii",
                 $brand_id,
                 $category_id,
                 $name,

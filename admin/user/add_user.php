@@ -142,52 +142,34 @@ require_once __DIR__ . "/../partials/sidebar.php";
                 </div>
 
                 <div class="form-group">
-                        <label class="form-label">
-                            Role
-                        </label>
+                    <label class="form-label">
+                        Role
+                    </label>
 
-                        <div class="custom-select" data-custom-select>
+                    <div class="custom-select" data-custom-select style="pointer-events: none; opacity: 0.8;">
 
-                            <input
-                                type="hidden"
-                                name="role"
-                                id="role"
-                                value="<?= htmlspecialchars($role); ?>"
-                                required>
+                        <input
+                            type="hidden"
+                            name="role"
+                            id="role"
+                            value="2"
+                            required>
 
-                            <button
-                                type="button"
-                                class="custom-select-trigger"
-                                data-custom-select-trigger>
+                        <button
+                            type="button"
+                            class="custom-select-trigger"
+                            data-custom-select-trigger
+                            disabled>
 
-                                <span data-custom-select-label>
-                                    <?php
-                                if ($role == '1') {
-                                    echo 'Superadmin';
-                                } elseif ($role == '2') {
-                                    echo 'Admin';
-                                } else {
-                                    echo 'Select Role';
-                                }
-                                ?>
+                            <span data-custom-select-label>
+                                Admin
                             </span>
 
-                            <i class="fa-solid fa-chevron-down"></i>
+                            <i class="fa-solid fa-lock" style="color: #999;"></i>
 
                         </button>
 
-                        <div
-                            class="custom-select-menu"
-                            data-custom-select-menu>
-
-                            <button
-                                type="button"
-                                class="custom-select-option"
-                                data-value="1"
-                                data-label="Superadmin">
-                                Super Admin
-                            </button>
-
+                        <div class="custom-select-menu" data-custom-select-menu>
                             <button
                                 type="button"
                                 class="custom-select-option"
@@ -195,7 +177,6 @@ require_once __DIR__ . "/../partials/sidebar.php";
                                 data-label="Admin">
                                 Admin
                             </button>
-
                         </div>
 
                     </div>

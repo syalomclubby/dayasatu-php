@@ -1,4 +1,25 @@
-<?php require_once __DIR__ . "/../../config/connection.php"; ?>
+<?php 
+require_once __DIR__ . "/../../config/connection.php"; 
+require_once __DIR__ . "/../security.php";
+// Cek Role buat nampilin usernyaa
+$logged_in_id = $_SESSION['user_id'] ?? 0;
+
+$sql_check_role = "SELECT role FROM users WHERE user_id = ? LIMIT 1";
+$stmt_check = mysqli_prepare($conn, $sql_check_role);
+$is_superadmin = false;
+
+if ($stmt_check) {
+    mysqli_stmt_bind_param($stmt_check, "i", $logged_in_id);
+    mysqli_stmt_execute($stmt_check);
+    $res_check = mysqli_stmt_get_result($stmt_check);
+    $data_check = mysqli_fetch_assoc($res_check);
+    
+    if (isset($data_check['role']) && $data_check['role'] == 1) {
+        $is_superadmin = true;
+    }
+    mysqli_stmt_close($stmt_check);
+}
+?>
 
 <!DOCTYPE html>
 <html lang="id">
@@ -104,11 +125,15 @@
                     <i class="fa-solid fa-layer-group"></i>
                     <span>Categories</span>
                 </a>
-
+                
+                
+                <?php if ($is_superadmin) : ?>
                 <a href="<?= $base_url ?>admin/user/users.php" class="<?= $current_menu === 'users' ? 'active' : '' ?>">
                     <i class="fa-solid fa-user"></i>
                     <span>User</span>
                 </a>
+                <?php endif; ?>
+
 
                 <a href="<?= $base_url ?>index.php" class="visit-site-link" target="_blank" rel="noopener">
                     <span class="visit-site-icon">
