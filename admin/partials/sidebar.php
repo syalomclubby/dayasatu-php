@@ -19,6 +19,89 @@ if ($stmt_check) {
     }
     mysqli_stmt_close($stmt_check);
 }
+
+if (isset($_GET['action']) && $_GET['action'] === 'get_all_activities') {
+    // Kita buat query murni mengambil semua log aktivitas TANPA LIMIT 5 seperti didashboard
+    $sql_activity = "SELECT
+        activity_type, item_id, item_name, meta_text, performed_by, activity_at, activity_label
+    FROM (
+        SELECT 'product' AS activity_type, p.product_id AS item_id, p.name AS item_name,
+            CONCAT(b.name, ' • ', c.name) AS meta_text, u.name AS performed_by,
+            COALESCE(p.followed_up_at, p.created_at) AS activity_at,
+            CASE WHEN p.followed_up_at IS NULL THEN 'Product Added' ELSE 'Product Updated' END AS activity_label
+        FROM products p
+        LEFT JOIN users u ON p.followed_up_by = u.user_id
+        INNER JOIN brands b ON p.brand_id = b.brand_id
+        INNER JOIN categories c ON p.category_id = c.category_id
+
+        UNION ALL
+
+        SELECT 'brand' AS activity_type, b.brand_id AS item_id, b.name AS item_name, 'Brand' AS meta_text,
+            u.name AS performed_by, COALESCE(b.followed_up_at, b.created_at) AS activity_at,
+            CASE WHEN b.followed_up_at IS NULL THEN 'Brand Added' ELSE 'Brand Updated' END AS activity_label
+        FROM brands b LEFT JOIN users u ON b.followed_up_by = u.user_id
+
+        UNION ALL
+
+        SELECT 'category' AS activity_type, c.category_id AS item_id, c.name AS item_name, 'Category' AS meta_text,
+            u.name AS performed_by, COALESCE(c.followed_up_at, c.created_at) AS activity_at,
+            CASE WHEN c.followed_up_at IS NULL THEN 'Category Added' ELSE 'Category Updated' END AS activity_label
+        FROM categories c LEFT JOIN users u ON c.followed_up_by = u.user_id
+    ) AS all_activity 
+    WHERE activity_at IS NOT NULL 
+    ORDER BY activity_at DESC";
+
+    $query_activity = mysqli_query($conn, $sql_activity);
+
+    if ($query_activity && mysqli_num_rows($query_activity) > 0) {
+        while ($row = mysqli_fetch_assoc($query_activity)) {
+            $icon_class = 'fa-box';
+            $bg_icon_class = '';
+            if ($row['activity_type'] == 'brand') { 
+                $icon_class = 'fa-tags'; 
+                $bg_icon_class = 'activity-brand'; 
+            } elseif ($row['activity_type'] == 'category') { 
+                $icon_class = 'fa-folder'; 
+                $bg_icon_class = 'activity-category'; 
+            }
+            
+            $status_class = 'created';
+            if (stripos($row['activity_label'], 'Updated') !== false) { 
+                $status_class = 'updated'; 
+            } elseif (stripos($row['activity_label'], 'Deleted') !== false) { 
+                $status_class = 'deleted'; 
+            }
+            ?>
+            <div class="notif-item" style="padding: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px;">
+                <div class="activity-icon <?= $bg_icon_class ?>" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; flex-shrink:0;">
+                    <i class="fa-solid <?= $icon_class ?>"></i>
+                </div>
+                <div class="notif-item-body" style="flex: 1; min-width: 0; text-align: left;">
+                    <div class="notif-item-label" style="font-size: 11px; font-weight:600; color:var(--text-light); text-transform:uppercase;"><?= htmlspecialchars($row['activity_label']) ?></div>
+                    <div class="notif-item-name" style="font-size: 14px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?= htmlspecialchars($row['item_name']) ?></div>
+                    <div class="notif-item-meta" style="font-size: 12px; color:var(--text-light); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        <?= htmlspecialchars($row['meta_text']) ?> 
+                        <?= !empty($row['performed_by']) ? '• ' . htmlspecialchars($row['performed_by']) : '' ?>
+                    </div>
+                </div>
+                <div class="activity-date <?= $status_class ?>" style="font-size: 10px; flex-shrink:0; text-align:right;">
+                    <span><?= date('d M', strtotime($row['activity_at'])); ?></span>
+                    <br>
+                    <span><?= date('H:i', strtotime($row['activity_at'])); ?></span>
+                </div>
+            </div>
+            <?php
+        }
+    } else {
+        echo '<div class="notif-empty" style="text-align:center; padding:20px; color:var(--text-light);"><i class="fa-solid fa-bell-slash"></i> <span>Tidak ada aktivitas terbaru</span></div>';
+    }
+    exit; // Menghentikan sistem agar sisa kode HTML tidak ikut ter-render masuk ke AJAX
+}
+
+// Cek Role buat nampilin usernyaa (Kode asli bawaan Anda)
+$logged_in_id = $_SESSION['user_id'] ?? 0;
+// ... (Sisa kode bawaan tetap sama di bawahnya)
+
 ?>
 
 <!DOCTYPE html>
@@ -164,12 +247,89 @@ if ($stmt_check) {
                 </div>
 
                 <div class="topbar-right">
-                    <button class="icon-button">
-                        <i class="fa-regular fa-bell"></i>
-                    </button>
-
-                    <div class="admin-pill">
-                        <?= htmlspecialchars($_SESSION['name']) ?>
-                    </div>
+    <div class="notif-wrapper" id="notifWrapper" style="position: relative; display: inline-block;">
+        <button class="icon-button" id="notifBtn">
+            <i class="fa-regular fa-bell"></i>
+        </button>
+        
+        <div class="notif-panel" id="notifPanel" style="position: absolute; right: 0; top: 125%; width: 360px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); display: none; z-index: 1000; overflow: hidden;">
+            <div class="notif-header" style="padding: 15px; border-bottom: 1px solid var(--border); font-weight: 700; color: var(--text); font-size: 16px; text-align: left;">
+                Recent Activity
+            </div>
+            <div class="notif-list" id="notifList" style="max-height: 400px; overflow-y: auto;">
                 </div>
+        </div>
+    </div>
+
+    <div class="admin-pill">
+        <?= htmlspecialchars($_SESSION['name']) ?>
+    </div>
+</div>
+
+<script>
+(function() {
+    const wrapper = document.getElementById('notifWrapper');
+    const btn = document.getElementById('notifBtn');
+    const panel = document.getElementById('notifPanel');
+    const list = document.getElementById('notifList');
+    
+    let isOpen = false;
+    let loaded = false;
+
+    function fetchNotifications() {
+        list.innerHTML = '<div class="notif-loading" style="text-align:center; padding:20px; color:var(--text-light);"><i class="fa-solid fa-spinner fa-spin"></i> <span>Loading...</span></div>';
+        
+        // Memanggil URL saat ini secara dinamis agar tidak salah path
+        const currentUrl = window.location.pathname;
+        
+        fetch(currentUrl + '?action=get_all_activities')
+            .then(response => {
+                if (!response.ok) throw new Error('Network response failed');
+                return response.text();
+            })
+            .then(html => {
+                list.innerHTML = html;
+                loaded = true;
+            })
+            .catch((err) => {
+                console.error(err);
+                list.innerHTML = '<div class="notif-empty" style="text-align:center; padding:20px; color:var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> <span>Failed to load</span></div>';
+            });
+    }
+
+    function togglePanel() {
+        if (isOpen) {
+            panel.style.display = 'none';
+            btn.classList.remove('active');
+            isOpen = false;
+        } else {
+            panel.style.display = 'block';
+            btn.classList.add('active');
+            isOpen = true;
+            if (!loaded) fetchNotifications();
+        }
+    }
+
+    btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        togglePanel();
+    });
+
+    document.addEventListener('click', function(e) {
+        if (isOpen && !wrapper.contains(e.target)) {
+            panel.style.display = 'none';
+            btn.classList.remove('active');
+            isOpen = false;
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && isOpen) {
+            panel.style.display = 'none';
+            btn.classList.remove('active');
+            isOpen = false;
+        }
+    });
+})();
+</script>
             </header>
