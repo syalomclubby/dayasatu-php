@@ -39,7 +39,7 @@ $query_brand = mysqli_query($conn, $sql_brand);
         <div class="alert alert-danger">
             <i class="fa-solid fa-circle-exclamation"></i>
             <span>
-                Brand tidak dapat dihapus karena masih memiliki produk.
+                The brand cannot be removed because it still has products.
             </span>
         </div>
     <?php endif; ?>

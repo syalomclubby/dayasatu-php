@@ -35,11 +35,11 @@ $query_category = mysqli_query($conn, $sql_category);
 
     <?php endif; ?>
 
-    <?php if (isset($_GET['error']) && $_GET['error'] === 'category_has_brands') : ?>
+    <?php if (isset($_GET['error']) && $_GET['error'] === 'category_has_products') : ?>
         <div class="alert alert-danger">
             <i class="fa-solid fa-circle-exclamation"></i>
             <span>
-                Category tidak dapat dihapus karena masih memiliki brand.
+                Category cannot be deleted because it still has products.
             </span>
         </div>
     <?php endif; ?>

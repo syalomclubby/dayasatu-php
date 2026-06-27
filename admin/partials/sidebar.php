@@ -61,7 +61,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_all_activities') {
                 $icon_class = 'fa-tags'; 
                 $bg_icon_class = 'activity-brand'; 
             } elseif ($row['activity_type'] == 'category') { 
-                $icon_class = 'fa-folder'; 
+                $icon_class = 'fa-layer-group'; 
                 $bg_icon_class = 'activity-category'; 
             }
             
@@ -254,7 +254,7 @@ $logged_in_id = $_SESSION['user_id'] ?? 0;
         
         <div class="notif-panel" id="notifPanel" style="position: absolute; right: 0; top: 125%; width: 360px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); display: none; z-index: 1000; overflow: hidden;">
             <div class="notif-header" style="padding: 15px; border-bottom: 1px solid var(--border); font-weight: 700; color: var(--text); font-size: 16px; text-align: left;">
-                Recent Activity
+                Activity
             </div>
             <div class="notif-list" id="notifList" style="max-height: 400px; overflow-y: auto;">
                 </div>

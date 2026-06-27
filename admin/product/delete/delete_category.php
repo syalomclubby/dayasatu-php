@@ -12,13 +12,13 @@ if (!$category_id) {
 
 /*
 |--------------------------------------------------------------------------
-| Cek apakah category masih dipakai brand
+| Cek apakah category masih dipakai product
 |--------------------------------------------------------------------------
 */
 
 $sqlCheck = "
     SELECT COUNT(*) AS total
-    FROM brands
+    FROM products
     WHERE category_id = ?
 ";
 
@@ -34,7 +34,7 @@ mysqli_stmt_close($stmtCheck);
 
 if (($rowCheck['total'] ?? 0) > 0) {
 
-    header("Location: ../categories.php?error=category_has_brands");
+    header("Location: ../categories.php?error=category_has_products");
     exit;
 }
 

@@ -30,6 +30,40 @@ $query_user = mysqli_query($conn, $sql_user);
 
     <?php endif; ?>
 
+    <?php if (isset($_GET['error'])) : 
+    $error = $_GET['error'];
+    $message = "";
+
+    if ($error === 'user_has_products') {
+        $message = "products";
+    } elseif ($error === 'user_has_brands') {
+        $message = "brands";
+    } elseif ($error === 'user_has_categories') {
+        $message = "categories";
+    }
+    elseif ($error === 'cannot_delete' && isset($_GET['relations'])) {
+        $relations_str = $_GET['relations'];
+        $last_comma_pos = strrpos($relations_str, ',');
+        if ($last_comma_pos !== false) {
+            $message = substr_replace($relations_str, ' and ', $last_comma_pos, 1);
+        } else {
+            $message = $relations_str;
+        }
+    }
+
+    if (!empty($message)) :
+?>
+    <div class="alert alert-danger">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>
+            User cannot be deleted because they still have <?php echo htmlspecialchars($message); ?>.
+        </span>
+    </div>
+<?php 
+    endif;
+endif; 
+?>
+
     <?php if (isset($_GET['success']) && $_GET['success'] === 'deleted') : ?>
         <div class="alert alert-success">
             <i class="fa-solid fa-circle-check"></i>
