@@ -282,7 +282,7 @@ $logged_in_id = $_SESSION['user_id'] ?? 0;
         // Memanggil URL saat ini secara dinamis agar tidak salah path
         const currentUrl = window.location.pathname;
         
-        fetch(currentUrl + '?action=get_all_activities')
+        fetch('<?= $base_url ?? "" ?>admin/partials/sidebar.php?action=get_all_activities')
             .then(response => {
                 if (!response.ok) throw new Error('Network response failed');
                 return response.text();
