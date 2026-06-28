@@ -7,7 +7,9 @@ products.name AS products_name,
 products.followed_up_at AS products_at,
 brands.name AS brand_name,
 users.name AS user_name,
-categories.name AS category_name
+categories.name AS category_name,
+(SELECT MIN(price) FROM product_prices WHERE product_id = products.product_id) AS min_price,
+(SELECT MAX(price) FROM product_prices WHERE product_id = products.product_id) AS max_price
 FROM products 
 INNER JOIN users ON products.followed_up_by = users.user_id
 INNER JOIN brands ON products.brand_id = brands.brand_id
@@ -66,6 +68,7 @@ $query_product = mysqli_query($conn, $sql_products);
                     <th>Brand</th>
                     <th>Cateory</th>
                     <th>Name</th>
+                    <th>Price</th>
                     <th>Description</th>
                     <th>Image</th>
                     <th>Followed Up By</th>
@@ -97,6 +100,20 @@ $query_product = mysqli_query($conn, $sql_products);
                             <div class="table-name">
                                 <?= $result['products_name']; ?>
                             </div>
+                        </td>
+
+                        <td>
+                            <?php 
+                                if ($result['min_price'] !== null && $result['max_price'] !== null) {
+                                    if ($result['min_price'] == $result['max_price']) {
+                                        echo "Rp " . number_format($result['min_price'], 0, ',', '.');
+                                    } else {
+                                        echo "Rp " . number_format($result['min_price'], 0, ',', '.') . " - Rp " . number_format($result['max_price'], 0, ',', '.');
+                                    }
+                            } else {
+                            echo "<em>Belum ada harga</em>";
+                            }
+                            ?>
                         </td>
 
                         <td>
@@ -133,6 +150,9 @@ $query_product = mysqli_query($conn, $sql_products);
                             <div class="table-actions">
                                 <a href="edit/edit_product.php?product_id=<?= $result['product_id']; ?>" class="table-action" aria-label="Edit">
                                     <i class="fa-solid fa-pen"></i>
+                                </a>
+                                <a href="product_prices.php?product_id=<?= $result['product_id'] ?>" class="btn-pricing" title="Kelola Harga">
+                                    <i class="fa-solid fa-tag"></i>
                                 </a>
                                 <a
                                     href="delete/delete_product.php?product_id=<?= $result['product_id']; ?>"
