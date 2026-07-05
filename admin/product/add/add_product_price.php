@@ -2,7 +2,7 @@
 require_once __DIR__ . "/../../security.php";
 require_once __DIR__ . "/../../../config/connection.php";
 
-$errors = [];
+
 
 $current_user_id = (int) ($_SESSION['user_id'] ?? 0);
 $current_user_name = '';
@@ -37,16 +37,8 @@ if (!isset($_GET['product_id']) || !is_numeric($_GET['product_id'])) {
 
 $product_id = (int) $_GET['product_id'];
 
-/*
-|--------------------------------------------------------------------------
-| Helper Functions
-|--------------------------------------------------------------------------
-*/
 
-function cleanSize($size)
-{
-    return strtolower(trim(preg_replace('/\s+/', ' ', $size)));
-}
+
 
 /*
 |--------------------------------------------------------------------------
@@ -109,413 +101,269 @@ $price = "";
 
 $errors = [];
 
-/*
-|--------------------------------------------------------------------------
-| Submit
-|--------------------------------------------------------------------------
-*/
+
+// SUBMIT
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $size = trim($_POST['size']);
-    $price = trim($_POST['price']);
+        $size = trim($_POST['size']);
+        $price = trim($_POST['price']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Validation
-    |--------------------------------------------------------------------------
-    */
+       // VALIDATION
 
-    if (empty($size)) {
-        $errors[] = "Size is required.";
-    }
-
-    if (empty($price)) {
-        $errors[] = "Price is required.";
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Convert Price
-    |--------------------------------------------------------------------------
-    */
-    $price = str_replace('.', '', $price);
-
-    if (!is_numeric($price)) {
-        $errors[] = "Price must be numeric.";
-
-    } else {
-        $price = (float) $price;
-        if ($price <= 0) {
-            $errors[] = "Price must be greater than zero.";
-        }
-    }
-        /*
-    |--------------------------------------------------------------------------
-    | Duplicate Size Validation
-    |--------------------------------------------------------------------------
-    */
-
-    if (empty($errors)) {
-
-        $sqlCheck = "
-            SELECT price_id
-            FROM product_prices
-            WHERE product_id = ?
-            AND LOWER(TRIM(size)) = LOWER(TRIM(?))
-            LIMIT 1
-        ";
-
-        $stmtCheck = mysqli_prepare($conn, $sqlCheck);
-
-        mysqli_stmt_bind_param(
-            $stmtCheck,
-            "is",
-            $product_id,
-            $size
-        );
-
-        mysqli_stmt_execute($stmtCheck);
-        mysqli_stmt_store_result($stmtCheck);
-        if (mysqli_stmt_num_rows($stmtCheck) > 0) {
-            $errors[] = "Size already exists for this product.";
+        if (empty($size)) {
+            $errors[] = "Size is required.";
         }
 
-        mysqli_stmt_close($stmtCheck);
-    }
+        if (empty($price)) {
+            $errors[] = "Price is required.";
+        }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Save Data
-    |--------------------------------------------------------------------------
-    */
+        // CONVERT PRICE
 
-    if (empty($errors)) {
+        $price = str_replace('.', '', $price);
 
-        $followed_up_by = $_SESSION['user_id'];
-
-        $sqlInsert = "
-
-            INSERT INTO product_prices
-            (
-
-                product_id,
-                size,
-                price,
-
-                followed_up_by,
-                followed_up_at,
-                created_at
-
-            )
-
-            VALUES
-            (
-
-                ?,
-                ?,
-                ?,
-
-                ?,
-                NOW(),
-                NOW()
-
-            )
-
-        ";
-
-        $stmtInsert = mysqli_prepare($conn, $sqlInsert);
-
-        mysqli_stmt_bind_param(
-
-            $stmtInsert,
-
-            "isdi",
-
-            $product_id,
-            $size,
-            $price,
-            $followed_up_by
-
-        );
-
-        if (mysqli_stmt_execute($stmtInsert)) {
-
-            $_SESSION['success'] = "Product price added successfully.";
-
-            header("Location: ../product_prices.php?product_id=" . $product_id);
-
-            exit();
+        if (!is_numeric($price)) {
+            $errors[] = "Price must be numeric.";
 
         } else {
-
-            $errors[] = "Failed to save product price.";
-
+            $price = (float) $price;
+            if ($price <= 0) {
+                $errors[] = "Price must be greater than zero.";
+            }
         }
 
+        // DOUBLE VALIDATION
+
+        if (empty($errors)) {
+
+            $sqlCheck = "
+                SELECT price_id
+                FROM product_prices
+                WHERE product_id = ?
+                AND LOWER(TRIM(size)) = LOWER(TRIM(?))
+                LIMIT 1
+            ";
+
+            $stmtCheck = mysqli_prepare($conn, $sqlCheck);
+
+            mysqli_stmt_bind_param(
+                $stmtCheck,
+                "is",
+                $product_id,
+                $size
+            );
+
+            mysqli_stmt_execute($stmtCheck);
+            mysqli_stmt_store_result($stmtCheck);
+            if (mysqli_stmt_num_rows($stmtCheck) > 0) {
+                $errors[] = "Size already exists for this product.";
+            }
+
+            mysqli_stmt_close($stmtCheck);
+        }
+
+        // SAVE DATA
+
+        if (empty($errors)) {
+
+            $followed_up_by = $_SESSION['user_id'];
+
+            $sqlInsert = "
+
+                INSERT INTO product_prices
+                (
+                    product_id,
+                    size,
+                    price,
+                    followed_up_by,
+                    followed_up_at,
+                    created_at
+                )
+
+                VALUES
+                (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    NOW(),
+                    NOW()
+                )
+            ";
+
+            $stmtInsert = mysqli_prepare($conn, $sqlInsert);
+            mysqli_stmt_bind_param(
+                $stmtInsert,
+                "isdi",
+                $product_id,
+                $size,
+                $price,
+                $followed_up_by
+            );
+
+        if (mysqli_stmt_execute($stmtInsert)) {
         mysqli_stmt_close($stmtInsert);
-
+        header("Location: ../product_prices.php?product_id=" . $product_id . "&success=added");
+        exit();
+        } else{
+            mysqli_stmt_close($stmtInsert);
+            $errors[] = "Failed to save product price.";
+        }
     }
-
 }
+
+
 require_once __DIR__ . "/../../partials/sidebar.php";
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
+<div class="content">
+    <div class="main-content">
 
-    <meta charset="UTF-8">
+        // PAGE HEADER
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-    <title>Add Product Price</title>
-
-    <link
-        rel="stylesheet"
-        href="../../../assets/css/admin.css">
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-</head>
-
-
-
-<body>
-
-
-
-<div class="main-content">
-
-    <!-- PAGE HEADER -->
-
-    <div class="page-header">
-
-        <div>
-
-            <h1>Add Product Price</h1>
-
-            <p>Add a new size and price for this product.</p>
-
-        </div>
-
-        <div class="action-group">
-
-            <a
-                href="../product_prices.php?product_id=<?= $product_id; ?>"
-                class="btn-back">
-
-                <i class="fas fa-arrow-left"></i>
-
-                Back
-
-            </a>
-
-        </div>
-
-    </div>
-
-    <!-- PRODUCT INFORMATION -->
-
-    <div class="card">
-
-        <div class="card-header">
-
-            <h2>Product Information</h2>
-
-        </div>
-
-        <div class="card-body">
-
-            <div class="form-group">
-
-                <label>Product</label>
-
-                <input
-                    type="text"
-                    class="form-control"
-                    readonly
-                    value="<?= htmlspecialchars($product['product_name']); ?>">
-
+        <div class="page-header">
+            <div>
+                <h1>Add Product Price</h1>
+                <p>Add a new size and price for this product.</p>
             </div>
 
-            <div class="form-group">
-
-                <label>Brand</label>
-
-                <input
-                    type="text"
-                    class="form-control"
-                    readonly
-                    value="<?= htmlspecialchars($product['brand_name']); ?>">
-
+            <div class="action-group">
+                <a
+                    href="../product_prices.php?product_id=<?= $product_id; ?>"
+                    class="btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Back
+                </a>
             </div>
-
-            <div class="form-group">
-
-                <label>Category</label>
-
-                <input
-                    type="text"
-                    class="form-control"
-                    readonly
-                    value="<?= htmlspecialchars($product['category_name']); ?>">
-
-            </div>
-
         </div>
 
-    </div>
+        // PRODUCT INFORMATION
 
-    <!-- PRICE FORM -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Product Information</h2>
+            </div>
 
-    <div class="card">
-
-        <div class="card-header">
-
-            <h2>Price Information</h2>
-
-        </div>
-
-        <div class="card-body">
-
-            <?php if (!empty($errors)): ?>
-
-                <div class="alert alert-danger">
-
-                    <ul>
-
-                        <?php foreach ($errors as $error): ?>
-
-                            <li><?= htmlspecialchars($error); ?></li>
-
-                        <?php endforeach; ?>
-
-                    </ul>
-
-                </div>
-
-            <?php endif; ?>
-
-            <form method="POST">
-
+            <div class="card-body">
                 <div class="form-group">
-
-                    <label>
-
-                        Size
-                    </label>
-
+                    <label>Product</label>
                     <input
-
                         type="text"
-
-                        name="size"
-
                         class="form-control"
-
-                        placeholder="Example : 5 Kg"
-
-                        value="<?= htmlspecialchars($size); ?>"
-
-                        required>
-
-                    <small>
-
-                        Example:
-                        1 Kg,
-                        5 Kg,
-                        20 Kg,
-                        500 ml
-
-                    </small>
-
+                        readonly
+                        value="<?= htmlspecialchars($product['product_name']); ?>">
                 </div>
 
                 <div class="form-group">
-
-                    <label>
-
-                        Price
-
-                    </label>
-
+                    <label>Brand</label>
                     <input
-
                         type="text"
-
-                        id="price"
-
-                        name="price"
-
                         class="form-control"
-
-                        placeholder="70.000"
-
-                        autocomplete="off"
-
-                        value="<?= htmlspecialchars($price); ?>"
-
-                        required>
-
+                        readonly
+                        value="<?= htmlspecialchars($product['brand_name']); ?>">
                 </div>
 
-                <div class="action-group">
-
-                    <button
-                        type="submit"
-                        class="btn-add"> Add Price
-                        <i class="fas fa-save"></i>
-                    </button>
-
-                    <a
-                        href="../product_prices.php?product_id=<?= $product_id; ?>"
-                        class="btn-back"> Cancel &nbsp
-                        <i class="fas fa-times"></i>
-                    </a>
-
+                <div class="form-group">
+                    <label>Category</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        readonly
+                        value="<?= htmlspecialchars($product['category_name']); ?>">
                 </div>
-
-            </form>
-
+            </div>
         </div>
 
+        // PRICE FORM
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Price Information</h2>
+            </div>
+
+            <div class="card-body">
+                <?php if (!empty($errors)): ?>
+                    <div class="alert alert-danger">
+                        <ul>
+                            <?php foreach ($errors as $error): ?>
+                                <li><?= htmlspecialchars($error); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <form method="POST">
+                    <div class="form-group">
+                        <label>
+                            Size
+                        </label>
+
+                        <input
+                            type="text"
+                            name="size"
+                            class="form-control"
+                            placeholder="Example : 5 Kg"
+                            value="<?= htmlspecialchars($size); ?>"
+                            required>
+                        <small>
+                            Example:
+                            1 Kg,
+                            5 Kg,
+                            20 Kg,
+                            500 ml
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Price
+                        </label>
+                        <input
+                            type="text"
+                            id="price"
+                            name="price"
+                            class="form-control"
+                            placeholder="70.000"
+                            autocomplete="off"
+                            value="<?= htmlspecialchars($price); ?>"
+                            required>
+                    </div>
+
+                    <div class="action-group">
+                        <button
+                            type="submit"
+                            class="btn-add"> Add Price
+                            <i class="fas fa-save"></i>
+                        </button>
+
+                        <a
+                            href="../product_prices.php?product_id=<?= $product_id; ?>"
+                            class="btn-back"> Cancel &nbsp
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
+    <script>
+    const priceInput = document.getElementById('price');
+    priceInput.addEventListener('input', function () {
+        let value = this.value.replace(/\D/g, '');
+        if (value === '') {
+            this.value = '';
+            return;
+        }
+        this.value = new Intl.NumberFormat('id-ID').format(value);
+    });
+    </script>
 </div>
 
-<script>
-
-const priceInput = document.getElementById('price');
-
-priceInput.addEventListener('input', function () {
-
-    let value = this.value.replace(/\D/g, '');
-
-    if (value === '') {
-        this.value = '';
-        return;
-    }
-
-    this.value = new Intl.NumberFormat('id-ID').format(value);
-
-});
-
-</script>
-
-</body>
-
-</html>
 
 <?php
-
 mysqli_stmt_close($stmtProduct);
-
 mysqli_close($conn);
-
 ?>

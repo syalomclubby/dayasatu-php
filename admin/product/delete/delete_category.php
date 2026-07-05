@@ -10,11 +10,7 @@ if (!$category_id) {
     exit;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Cek apakah category masih dipakai product
-|--------------------------------------------------------------------------
-*/
+// Cek apakah category masih dipakai product
 
 $sqlCheck = "
     SELECT COUNT(*) AS total
@@ -38,11 +34,7 @@ if (($rowCheck['total'] ?? 0) > 0) {
     exit;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Hapus category
-|--------------------------------------------------------------------------
-*/
+// Hapus Category
 
 $sqlDelete = "DELETE FROM categories WHERE category_id = ?";
 $stmtDelete = mysqli_prepare($conn, $sqlDelete);

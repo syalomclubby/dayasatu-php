@@ -1,4 +1,16 @@
 <?php include 'partials/header.php'; ?>
+<?php
+$host = "localhost";
+$user = "root";       // Username database Anda (default XAMPP biasanya root)
+$pass = "";           // Password database Anda (default XAMPP biasanya kosong)
+$db   = "dayasatu"; // Ubah dengan nama database yang Anda buat
+
+$koneksi = mysqli_connect($host, $user, $pass, $db);
+
+if (!$koneksi) {
+    die("Koneksi ke database gagal: " . mysqli_connect_error());
+}
+?>
 
 <main class="page" id="home">
   <section class="screen hero-screen">

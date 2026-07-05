@@ -118,93 +118,95 @@ $totalPrices = mysqli_num_rows($priceResult);
 $pageTitle = "Product Pricing";
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-    <title><?= htmlspecialchars($pageTitle); ?></title>
-
-    <link
-        rel="stylesheet"
-        href="../../assets/css/admin.css">
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-</head>
-
-<body>
+<div class="content">
 
 <?php include '../partials/sidebar.php' ?>
 
 <div class="main-content">
-
     <div class="page-header">
-
         <div>
-
             <h1>Pricing Management</h1>
-
             <p>Manage prices for each product.</p>
-
         </div>
 
         <div class="action-group">
-
             <a
                 href="products.php"
                 class="btn-back">
-
                 <i class="fas fa-arrow-left"></i>
-
                 Back to Products
-
             </a>
-
         </div>
-
     </div>
 
     <!-- PRODUCT INFORMATION -->
 
     <div class="card">
+    <!-- Success Alert -->
+<?php if (isset($_GET['success'])) : ?>
+
+    <?php if ($_GET['success'] === 'added') : ?>
+        <div class="alert alert-success">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Product price successfully added.</span>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($_GET['success'] === 'updated') : ?>
+        <div class="alert alert-success">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Product price successfully updated.</span>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($_GET['success'] === 'deleted') : ?>
+        <div class="alert alert-success">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Product price successfully deleted.</span>
+        </div>
+    <?php endif; ?>
+
+<?php endif; ?>
+
+
+<!-- Error Alert -->
+<?php if (isset($_GET['error'])) : ?>
+
+    <?php if ($_GET['error'] === 'notfound') : ?>
+        <div class="alert alert-danger">
+            <i class="fa-solid fa-circle-xmark"></i>
+            <span>Product price not found.</span>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($_GET['error'] === 'failed') : ?>
+        <div class="alert alert-danger">
+            <i class="fa-solid fa-circle-xmark"></i>
+            <span>Failed to process product price.</span>
+        </div>
+    <?php endif; ?>
+
+<?php endif; ?>
 
         <div class="card-header">
-
             <h2>Product Information</h2>
-
-            <a href="products.php" class="btn-back">
-                <i class="fas fa-arrow-left"></i>
-                Back to Products
-            </a>
         </div>
 
         <div class="card-body">
-
             <table class="info-table">
-
                 <tr>
                     <th width="180">Product</th>
                     <td>
                         <?= htmlspecialchars($product['product_name']); ?>
                     </td>
                 </tr>
-
                 <tr>
                     <th>Brand</th>
                     <td>
                         <?= htmlspecialchars($product['brand_name']); ?>
                     </td>
                 </tr>
-
                 <tr>
                     <th>Category</th>
                     <td>
@@ -220,7 +222,6 @@ $pageTitle = "Product Pricing";
             </table>
         </div>
     </div>
-
 
 
     <!-- PRICE TABLE -->
@@ -280,60 +281,53 @@ $pageTitle = "Product Pricing";
                         <?= formatDateTime($row['created_at']); ?>
                     </td>
                     <td>
-                         <a
+                        <div class="table-actions">
+                             <a
                             href="edit/edit_product_price.php?price_id=<?= $row['price_id']; ?>"
-                            class="btn-edit"
-                            title="Edit">
+                            class="table-action table-action-danger" aria-label="Edit">
                             <i class="fas fa-edit"></i>
-                        </a>
+                            </a>
 
-                        <a
-                            href="delete/delete_product_price.php?price_id=<?= $row['price_id']; ?>"
-                            class="btn-delete"
-                            onclick="return confirm('Delete this price?');"
-                            title="Delete">
-                            <i class="fas fa-trash"></i>
-                        </a>
+                            <form
+                                action="delete/delete_product_price.php"
+                                method="POST"
+                                class="delete-form">
+                                <input
+                                    type="hidden"
+                                    name="price_id"
+                                    value="<?= $row['price_id']; ?>">
+                                <button
+                                    type="submit"
+                                    class="table-action table-action-danger"
+                                        aria-label="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
-
                 <?php endwhile; ?>
-
                 </tbody>
 
             </table>
-
             <?php else: ?>
-
                 <div class="empty-state">
-
                     <i
                         class="fas fa-tags"
                         style="font-size:48px;color:#999;margin-bottom:15px;">
                     </i>
-
                     <h3>No Product Prices Found</h3>
-
                     <p>
-
                         Click <strong>Add Price</strong>
                         to create the first price.
-
                     </p>
-
                 </div>
-
             <?php endif; ?>
-
         </div>
-
     </div>
-
+</div>
 </div>
 
-</body>
-
-</html>
 
 <?php
 
@@ -343,6 +337,40 @@ mysqli_stmt_close($stmtPrices);
 mysqli_close($conn);
 
 ?>
+
+<script>
+    document.querySelectorAll(".delete-form").forEach(form => {
+
+    form.addEventListener("submit", function(e){
+
+        e.preventDefault();
+
+            Swal.fire({
+                title: 'Delete Price?',
+                text: 'Harga yang dihapus tidak dapat dikembalikan.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete Price',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+
+                customClass: {
+                    popup: 'swal-popup',
+                    title: 'swal-title',
+                    htmlContainer: 'swal-text',
+                    confirmButton: 'swal-btn-delete',
+                    cancelButton: 'swal-btn-cancel'
+                },
+
+        }).then((result)=>{
+
+            if(result.isConfirmed){
+                form.submit();
+            }
+        });
+    });
+});
+</script>
 
 
                 
