@@ -3,7 +3,10 @@
 require_once __DIR__ . "/../security.php";
 require_once __DIR__ . "/../../config/connection.php";
 
-$sql_user = "SELECT * FROM users";
+$sql_user = "SELECT *,
+created_at AS waktu
+FROM users
+";
 $query_user = mysqli_query($conn, $sql_user);
 
 ?>
@@ -121,7 +124,7 @@ endif;
                         </td>
 
                         <td class="table-muted">
-                            <?= $result['created_at']; ?>
+                            <?= $result['waktu']; ?>
                         </td>
 
                         <td>

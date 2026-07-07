@@ -89,7 +89,7 @@ SELECT
     pp.size,
     pp.price,
     pp.followed_up_at,
-    pp.created_at,
+    pp.created_at AS waktu,
 
     u.name AS admin_name
 
@@ -278,7 +278,7 @@ $pageTitle = "Product Pricing";
                         <?= formatDateTime($row['followed_up_at']); ?>
                     </td>
                     <td>
-                        <?= formatDateTime($row['created_at']); ?>
+                        <?= formatDateTime($row['waktu']); ?>
                     </td>
                     <td>
                         <div class="table-actions">

@@ -5,6 +5,7 @@ require_once __DIR__ . "/../../config/connection.php";
 $sql_brand = "SELECT *,
 brands.name AS brand_name,
 brands.followed_up_at AS brands_at,
+brands.created_at AS waktu,
 users.name AS user_name
 FROM brands
 INNER JOIN users ON brands.followed_up_by = users.user_id
@@ -109,7 +110,7 @@ $query_brand = mysqli_query($conn, $sql_brand);
                         </td>
 
                         <td class="table-muted">
-                            <?= $result['created_at']; ?>
+                            <?= $result['waktu']; ?>
                         </td>
 
                         <td>

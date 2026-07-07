@@ -5,6 +5,7 @@ require_once __DIR__ . "/../../config/connection.php";
 $sql_products = "SELECT *, 
 products.name AS products_name,
 products.followed_up_at AS products_at,
+products.created_at AS waktu,
 brands.name AS brand_name,
 users.name AS user_name,
 categories.name AS category_name,
@@ -143,7 +144,7 @@ $query_product = mysqli_query($conn, $sql_products);
                         </td>
 
                         <td class="table-muted">
-                            <?= $result['created_at']; ?>
+                            <?= $result['waktu']; ?>
                         </td>
 
                         <td>

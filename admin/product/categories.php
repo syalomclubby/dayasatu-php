@@ -5,6 +5,7 @@ require_once __DIR__ . "/../../config/connection.php";
 
 $sql_category = "SELECT *,
 categories.name AS category_name,
+categories.created_at AS waktu,
 users.name AS user_name
 FROM categories
 INNER JOIN users ON categories.followed_up_by = users.user_id
@@ -102,7 +103,7 @@ $query_category = mysqli_query($conn, $sql_category);
                         </td>
 
                         <td class="table-muted">
-                            <?= $result['created_at']; ?>
+                            <?= $result['waktu']; ?>
                         </td>
 
                         <td>
