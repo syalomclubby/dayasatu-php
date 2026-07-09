@@ -153,7 +153,7 @@ $query_product = mysqli_query($conn, $sql_products);
                                 <a href="edit/edit_product.php?product_id=<?= $result['product_id']; ?>" class="table-action" aria-label="Edit">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
-                                <a href="product_prices.php?product_id=<?= $result['product_id'] ?>" class="btn-pricing" title="Kelola Harga">
+                                <a href="product_prices.php?product_id=<?= $result['product_id'] ?>" class="table-action" aria-label="Pricing">
                                     <i class="fa-solid fa-tag"></i>
                                 </a>
                                 <a
