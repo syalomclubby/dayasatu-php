@@ -10,7 +10,8 @@ brands.name AS brand_name,
 users.name AS user_name,
 categories.name AS category_name,
 (SELECT MIN(price) FROM product_prices WHERE product_id = products.product_id) AS min_price,
-(SELECT MAX(price) FROM product_prices WHERE product_id = products.product_id) AS max_price
+(SELECT MAX(price) FROM product_prices WHERE product_id = products.product_id) AS max_price,
+products.description
 FROM products 
 INNER JOIN users ON products.followed_up_by = users.user_id
 INNER JOIN brands ON products.brand_id = brands.brand_id

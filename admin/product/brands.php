@@ -69,7 +69,6 @@ $query_brand = mysqli_query($conn, $sql_brand);
                 <tr>
                     <th>No</th>
                     <th>Name</th>
-                    <th>Description</th>
                     <th>Followed Up By</th>
                     <th>Followed Up At</th>
                     <th>Created At</th>
@@ -81,7 +80,6 @@ $query_brand = mysqli_query($conn, $sql_brand);
                 $brand = 1;
                 while ($result = mysqli_fetch_array($query_brand)) {
                     $brand_name = $result['brand_name'];
-                    $description = $result['description'];
                     $brand_id = $result['brand_id'];
                 ?>
                     <tr>
@@ -92,12 +90,6 @@ $query_brand = mysqli_query($conn, $sql_brand);
                         <td>
                             <div class="table-name">
                                 <?= htmlspecialchars($brand_name); ?>
-                            </div>
-                        </td>
-
-                        <td>
-                            <div class="table-description">
-                                <?= htmlspecialchars($description); ?>
                             </div>
                         </td>
 

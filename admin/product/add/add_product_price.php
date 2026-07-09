@@ -221,7 +221,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
 <div class="content">
     <div class="main-content">
 
-        // PAGE HEADER
+         <!-- PAGE HEADER -->
 
         <div class="page-header">
             <div>
@@ -239,7 +239,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
             </div>
         </div>
 
-        // PRODUCT INFORMATION
+        <!-- PRODUCT INFORMATION -->
 
         <div class="card">
             <div class="card-header">
@@ -276,7 +276,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
             </div>
         </div>
 
-        // PRICE FORM
+        <!-- PRICE FORM -->
 
         <div class="card">
             <div class="card-header">

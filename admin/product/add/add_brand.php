@@ -6,7 +6,6 @@ require_once __DIR__ . "/../../../config/connection.php";
 $errors = [];
 
 $name = '';
-$description = '';
 
 $current_user_id = (int) ($_SESSION['user_id'] ?? 0);
 $current_user_name = '';
@@ -34,14 +33,9 @@ $query_categories = mysqli_query($conn, $sql_categories);
 if (isset($_POST['save'])) {
 
     $name = trim($_POST['name'] ?? '');
-    $description = trim($_POST['description'] ?? '');
 
     if ($name === '') {
         $errors[] = 'Brand name is required.';
-    }
-
-    if ($description === '') {
-        $errors[] = 'Description is required.';
     }
 
     if (empty($errors)) {
@@ -50,12 +44,10 @@ if (isset($_POST['save'])) {
             INSERT INTO brands
             (
                 name,
-                description,
                 followed_up_by
             )
             VALUES
             (
-                ?,
                 ?,
                 ?
             )
@@ -66,9 +58,8 @@ if (isset($_POST['save'])) {
         if ($stmt) {
             mysqli_stmt_bind_param(
                 $stmt,
-                "ssi",
+                "si",
                 $name,
-                $description,
                 $current_user_id
             );
 
@@ -147,19 +138,6 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                         value="<?= htmlspecialchars($name); ?>"
                         placeholder="Enter brand name"
                         required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">
-                        Description
-                    </label>
-
-                    <textarea
-                        name="description"
-                        class="form-control"
-                        rows="6"
-                        placeholder="Enter brand description"
-                        required><?= htmlspecialchars($description);?></textarea>
                 </div>
 
                 <div class="action-group">
