@@ -2,6 +2,21 @@
 require_once __DIR__ . "/../security.php";
 require_once __DIR__ . "/../../config/connection.php";
 
+// Pagination
+$limit = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+
+if ($page < 1) {
+    $page = 1;
+}
+
+$offset = ($page - 1) * $limit;
+
+// Hitung total data
+$total_query = mysqli_query($conn, "SELECT COUNT(*) AS total FROM products");
+$total_data = mysqli_fetch_assoc($total_query)['total'];
+$total_pages = ceil($total_data / $limit);
+
 $sql_products = "SELECT *, 
 products.name AS products_name,
 products.followed_up_at AS products_at,
@@ -16,6 +31,7 @@ FROM products
 INNER JOIN users ON products.followed_up_by = users.user_id
 INNER JOIN brands ON products.brand_id = brands.brand_id
 INNER JOIN categories ON products.category_id = categories.category_id
+LIMIT $limit OFFSET $offset
 ";
 
 $query_product = mysqli_query($conn, $sql_products);
@@ -82,7 +98,7 @@ $query_product = mysqli_query($conn, $sql_products);
 
             <tbody>
                 <?php
-                $i = 1;
+                $i = $offset + 1;
                 while ($result = mysqli_fetch_array($query_product)) {
                 ?>
                     <tr>
@@ -169,6 +185,36 @@ $query_product = mysqli_query($conn, $sql_products);
             </tbody>
         </table>
     </div>
+
+    
+
+    <div style="display:flex; justify-content:center; margin-top:24px;">
+        <div class="pagination">
+
+            <?php if ($page > 1): ?>
+                <a href="?page=<?= $page-1 ?>" class="page-link">
+                    <i class="fa-solid fa-angle-left"></i>
+                </a>
+            <?php endif; ?>
+
+            <?php for ($p = 1; $p <= $total_pages; $p++): ?>
+                <a
+                    href="?page=<?= $p ?>"
+                    class="page-link <?= ($p == $page) ? 'active' : '' ?>">
+                    <?= $p ?>
+                </a>
+            <?php endfor; ?>
+
+            <?php if ($page < $total_pages): ?>
+                <a href="?page=<?= $page+1 ?>" class="page-link">
+                    <i class="fa-solid fa-angle-right"></i>
+                </a>
+            <?php endif; ?>
+
+        </div>
+    </div>
+
+
 </div>
 
 <script>
