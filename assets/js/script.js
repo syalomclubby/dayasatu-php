@@ -329,7 +329,7 @@ document
 
     if(currentPage>1){
         currentPage--;
-         animationPagination(()=>{
+         animatePagination(()=>{
         updatePagination(filteredProducts);
     });
 }});
@@ -345,7 +345,7 @@ document
         );
     if(currentPage<totalPages){
       currentPage++;
-      animationPagination(()=>{
+      animatePagination(()=>{
       updatePagination(filteredProducts);
     });
 }});
