@@ -12,6 +12,13 @@ if (!$koneksi) {
 }
 ?>
 
+<?php
+define('DAYASATU', true);
+
+require_once 'config/connection.php';
+require_once 'includes/product_query.php';
+?>
+
 <main class="page" id="home">
   <section class="screen hero-screen">
     <div class="container screen-inner hero-grid">
@@ -184,201 +191,165 @@ if (!$koneksi) {
 
   <section id="produk" class="screen section-light">
     <div class="container screen-inner stack">
-      <div class="section-head hidden-left">
+      <div class="section-head">
         <span class="section-tag">Produk</span>
         <h2>Produk Unggulan</h2>
         <p>
           Kami menyediakan berbagai brand dan material untuk kebutuhan
-          pengecatan dan finishing.
+          pengecatan dan finishing. <br><br>
         </p>
-        <div class="product-filter">
-          <button class="filter-btn active" data-filter="all">Semua</button>
-          <button class="filter-btn" data-filter="cat">Cat</button>
-          <button class="filter-btn" data-filter="bahan">Bahan</button>
-          <button class="filter-btn" data-filter="tiner">Tiner</button>
-          <button class="filter-btn" data-filter="lem">Lem</button>
-          <button class="filter-btn" data-filter="finishing">
-            Finishing
+
+        <section class="product-filter-container">
+
+          <button
+              id="filter-toggle"
+              class="filter-toggle">
+
+              <div class="filter-toggle-left">
+                  <div class="filter-header">
+                      <i class="fa-solid fa-filter"></i>
+                      <span id="filter-title">
+                          Filter Produk
+                      </span>
+                  </div>
+                  <div id="active-filters" class="active-filters">
+                  </div>
+              </div>
+              <i
+                  id="filter-arrow"
+                  class="fa-solid fa-chevron-down">
+              </i>
           </button>
-        </div>
+
+          <div
+              id="filter-content"
+              class="filter-content collapsed">
+
+              <div class="filter-group">
+
+                <h3>Brand</h3>
+
+                <div
+                    class="product-filter"
+                    id="brand-filter">
+
+                    <button
+                        class="filter-btn active"
+                        data-brand="all">
+                        Semua
+                    </button>
+
+                    <?php while($brand = mysqli_fetch_assoc($query_brands)): ?>
+
+                        <button
+                            class="filter-btn"
+                            data-brand="<?= strtolower(htmlspecialchars($brand['name'])) ?>">
+
+                            <?= htmlspecialchars($brand['name']) ?>
+                        </button>
+                    <?php endwhile; ?>
+                </div>
+            </div>
+
+            <br>
+
+              <div class="filter-group">
+
+                <h3>Kategori</h3>
+
+                <div
+                    class="product-filter"
+                    id="category-filter">
+
+                    <button
+                        class="filter-btn active"
+                        data-category="all">
+                        Semua
+                    </button>
+
+                    <?php while($category = mysqli_fetch_assoc($query_categories)): ?>
+
+                        <button
+                            class="filter-btn"
+                            data-category="<?= strtolower(htmlspecialchars($category['name'])) ?>">
+
+                            <?= htmlspecialchars($category['name']) ?>
+                        </button>
+                    <?php endwhile; ?>
+                </div>
+              </div>
+          </div>
+      </section>
       </div>
 
       <div class="product-grid hidden-left">
-        <article class="product-card featured" data-category="cat">
-          <div class="product-image">
-            <img src="assets/images/products/belkote.png" alt="Belkote" />
-          </div>
-          <div class="product-body">
-            <h3>Belkote</h3>
-            <p>Solusi cat dan finishing berkualitas tinggi.</p>
-          </div>
-        </article>
 
-        <article class="product-card" data-category="cat">
-          <div class="product-image">
-            <img src="assets/images/products/axt.png" alt="AXT" />
-          </div>
-          <div class="product-body">
-            <h3>AXT</h3>
-            <p>Performa pengecatan andal.</p>
-          </div>
-        </article>
+        <?php while($product = mysqli_fetch_assoc($query_products)): ?>
 
-        <article class="product-card" data-category="finishing">
-          <div class="product-image">
-            <img src="assets/images/products/nikken.png" alt="Nikken" />
-          </div>
-          <div class="product-body">
-            <h3>Nikken</h3>
-            <p>Finishing dan perlindungan.</p>
-          </div>
-        </article>
+        <?php
+        $brandFolder = strtolower(trim($product['brand_name']));
+        $brandFolder = str_replace(' ', '_', $brandFolder);
+        $imagePath = "assets/images/products/$brandFolder/" . $product['image'] . ".png";
 
-        <article class="product-card" data-category="cat">
-          <div class="product-image">
-            <img src="assets/images/products/dms.png" alt="DMS" />
-          </div>
-          <div class="product-body">
-            <h3>DMS Premium</h3>
-            <p>Untuk otomotif dan industri.</p>
-          </div>
-        </article>
+        if(!file_exists($imagePath))
+        {
+            $imagePath = "assets/images/products/no_brand/" . $product['image'];
+        }
+        ?>
 
-        <article class="product-card" data-category="cat">
-          <div class="product-image">
-            <img
-              src="assets/images/products/nippon.png"
-              alt="Nippon Nax Prime" />
-          </div>
-          <div class="product-body">
-            <h3>Nippon Nax Prime</h3>
-            <p>Hasil refinish lebih halus.</p>
-          </div>
-        </article>
+        <article
+        class="product-card"
+        data-brand="<?= strtolower(htmlspecialchars($product['brand_name'])) ?>"
+        data-category="<?= strtolower(htmlspecialchars($product['category_name'])) ?>">
 
-        <article class="product-card" data-category="finishing">
-          <div class="product-image">
-            <img src="assets/images/products/autobright.png" alt="Autobright" />
-          </div>
-          <div class="product-body">
-            <h3>Autobright</h3>
-            <p>Finishing tampak bersih.</p>
-          </div>
-        </article>
+            <div class="product-image">
+                <img
+                src="<?= $imagePath ?>"
+                alt="<?= htmlspecialchars($product['name']) ?>">
+            </div>
 
-        <article class="product-card" data-category="bahan">
-          <div class="product-image">
-            <img src="assets/images/products/kingkong.png" alt="Mortar Kingkong" />
-          </div>
-          <div class="product-body">
-            <h3>Mortar Kingkong</h3>
-            <p>Persiapan permukaan maksimal.</p>
-          </div>
-        </article>
+            <div class="product-body">
 
-        <article class="product-card" data-category="tiner">
-          <div class="product-image">
-            <img
-              src="assets/images/products/tinerpredator.png"
-              alt="Thinner Predator" />
-          </div>
-          <div class="product-body">
-            <h3>Thinner Predator</h3>
-            <p>Bahan pelarut berkualitas.</p>
-          </div>
-        </article>
+                <h3>
+                    <?= htmlspecialchars($product['name']) ?>
+                </h3>
 
-        <article class="product-card" data-category="tiner">
-          <div class="product-image">
-            <img src="assets/images/products/drakhon.png" alt="Drakhon" />
-          </div>
-          <div class="product-body">
-            <h3>Drakhon</h3>
-            <p>Proteksi dan hasil akhir kuat.</p>
-          </div>
-        </article>
+                <p>
+                    <?= htmlspecialchars($product['description']) ?>
+                </p>
 
-        <article class="product-card" data-category="tiner">
-          <div class="product-image">
-            <img src="assets/images/products/piala-f7.png" alt="Piala F7" />
-          </div>
-          <div class="product-body">
-            <h3>Thinner F7</h3>
-            <p>Finishing dengan estetika tinggi.</p>
-          </div>
-        </article>
+                <?php if($product['min_price']): ?>
 
-        <article class="product-card" data-category="lem">
-          <div class="product-image">
-            <img src="assets/images/products/supra.png" alt="PVAc Supra" />
-          </div>
-          <div class="product-body">
-            <h3>Lem Putih PVAc Supra</h3>
-            <p>Lem serbaguna untuk kayu dan kertas.</p>
-          </div>
-        </article>
+                <div class="product-price">
+                    Rp <?= number_format($product['min_price'],0,',','.') ?>
+                </div>
 
-        <article class="product-card" data-category="lem">
-          <div class="product-image">
-            <img src="assets/images/products/epoprima.png" alt="Epoxy Epoprima" />
-          </div>
-          <div class="product-body">
-            <h3>Lem Epoxy Epoprima</h3>
-            <p>Lem kuat dan tahan lama untuk kayu/besi.</p>
-          </div>
-        </article>
+                <?php endif; ?>
 
-        <article class="product-card" data-category="lem">
-          <div class="product-image">
-            <img src="assets/images/products/nonsag.png" alt="Benua Non Sag" />
-          </div>
-          <div class="product-body">
-            <h3>Lem Benua Non Sag Epoxy</h3>
-            <p>Lem kapal tidak bau dan kuat</p>
-          </div>
+            </div>
         </article>
-
-        <article class="product-card" data-category="finishing">
-          <div class="product-image">
-            <img src="assets/images/products/swi.png" alt="Swi" />
-          </div>
-          <div class="product-body">
-            <h3>Swi Melamine</h3>
-            <p>Lapisan atas pelindung kayu mengilap.</p>
-          </div>
-        </article>
-
-        <article class="product-card" data-category="finishing">
-          <div class="product-image">
-            <img src="assets/images/products/progloss.png" alt="Pro Gloss" />
-          </div>
-          <div class="product-body">
-            <h3>Pro Gloss Melamine</h3>
-            <p>Dasar pelapis penutup pori kayu.</p>
-          </div>
-        </article>
-
-        <article class="product-card" data-category="cat">
-          <div class="product-image">
-            <img src="assets/images/products/sapporo.png" alt="Sapporo" />
-          </div>
-          <div class="product-body">
-            <h3>Sapporo</h3>
-            <p>Cat semprot motor tahan bensin.</p>
-          </div>
-        </article>
-
-        <article class="product-card" data-category="tiner">
-          <div class="product-image">
-            <img src="assets/images/products/piala.png" alt="Thinner Piala" />
-          </div>
-          <div class="product-body">
-            <h3>Thinner Piala</h3>
-            <p>Pengencer cat duco hasil mengkilap.</p>
-          </div>
-        </article>
+        <?php endwhile; ?>
       </div>
-    </div>
+
+      <div id="empty-product" class="empty-product">
+        <div class="empty-icon">
+              <i class="fas fa-box-open"></i>
+        </div>
+          <h3>Produk tidak ditemukan</h3>
+          <p>
+              Coba pilih Brand atau Kategori yang berbeda.
+          </p>
+      </div>
+      <div class="pagination-container">
+        <button id="prev-page" class="pagination-btn">
+            &laquo;
+        </button>
+        <div id="pagination-numbers"></div>
+        <button id="next-page" class="pagination-btn">
+            &raquo;
+      </button>
+      </div>
+</div>
   </section>
 
   <section class="screen section-dark">

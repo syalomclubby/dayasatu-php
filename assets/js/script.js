@@ -115,25 +115,185 @@ if (contactForm) {
 }
 
 // Filter produk
-const btns = document.querySelectorAll(".filter-btn");
-const items = document.querySelectorAll(".product-card");
 
-btns.forEach(btn => btn.onclick = () => {
-  const f = btn.dataset.filter;
-  btns.forEach(b => b.classList.toggle("active", b === btn));
-  items.forEach(el => {
-    const ok = f === "all" || el.dataset.category === f;
-    el.classList.remove("show");
+const productCards = document.querySelectorAll(".product-card");
+const brandButtons = document.querySelectorAll("#brand-filter .filter-btn");
+const categoryButtons = document.querySelectorAll("#category-filter .filter-btn");
+const searchInput = null;
+const emptyState = document.getElementById("empty-product");
 
-    if (ok) {
-      el.style.display = "";
-      void el.offsetWidth;
-      el.classList.add("show");
-    } else {
-      el.style.display = "none";
+let currentBrand = "all";
+let currentCategory = "all";
+const filterTitle =
+    document.getElementById("filter-title");
+
+const productsPerPage = 8;
+let currentPage = 1;
+let filteredProducts = [];
+
+function renderProducts(cards){
+
+    // Sembunyikan semua produk
+    productCards.forEach(card=>{
+        card.style.display = "none";
+    });
+
+    const start =
+        (currentPage - 1) * productsPerPage;
+    const end =
+        start + productsPerPage;
+    cards.forEach((card,index)=>{
+        if(index >= start && index < end){
+            card.style.display = "";
+        }
+    });
+}
+
+function updatePagination(cards){
+
+    const paginationNumbers =
+        document.getElementById("pagination-numbers");
+    paginationNumbers.innerHTML = "";
+    const totalPages =
+        Math.ceil(
+            cards.length /
+            productsPerPage
+        );
+
+    if(currentPage > totalPages){
+        currentPage = totalPages;
     }
-  });
+
+    renderProducts(cards)
+
+    for(let i=1;i<=totalPages;i++){
+
+        const btn =
+            document.createElement("button");
+        btn.className="page-number";
+        btn.textContent=i;
+
+        if(i===currentPage){
+            btn.classList.add("active");
+        }
+
+        btn.addEventListener("click",()=>{
+            currentPage=i;
+            animatePagination(()=>{
+              updatePagination(cards);
+            })
+        });
+        paginationNumbers.appendChild(btn);
+    }
+}
+
+function filterProducts() {
+
+   const productGrid = document.querySelector(".product-grid");
+    productGrid.classList.add("filtering");
+
+    setTimeout(() => {
+
+    const visibleCards = [];
+
+  productCards.forEach(card => {
+
+    const brand = card.dataset.brand.toLowerCase();
+    const category = card.dataset.category.toLowerCase();
+
+    const matchBrand =
+        currentBrand === "all" ||
+        brand === currentBrand;
+
+    const matchCategory =
+        currentCategory === "all" ||
+        category === currentCategory;
+
+    if (matchBrand && matchCategory) {
+        visibleCards.push(card);
+    } else {
+        card.style.display = "none";
+    }
 });
+
+    filteredProducts = visibleCards;
+    updatePagination(filteredProducts);
+
+    if(emptyState){
+      emptyState.style.display =
+        filteredProducts.length === 0
+        ? "block"
+        : "none";
+    }
+
+     productGrid.classList.remove("filtering");
+    }, 250);
+}
+
+function updateFilterTitle(){
+    activeFilters.innerHTML = "";
+
+    if(
+        currentBrand === "all" &&
+        currentCategory === "all"
+    ){
+        activeFilters.style.display = "none"
+        filterTitle.textContent = "Filter Produk";
+        return;
+    }
+    activeFilters.style.display = "flex";
+    filterTitle.textContent = "Filter Produk";
+
+    if(currentBrand !== "all"){
+        const badge =   document.createElement("span");
+        badge.className = "filter-badge";
+        badge.textContent =
+            document.querySelector(
+                "#brand-filter .filter-btn.active"
+            ).textContent;
+        activeFilters.appendChild(badge);
+    }
+
+    if(currentCategory !== "all"){
+        const badge = document.createElement("span");
+
+        badge.className = "filter-badge";
+        badge.textContent =
+            document.querySelector(
+                "#category-filter .filter-btn.active"
+            ).textContent;
+        activeFilters.appendChild(badge);
+    }
+}
+
+const activeFilters =
+    document.getElementById("active-filters");
+
+brandButtons.forEach(button=>{
+
+    button.addEventListener("click",()=>{
+        brandButtons.forEach(btn=>btn.classList.remove("active"));
+        button.classList.add("active");
+        currentBrand = button.dataset.brand;
+        updateFilterTitle();
+        currentPage = 1;
+        filterProducts();
+    });
+});
+
+categoryButtons.forEach(button=>{
+
+    button.addEventListener("click",()=>{
+      categoryButtons.forEach(btn=>btn.classList.remove("active"));
+      button.classList.add("active");
+      currentCategory = button.dataset.category;
+      updateFilterTitle();
+      currentPage = 1;
+      filterProducts();
+    });
+});   
+
+filterProducts();
 
 // popup lightbox (gambar)
 const images = document.querySelectorAll(".product-card img");
@@ -161,3 +321,67 @@ lightbox.addEventListener("click", (e) => {
   }
 });
 
+// event previous & next
+
+document
+.getElementById("prev-page")
+.addEventListener("click",()=>{
+
+    if(currentPage>1){
+        currentPage--;
+         animationPagination(()=>{
+        updatePagination(filteredProducts);
+    });
+}});
+
+document
+.getElementById("next-page")
+.addEventListener("click",()=>{
+
+    const totalPages =
+        Math.ceil(
+            filteredProducts.length /
+            productsPerPage
+        );
+    if(currentPage<totalPages){
+      currentPage++;
+      animationPagination(()=>{
+      updatePagination(filteredProducts);
+    });
+}});
+
+// animasi Pagination
+
+function animatePagination(callback){
+
+    const productGrid = document.querySelector(".product-grid");
+
+    productGrid.classList.add("filtering");
+
+    setTimeout(() => {
+
+        callback();
+
+        productGrid.classList.remove("filtering");
+
+    },250);
+
+}
+
+// Tampilan Filter
+const filterToggle =
+document.getElementById("filter-toggle");
+
+const filterContent =
+document.getElementById("filter-content");
+
+const filterArrow =
+document.getElementById("filter-arrow");
+
+filterToggle.addEventListener("click",()=>{
+
+    filterContent.classList.toggle("collapsed");
+
+    filterArrow.classList.toggle("rotate");
+
+});
