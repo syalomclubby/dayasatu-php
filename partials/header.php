@@ -1,3 +1,4 @@
+<?php include 'config/connection.php'; ?>
 <!doctype html>
 <html lang="id">
 

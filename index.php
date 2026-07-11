@@ -1,16 +1,4 @@
 <?php include 'partials/header.php'; ?>
-<?php
-$host = "localhost";
-$user = "root";       // Username database Anda (default XAMPP biasanya root)
-$pass = "";           // Password database Anda (default XAMPP biasanya kosong)
-$db   = "dayasatu"; // Ubah dengan nama database yang Anda buat
-
-$koneksi = mysqli_connect($host, $user, $pass, $db);
-
-if (!$koneksi) {
-    die("Koneksi ke database gagal: " . mysqli_connect_error());
-}
-?>
 
 <?php
 define('DAYASATU', true);
@@ -202,154 +190,160 @@ require_once 'includes/product_query.php';
         <section class="product-filter-container">
 
           <button
-              id="filter-toggle"
-              class="filter-toggle">
+            id="filter-toggle"
+            class="filter-toggle">
 
-              <div class="filter-toggle-left">
-                  <div class="filter-header">
-                      <i class="fa-solid fa-filter"></i>
-                      <span id="filter-title">
-                          Filter Produk
-                      </span>
-                  </div>
-                  <div id="active-filters" class="active-filters">
-                  </div>
+            <div class="filter-toggle-left">
+              <div class="filter-header">
+                <i class="fa-solid fa-filter"></i>
+                <span id="filter-title">
+                  Filter Produk
+                </span>
               </div>
-              <i
-                  id="filter-arrow"
-                  class="fa-solid fa-chevron-down">
-              </i>
+              <div id="active-filters" class="active-filters">
+              </div>
+            </div>
+            <i
+              id="filter-arrow"
+              class="fa-solid fa-chevron-down">
+            </i>
           </button>
 
           <div
-              id="filter-content"
-              class="filter-content collapsed">
+            id="filter-content"
+            class="filter-content collapsed">
 
-              <div class="filter-group">
+            <div class="filter-group">
 
-                <h3>Brand</h3>
+              <h3>Brand</h3>
 
-                <div
-                    class="product-filter"
-                    id="brand-filter">
+              <div
+                class="product-filter"
+                id="brand-filter">
 
-                    <button
-                        class="filter-btn active"
-                        data-brand="all">
-                        Semua
-                    </button>
+                <button
+                  class="filter-btn active"
+                  data-brand="all">
+                  Semua
+                </button>
 
-                    <?php while($brand = mysqli_fetch_assoc($query_brands)): ?>
+                <?php while ($brand = mysqli_fetch_assoc($query_brands)): ?>
 
-                        <button
-                            class="filter-btn"
-                            data-brand="<?= strtolower(htmlspecialchars($brand['name'])) ?>">
+                  <button
+                    class="filter-btn"
+                    data-brand="<?= strtolower(htmlspecialchars($brand['name'])) ?>">
 
-                            <?= htmlspecialchars($brand['name']) ?>
-                        </button>
-                    <?php endwhile; ?>
-                </div>
+                    <?= htmlspecialchars($brand['name']) ?>
+                  </button>
+                <?php endwhile; ?>
+              </div>
             </div>
 
             <br>
 
-              <div class="filter-group">
+            <div class="filter-group">
 
-                <h3>Kategori</h3>
+              <h3>Kategori</h3>
 
-                <div
-                    class="product-filter"
-                    id="category-filter">
+              <div
+                class="product-filter"
+                id="category-filter">
 
-                    <button
-                        class="filter-btn active"
-                        data-category="all">
-                        Semua
-                    </button>
+                <button
+                  class="filter-btn active"
+                  data-category="all">
+                  Semua
+                </button>
 
-                    <?php while($category = mysqli_fetch_assoc($query_categories)): ?>
+                <?php while ($category = mysqli_fetch_assoc($query_categories)): ?>
 
-                        <button
-                            class="filter-btn"
-                            data-category="<?= strtolower(htmlspecialchars($category['name'])) ?>">
+                  <button
+                    class="filter-btn"
+                    data-category="<?= strtolower(htmlspecialchars($category['name'])) ?>">
 
-                            <?= htmlspecialchars($category['name']) ?>
-                        </button>
-                    <?php endwhile; ?>
-                </div>
+                    <?= htmlspecialchars($category['name']) ?>
+                  </button>
+                <?php endwhile; ?>
               </div>
+            </div>
           </div>
-      </section>
+        </section>
       </div>
 
       <div class="product-grid hidden-left">
 
-        <?php while($product = mysqli_fetch_assoc($query_products)): ?>
+        <?php while ($product = mysqli_fetch_assoc($query_products)): ?>
 
-        <?php
-        $brandFolder = strtolower(trim($product['brand_name']));
-        $brandFolder = str_replace(' ', '_', $brandFolder);
-        $imagePath = "assets/images/products/$brandFolder/" . $product['image'] . ".png";
+          <?php
+          $brandFolder = strtolower(trim($product['brand_name']));
+          $brandFolder = str_replace(' ', '_', $brandFolder);
+          $imagePath = "assets/images/products/$brandFolder/" . $product['image'] . ".png";
 
-        if(!file_exists($imagePath))
-        {
+          if (!file_exists($imagePath)) {
             $imagePath = "assets/images/products/no_brand/" . $product['image'];
-        }
-        ?>
+          }
+          ?>
 
-        <article
-        class="product-card"
-        data-brand="<?= strtolower(htmlspecialchars($product['brand_name'])) ?>"
-        data-category="<?= strtolower(htmlspecialchars($product['category_name'])) ?>">
+          <article
+            class="product-card"
+            data-brand="<?= strtolower(htmlspecialchars($product['brand_name'])) ?>"
+            data-category="<?= strtolower(htmlspecialchars($product['category_name'])) ?>">
 
             <div class="product-image">
-                <img
+              <img
                 src="<?= $imagePath ?>"
                 alt="<?= htmlspecialchars($product['name']) ?>">
             </div>
 
             <div class="product-body">
 
-                <h3>
-                    <?= htmlspecialchars($product['name']) ?>
-                </h3>
+              <h3>
+                <?= htmlspecialchars($product['name']) ?>
+              </h3>
 
+              <div class="product-description">
                 <p>
-                    <?= htmlspecialchars($product['description']) ?>
+                  <?= nl2br(htmlspecialchars($product['description'])) ?>
                 </p>
 
-                <?php if($product['min_price']): ?>
+                <button class="see-more-btn" type="button">
+                  See More
+                  <i class="fa-solid fa-chevron-down"></i>
+                </button>
+              </div>
+
+              <?php if ($product['min_price']): ?>
 
                 <div class="product-price">
-                    Rp <?= number_format($product['min_price'],0,',','.') ?>
+                  Rp <?= number_format($product['min_price'], 0, ',', '.') ?>
                 </div>
 
-                <?php endif; ?>
+              <?php endif; ?>
 
             </div>
-        </article>
+          </article>
         <?php endwhile; ?>
       </div>
 
       <div id="empty-product" class="empty-product">
         <div class="empty-icon">
-              <i class="fas fa-box-open"></i>
+          <i class="fas fa-box-open"></i>
         </div>
-          <h3>Produk tidak ditemukan</h3>
-          <p>
-              Coba pilih Brand atau Kategori yang berbeda.
-          </p>
+        <h3>Produk tidak ditemukan</h3>
+        <p>
+          Coba pilih Brand atau Kategori yang berbeda.
+        </p>
       </div>
       <div class="pagination-container">
         <button id="prev-page" class="pagination-btn">
-            &laquo;
+          &laquo;
         </button>
         <div id="pagination-numbers"></div>
         <button id="next-page" class="pagination-btn">
-            &raquo;
-      </button>
+          &raquo;
+        </button>
       </div>
-</div>
+    </div>
   </section>
 
   <section class="screen section-dark">

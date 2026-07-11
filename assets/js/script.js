@@ -9,38 +9,51 @@ window.addEventListener("load", () => {
       document.body.classList.remove("loading");
       document.body.classList.add("loaded");
 
-      startAnimations(); 
+      startAnimations();
 
-      const priorityElements = document.querySelectorAll('.navbar, .hero-screen .hidden-left, .hero-screen .hidden-right');
-      priorityElements.forEach(el => {
-        el.classList.add('show');
+      const priorityElements = document.querySelectorAll(
+        ".navbar, .hero-screen .hidden-left, .hero-screen .hidden-right",
+      );
+      priorityElements.forEach((el) => {
+        el.classList.add("show");
       });
-
-    }, 500); 
+    }, 500);
   }, 2000);
 });
 
 function startAnimations() {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('show');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, {
-    rootMargin: '0px 0px 100px 0px',
-    threshold: 0.01 
-  });
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("show");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      rootMargin: "0px 0px 100px 0px",
+      threshold: 0.01,
+    },
+  );
 
-  const hiddenElements = document.querySelectorAll('.hidden-left, .hidden-right');
+  const hiddenElements = document.querySelectorAll(
+    ".hidden-left, .hidden-right",
+  );
   hiddenElements.forEach((el) => observer.observe(el));
 
-  window.addEventListener('scroll', () => {
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
-      hiddenElements.forEach(el => el.classList.add('show'));
-    }
-  }, { passive: true });
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 50
+      ) {
+        hiddenElements.forEach((el) => el.classList.add("show"));
+      }
+    },
+    { passive: true },
+  );
 }
 
 // --- KODE NAVIGASI & FORM ---
@@ -71,7 +84,8 @@ if (menuBtn && mobileShell) {
   }
 
   document.addEventListener("click", (event) => {
-    const clickedInside = mobileShell.contains(event.target) || menuBtn.contains(event.target);
+    const clickedInside =
+      mobileShell.contains(event.target) || menuBtn.contains(event.target);
     if (!clickedInside && mobileShell.classList.contains("open")) {
       closeMenu();
     }
@@ -118,180 +132,154 @@ if (contactForm) {
 
 const productCards = document.querySelectorAll(".product-card");
 const brandButtons = document.querySelectorAll("#brand-filter .filter-btn");
-const categoryButtons = document.querySelectorAll("#category-filter .filter-btn");
+const categoryButtons = document.querySelectorAll(
+  "#category-filter .filter-btn",
+);
 const searchInput = null;
 const emptyState = document.getElementById("empty-product");
 
 let currentBrand = "all";
 let currentCategory = "all";
-const filterTitle =
-    document.getElementById("filter-title");
+const filterTitle = document.getElementById("filter-title");
 
 const productsPerPage = 8;
 let currentPage = 1;
 let filteredProducts = [];
 
-function renderProducts(cards){
+function renderProducts(cards) {
+  // Sembunyikan semua produk
+  productCards.forEach((card) => {
+    card.style.display = "none";
+  });
 
-    // Sembunyikan semua produk
-    productCards.forEach(card=>{
-        card.style.display = "none";
-    });
-
-    const start =
-        (currentPage - 1) * productsPerPage;
-    const end =
-        start + productsPerPage;
-    cards.forEach((card,index)=>{
-        if(index >= start && index < end){
-            card.style.display = "";
-        }
-    });
+  const start = (currentPage - 1) * productsPerPage;
+  const end = start + productsPerPage;
+  cards.forEach((card, index) => {
+    if (index >= start && index < end) {
+      card.style.display = "";
+    }
+  });
 }
 
-function updatePagination(cards){
+function updatePagination(cards) {
+  const paginationNumbers = document.getElementById("pagination-numbers");
+  paginationNumbers.innerHTML = "";
+  const totalPages = Math.ceil(cards.length / productsPerPage);
 
-    const paginationNumbers =
-        document.getElementById("pagination-numbers");
-    paginationNumbers.innerHTML = "";
-    const totalPages =
-        Math.ceil(
-            cards.length /
-            productsPerPage
-        );
+  if (currentPage > totalPages) {
+    currentPage = totalPages;
+  }
 
-    if(currentPage > totalPages){
-        currentPage = totalPages;
+  renderProducts(cards);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement("button");
+    btn.className = "page-number";
+    btn.textContent = i;
+
+    if (i === currentPage) {
+      btn.classList.add("active");
     }
 
-    renderProducts(cards)
-
-    for(let i=1;i<=totalPages;i++){
-
-        const btn =
-            document.createElement("button");
-        btn.className="page-number";
-        btn.textContent=i;
-
-        if(i===currentPage){
-            btn.classList.add("active");
-        }
-
-        btn.addEventListener("click",()=>{
-            currentPage=i;
-            animatePagination(()=>{
-              updatePagination(cards);
-            })
-        });
-        paginationNumbers.appendChild(btn);
-    }
+    btn.addEventListener("click", () => {
+      currentPage = i;
+      animatePagination(() => {
+        updatePagination(cards);
+      });
+    });
+    paginationNumbers.appendChild(btn);
+  }
 }
 
 function filterProducts() {
+  const productGrid = document.querySelector(".product-grid");
+  productGrid.classList.add("filtering");
 
-   const productGrid = document.querySelector(".product-grid");
-    productGrid.classList.add("filtering");
-
-    setTimeout(() => {
-
+  setTimeout(() => {
     const visibleCards = [];
 
-  productCards.forEach(card => {
+    productCards.forEach((card) => {
+      const brand = card.dataset.brand.toLowerCase();
+      const category = card.dataset.category.toLowerCase();
 
-    const brand = card.dataset.brand.toLowerCase();
-    const category = card.dataset.category.toLowerCase();
+      const matchBrand = currentBrand === "all" || brand === currentBrand;
 
-    const matchBrand =
-        currentBrand === "all" ||
-        brand === currentBrand;
+      const matchCategory =
+        currentCategory === "all" || category === currentCategory;
 
-    const matchCategory =
-        currentCategory === "all" ||
-        category === currentCategory;
-
-    if (matchBrand && matchCategory) {
+      if (matchBrand && matchCategory) {
         visibleCards.push(card);
-    } else {
+      } else {
         card.style.display = "none";
-    }
-});
+      }
+    });
 
     filteredProducts = visibleCards;
     updatePagination(filteredProducts);
 
-    if(emptyState){
+    if (emptyState) {
       emptyState.style.display =
-        filteredProducts.length === 0
-        ? "block"
-        : "none";
+        filteredProducts.length === 0 ? "block" : "none";
     }
 
-     productGrid.classList.remove("filtering");
-    }, 250);
+    productGrid.classList.remove("filtering");
+  }, 250);
 }
 
-function updateFilterTitle(){
-    activeFilters.innerHTML = "";
+function updateFilterTitle() {
+  activeFilters.innerHTML = "";
 
-    if(
-        currentBrand === "all" &&
-        currentCategory === "all"
-    ){
-        activeFilters.style.display = "none"
-        filterTitle.textContent = "Filter Produk";
-        return;
-    }
-    activeFilters.style.display = "flex";
+  if (currentBrand === "all" && currentCategory === "all") {
+    activeFilters.style.display = "none";
     filterTitle.textContent = "Filter Produk";
+    return;
+  }
+  activeFilters.style.display = "flex";
+  filterTitle.textContent = "Filter Produk";
 
-    if(currentBrand !== "all"){
-        const badge =   document.createElement("span");
-        badge.className = "filter-badge";
-        badge.textContent =
-            document.querySelector(
-                "#brand-filter .filter-btn.active"
-            ).textContent;
-        activeFilters.appendChild(badge);
-    }
+  if (currentBrand !== "all") {
+    const badge = document.createElement("span");
+    badge.className = "filter-badge";
+    badge.textContent = document.querySelector(
+      "#brand-filter .filter-btn.active",
+    ).textContent;
+    activeFilters.appendChild(badge);
+  }
 
-    if(currentCategory !== "all"){
-        const badge = document.createElement("span");
+  if (currentCategory !== "all") {
+    const badge = document.createElement("span");
 
-        badge.className = "filter-badge";
-        badge.textContent =
-            document.querySelector(
-                "#category-filter .filter-btn.active"
-            ).textContent;
-        activeFilters.appendChild(badge);
-    }
+    badge.className = "filter-badge";
+    badge.textContent = document.querySelector(
+      "#category-filter .filter-btn.active",
+    ).textContent;
+    activeFilters.appendChild(badge);
+  }
 }
 
-const activeFilters =
-    document.getElementById("active-filters");
+const activeFilters = document.getElementById("active-filters");
 
-brandButtons.forEach(button=>{
-
-    button.addEventListener("click",()=>{
-        brandButtons.forEach(btn=>btn.classList.remove("active"));
-        button.classList.add("active");
-        currentBrand = button.dataset.brand;
-        updateFilterTitle();
-        currentPage = 1;
-        filterProducts();
-    });
+brandButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    brandButtons.forEach((btn) => btn.classList.remove("active"));
+    button.classList.add("active");
+    currentBrand = button.dataset.brand;
+    updateFilterTitle();
+    currentPage = 1;
+    filterProducts();
+  });
 });
 
-categoryButtons.forEach(button=>{
-
-    button.addEventListener("click",()=>{
-      categoryButtons.forEach(btn=>btn.classList.remove("active"));
-      button.classList.add("active");
-      currentCategory = button.dataset.category;
-      updateFilterTitle();
-      currentPage = 1;
-      filterProducts();
-    });
-});   
+categoryButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    categoryButtons.forEach((btn) => btn.classList.remove("active"));
+    button.classList.add("active");
+    currentCategory = button.dataset.category;
+    updateFilterTitle();
+    currentPage = 1;
+    filterProducts();
+  });
+});
 
 filterProducts();
 
@@ -301,7 +289,7 @@ const lightbox = document.getElementById("lightbox");
 const lightboxImg = lightbox.querySelector(".lightbox-img");
 const closeBtn = lightbox.querySelector(".lightbox-close");
 
-images.forEach(img => {
+images.forEach((img) => {
   img.style.cursor = "pointer";
 
   img.addEventListener("click", (e) => {
@@ -323,65 +311,68 @@ lightbox.addEventListener("click", (e) => {
 
 // event previous & next
 
-document
-.getElementById("prev-page")
-.addEventListener("click",()=>{
-
-    if(currentPage>1){
-        currentPage--;
-         animatePagination(()=>{
-        updatePagination(filteredProducts);
-    });
-}});
-
-document
-.getElementById("next-page")
-.addEventListener("click",()=>{
-
-    const totalPages =
-        Math.ceil(
-            filteredProducts.length /
-            productsPerPage
-        );
-    if(currentPage<totalPages){
-      currentPage++;
-      animatePagination(()=>{
+document.getElementById("prev-page").addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--;
+    animatePagination(() => {
       updatePagination(filteredProducts);
     });
-}});
+  }
+});
+
+document.getElementById("next-page").addEventListener("click", () => {
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  if (currentPage < totalPages) {
+    currentPage++;
+    animatePagination(() => {
+      updatePagination(filteredProducts);
+    });
+  }
+});
 
 // animasi Pagination
 
-function animatePagination(callback){
+function animatePagination(callback) {
+  const productGrid = document.querySelector(".product-grid");
 
-    const productGrid = document.querySelector(".product-grid");
+  productGrid.classList.add("filtering");
 
-    productGrid.classList.add("filtering");
+  setTimeout(() => {
+    callback();
 
-    setTimeout(() => {
-
-        callback();
-
-        productGrid.classList.remove("filtering");
-
-    },250);
-
+    productGrid.classList.remove("filtering");
+  }, 250);
 }
 
 // Tampilan Filter
-const filterToggle =
-document.getElementById("filter-toggle");
+const filterToggle = document.getElementById("filter-toggle");
 
-const filterContent =
-document.getElementById("filter-content");
+const filterContent = document.getElementById("filter-content");
 
-const filterArrow =
-document.getElementById("filter-arrow");
+const filterArrow = document.getElementById("filter-arrow");
 
-filterToggle.addEventListener("click",()=>{
+filterToggle.addEventListener("click", () => {
+  filterContent.classList.toggle("collapsed");
 
-    filterContent.classList.toggle("collapsed");
+  filterArrow.classList.toggle("rotate");
+});
 
-    filterArrow.classList.toggle("rotate");
+// See More Button
+document.querySelectorAll(".product-description").forEach((desc) => {
+  const text = desc.querySelector("p");
+  const button = desc.querySelector(".see-more-btn");
+  const label = button.querySelector("span");
 
+  if (text.scrollHeight <= text.clientHeight + 2) {
+    button.style.display = "none";
+    return;
+  }
+
+  button.addEventListener("click", () => {
+    desc.classList.toggle("expanded");
+
+    label.textContent = desc.classList.contains("expanded")
+      ? "See Less"
+      : "See More";
+  });
 });
