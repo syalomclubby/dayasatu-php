@@ -114,7 +114,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
         <div>
             <div class="page-title">Edit Brand</div>
             <div class="page-description">
-                Ubah data brand yang sudah ada di sistem.
+                Update the details of an existing brand.
             </div>
         </div>
 
@@ -133,7 +133,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                 </div>
 
                 <div class="card-subtitle">
-                    Data dikelola oleh: <strong><?= htmlspecialchars($current_user_name ?: 'Current User', ENT_QUOTES, 'UTF-8'); ?></strong>
+                    This brand is managed by: <strong><?= htmlspecialchars($current_user_name ?: 'Current User', ENT_QUOTES, 'UTF-8'); ?></strong>
                 </div>
             </div>
         </div>

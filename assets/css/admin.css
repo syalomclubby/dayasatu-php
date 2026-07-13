@@ -138,6 +138,30 @@ ul {
   overflow-x: hidden;
 }
 
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 42px;
+}
+
+.sidebar-close {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 18px;
+  transition: 0.2s;
+}
+
+.sidebar-close:hover {
+  background: var(--primary-soft);
+}
+
 /* =========================
    LOGO
 ========================= */
@@ -146,7 +170,6 @@ ul {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 42px;
 }
 
 .brand img {
@@ -274,20 +297,21 @@ ul {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 50px 40px;
+  padding: 0 40px;
 }
 
 .topbar-left {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
 }
 
 .topbar-left h2 {
   font-size: 22px;
   font-weight: 700;
   color: var(--text);
-  margin: 0 0 4px 0;
+  margin: 0;
   line-height: 1.2;
 }
 
@@ -359,28 +383,6 @@ ul {
 .topbar-right .btn-danger:hover {
   background: #dc2626;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
-}
-
-@media (max-width: 768px) {
-  .topbar {
-    padding: 16px 20px;
-  }
-
-  .topbar-left p {
-    display: none;
-  }
-
-  .admin-pill {
-    display: none;
-  }
-
-  .topbar-right .btn {
-    padding: 10px 14px;
-  }
-
-  .topbar-right .btn span {
-    display: none;
-  }
 }
 
 /* =========================================================
@@ -456,6 +458,10 @@ ul {
 .card-footer {
   padding: 20px 28px;
   border-top: 1px solid var(--border);
+}
+
+.card-info-header {
+  margin-bottom: 30px;
 }
 
 /* =========================================================
@@ -749,6 +755,10 @@ ul {
   height: fit-content;
 }
 
+#mobile-banner-slot {
+  margin-bottom: 24px;
+}
+
 /* =========================================================
    LATEST PRODUCTS
 ========================================================= */
@@ -991,23 +1001,6 @@ ul {
   color: #a855f7;
 }
 
-@media (max-width: 768px) {
-  .activity-row {
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
-
-  .activity-date {
-    width: 100%;
-    min-width: unset;
-
-    margin-left: 74px;
-    margin-top: 10px;
-
-    align-items: flex-start;
-  }
-}
-
 /* =========================================================
    TABLE WRAPPER
 ========================================================= */
@@ -1182,19 +1175,56 @@ ul {
   border-color: rgba(239, 68, 68, 0.18);
 }
 
-@media (max-width: 768px) {
-  .table {
-    min-width: 1200px;
-  }
+.table-loading,
+.table-empty {
+  text-align: center;
+  padding: 50px;
+  color: #7b8497;
+  font-size: 15px;
+}
 
-  .table thead th,
-  .table tbody td {
-    padding: 16px 18px;
-  }
+.table-loading i {
+  margin-right: 8px;
+}
 
-  .table-description {
-    max-width: 260px;
-  }
+.info-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.info-table tr:not(:last-child) th,
+.info-table tr:not(:last-child) td {
+  border-bottom: 1px solid var(--border);
+}
+
+.info-table th {
+  width: 180px;
+  padding: 14px 0;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-light);
+  letter-spacing: 0.02em;
+}
+
+.info-table td {
+  padding: 14px 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.info-table tr:first-child th,
+.info-table tr:first-child td {
+  padding-top: 0;
+}
+
+.info-table tr:last-child th,
+.info-table tr:last-child td {
+  padding-bottom: 0;
 }
 
 /* =========================================================
@@ -1273,30 +1303,153 @@ select.form-control {
    SEARCH BOX
 ========================================================= */
 
-.search-box {
-  position: relative;
+.table-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 22px;
 }
 
-.search-box i {
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  transform: translateY(-50%);
+.table-search {
+  width: 380px;
+  max-width: 100%;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 52px;
+
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+.search-box:hover {
+  border-color: #cbd5e1;
+}
+
+.search-box:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.08);
+}
+
+.search-box .fa-magnifying-glass {
+  width: 52px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.search-box input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+
+  padding-right: 14px;
+
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.search-box input::placeholder {
   color: #94a3b8;
 }
 
-.search-box .form-control {
-  padding-left: 52px;
+.search-clear {
+  width: 36px;
+  height: 36px;
+
+  margin-right: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  color: #94a3b8;
+
+  transition: 0.2s;
+}
+
+.search-clear:hover {
+  background: #fef2f2;
+  color: var(--danger);
+}
+
+.table-empty {
+  min-width: 1200px;
+  padding: 70px 20px !important;
+  text-align: center;
+  background: #fff;
+}
+
+.table-empty-content {
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.table-empty-icon {
+  width: 74px;
+  height: 74px;
+
+  margin: 0 auto 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.table-empty-icon i {
+  font-size: 28px;
+  color: var(--primary);
+}
+
+.table-empty h4 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.table-empty p {
+  margin: 0;
+  color: var(--text-light);
+  font-size: 14px;
+  line-height: 1.7;
 }
 
 /* =========================================================
    PAGINATION
 ========================================================= */
 
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
 .pagination {
   display: flex;
-  align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .page-link {
@@ -1323,26 +1476,43 @@ select.form-control {
   color: white;
 }
 
+.pagination-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  color: var(--text-light);
+  user-select: none;
+}
+
 /* =========================================================
    EMPTY STATE
 ========================================================= */
 
 .empty-state {
-  padding: 80px 40px;
+  padding: 70px 30px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: white;
+
   text-align: center;
 }
 
-.empty-icon {
-  width: 90px;
-  height: 90px;
-  margin: auto;
-  border-radius: 30px;
-  background: var(--primary-light);
-  color: var(--primary);
+.empty-state-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 34px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.empty-state-icon i {
+  font-size: 30px;
+  color: var(--primary);
 }
 
 .empty-title {
@@ -1730,6 +1900,67 @@ select.form-control {
   justify-content: center;
 }
 
+.notif-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.notif-panel {
+  position: absolute;
+  right: 0;
+  top: 125%;
+  width: 360px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  display: none;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.notif-header {
+  padding: 15px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  color: var(--text);
+  font-size: 16px;
+  text-align: left;
+}
+
+.notif-list {
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.notif-footer {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  background: var(--card);
+}
+
+.notif-toggle-btn {
+  width: 100%;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary-bg);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: 0.2s;
+}
+
+.notif-toggle-btn:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
 /* =========================================================
    TOOLTIP
 ========================================================= */
@@ -1761,6 +1992,42 @@ select.form-control {
   background: var(--border);
 }
 
+/* ===========================
+   Mobile Components
+=========================== */
+
+.menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 20px;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.25s;
+  z-index: 998;
+}
+
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+body.sidebar-open {
+  overflow: hidden;
+}
+
 /* =========================================================
    RESPONSIVE
 ========================================================= */
@@ -1777,39 +2044,151 @@ select.form-control {
   }
 }
 
-@media (max-width: 992px) {
+@media (min-width: 768px) and (max-width: 992px) {
   .sidebar {
-    width: 90px;
-  }
-
-  .main {
-    margin-left: 90px;
-  }
-
-  .brand h1,
-  .brand p,
-  .menu-title,
-  .menu a span {
-    display: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    left: -280px;
-    transition: 0.3s;
+    width: 310px;
+    left: -310px;
+    padding: 24px;
+    transition: left 0.3s ease;
   }
 
   .sidebar.show {
     left: 0;
   }
 
+  .sidebar-overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
   .main {
     margin-left: 0;
+    width: 100%;
   }
 
   .topbar {
-    padding: 0 20px;
+    left: 0;
+    padding: 0 24px;
+    justify-content: flex-start;
+    gap: 16px;
+  }
+
+  .topbar-left {
+    flex: 1;
+  }
+
+  .topbar-left p {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .content {
+    padding: 24px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-2 > * {
+    min-width: 0;
+  }
+
+  .latest-products-card,
+  .quick-actions-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .latest-product-item,
+  .quick-action {
+    min-width: 0;
+  }
+
+  .product-info,
+  .quick-action-left {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .products-name,
+  .product-meta,
+  .quick-action-title,
+  .quick-action-desc {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .topbar {
+    left: 0;
+  }
+
+  .sidebar {
+    width: 310px;
+    left: -310px;
+    transition: left 0.3s ease;
+  }
+
+  .sidebar.show {
+    left: 0;
+  }
+
+  .sidebar-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .main {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .topbar {
+    padding: 16px 20px;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .topbar-left {
+    flex: 1;
+  }
+
+  .topbar-left p {
+    display: none;
+  }
+
+  .admin-pill {
+    display: none;
+  }
+
+  .topbar-right .btn {
+    padding: 10px 14px;
+  }
+
+  .topbar-right .btn span {
+    display: none;
   }
 
   .content {
@@ -1818,6 +2197,149 @@ select.form-control {
 
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  .brand h1,
+  .brand p,
+  .menu-title,
+  .menu a span {
+    display: block;
+  }
+
+  .activity-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .activity-date {
+    width: 100%;
+    min-width: unset;
+
+    margin-left: 74px;
+    margin-top: 10px;
+
+    align-items: flex-start;
+  }
+
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 20px;
+  }
+
+  .table {
+    width: max-content;
+    min-width: 1200px;
+    border-collapse: separate;
+  }
+
+  .table thead th,
+  .table tbody td {
+    padding: 16px 18px;
+  }
+
+  .table-description {
+    max-width: 260px;
+  }
+
+  .pagination-wrapper {
+    padding: 0 16px;
+  }
+
+  .pagination {
+    width: 100%;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .page-header .btn-back,
+  .page-header .btn-add {
+    width: 100%;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .btn-add {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .notif-panel {
+    width: 300px;
+    max-width: calc(100vw - 32px);
+  }
+
+  /* Tambahkan ini */
+  .notif-item {
+    gap: 8px !important;
+  }
+
+  .notif-item-body {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .notif-item-label,
+  .notif-item-name,
+  .notif-item-meta {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .activity-date {
+    min-width: 56px !important;
+    width: 56px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .activity-date::before {
+    letter-spacing: 0.04em;
+    font-size: 8px;
+  }
+
+  .activity-date span:first-child {
+    font-size: 11px;
+  }
+
+  .activity-date span:last-child {
+    font-size: 10px;
+  }
+
+  .table-toolbar {
+    display: flex;
+    width: 100%;
+  }
+
+  .table-search {
+    width: 100%;
+    flex: 1;
+    max-width: none;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .table-empty {
+    padding: 40px 20px !important;
+  }
+
+  .table-empty-content {
+    width: 300px;
+    margin: 0 auto;
   }
 }
 
@@ -1838,7 +2360,6 @@ select.form-control {
   .table tbody,
   .table tr,
   .table td {
-    display: block;
     width: 100%;
   }
 
@@ -3144,10 +3665,7 @@ select.form-control {
   border: none;
   padding: 0;
   margin: 0;
-  color: var(
-    --text-light,
-    #64748b
-  );
+  color: var(--text-light, #64748b);
   cursor: pointer;
   display: flex;
   align-items: center;

@@ -77,7 +77,7 @@ require_once __DIR__ . "/../partials/sidebar.php";
             </div>
 
             <div class="page-description">
-                Tambahkan user atau admin baru ke sistem.
+                Enter the details to create a new user account.
             </div>
         </div>
 
@@ -96,7 +96,7 @@ require_once __DIR__ . "/../partials/sidebar.php";
                     User Information
                 </div>
                 <div class="card-subtitle">
-                    Silakan isi data user baru di bawah ini dengan benar.
+                    Complete the information below to set up the account.
                 </div>
             </div>
         </div>

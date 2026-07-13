@@ -295,7 +295,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <!-- Product Information -->
 
-        <div class="card">
+        <div class="card card-info-header">
 
             <div class="card-header">
 
@@ -437,7 +437,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     </div>
 
-                                    <div class="action-group">
+                    <div class="action-group">
 
                         <button
                             type="submit"

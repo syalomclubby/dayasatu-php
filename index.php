@@ -187,87 +187,108 @@ require_once 'includes/product_query.php';
           pengecatan dan finishing. <br><br>
         </p>
 
-        <section class="product-filter-container">
+        <div class="product-toolbar">
+          <div class="product-search">
 
-          <button
-            id="filter-toggle"
-            class="filter-toggle">
+            <i class="fa-solid fa-magnifying-glass"></i>
 
-            <div class="filter-toggle-left">
-              <div class="filter-header">
-                <i class="fa-solid fa-filter"></i>
-                <span id="filter-title">
-                  Filter Produk
-                </span>
-              </div>
-              <div id="active-filters" class="active-filters">
-              </div>
-            </div>
-            <i
-              id="filter-arrow"
-              class="fa-solid fa-chevron-down">
-            </i>
-          </button>
+            <input
+              type="text"
+              id="product-search"
+              placeholder="Search product...">
 
-          <div
-            id="filter-content"
-            class="filter-content collapsed">
+            <button
+              id="clear-search"
+              type="button">
 
-            <div class="filter-group">
+              <i class="fa-solid fa-xmark"></i>
 
-              <h3>Brand</h3>
+            </button>
 
-              <div
-                class="product-filter"
-                id="brand-filter">
-
-                <button
-                  class="filter-btn active"
-                  data-brand="all">
-                  Semua
-                </button>
-
-                <?php while ($brand = mysqli_fetch_assoc($query_brands)): ?>
-
-                  <button
-                    class="filter-btn"
-                    data-brand="<?= strtolower(htmlspecialchars($brand['name'])) ?>">
-
-                    <?= htmlspecialchars($brand['name']) ?>
-                  </button>
-                <?php endwhile; ?>
-              </div>
-            </div>
-
-            <br>
-
-            <div class="filter-group">
-
-              <h3>Kategori</h3>
-
-              <div
-                class="product-filter"
-                id="category-filter">
-
-                <button
-                  class="filter-btn active"
-                  data-category="all">
-                  Semua
-                </button>
-
-                <?php while ($category = mysqli_fetch_assoc($query_categories)): ?>
-
-                  <button
-                    class="filter-btn"
-                    data-category="<?= strtolower(htmlspecialchars($category['name'])) ?>">
-
-                    <?= htmlspecialchars($category['name']) ?>
-                  </button>
-                <?php endwhile; ?>
-              </div>
-            </div>
           </div>
-        </section>
+
+          <section class="product-filter-container">
+
+            <button
+              id="filter-toggle"
+              class="filter-toggle">
+
+              <div class="filter-toggle-left">
+                <div class="filter-header">
+                  <i class="fa-solid fa-filter"></i>
+                  <span id="filter-title">
+                    Filter Produk
+                  </span>
+                </div>
+                <div id="active-filters" class="active-filters">
+                </div>
+              </div>
+              <i
+                id="filter-arrow"
+                class="fa-solid fa-chevron-down">
+              </i>
+            </button>
+
+            <div
+              id="filter-content"
+              class="filter-content collapsed">
+
+              <div class="filter-group">
+
+                <h3>Brand</h3>
+
+                <div
+                  class="product-filter"
+                  id="brand-filter">
+
+                  <button
+                    class="filter-btn active"
+                    data-brand="all">
+                    Semua
+                  </button>
+
+                  <?php while ($brand = mysqli_fetch_assoc($query_brands)): ?>
+
+                    <button
+                      class="filter-btn"
+                      data-brand="<?= strtolower(htmlspecialchars($brand['name'])) ?>">
+
+                      <?= htmlspecialchars($brand['name']) ?>
+                    </button>
+                  <?php endwhile; ?>
+                </div>
+              </div>
+
+              <br>
+
+              <div class="filter-group">
+
+                <h3>Kategori</h3>
+
+                <div
+                  class="product-filter"
+                  id="category-filter">
+
+                  <button
+                    class="filter-btn active"
+                    data-category="all">
+                    Semua
+                  </button>
+
+                  <?php while ($category = mysqli_fetch_assoc($query_categories)): ?>
+
+                    <button
+                      class="filter-btn"
+                      data-category="<?= strtolower(htmlspecialchars($category['name'])) ?>">
+
+                      <?= htmlspecialchars($category['name']) ?>
+                    </button>
+                  <?php endwhile; ?>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
 
       <div class="product-grid hidden-left">
@@ -335,12 +356,14 @@ require_once 'includes/product_query.php';
         </p>
       </div>
       <div class="pagination-container">
-        <button id="prev-page" class="pagination-btn">
-          &laquo;
+        <button id="prev-page" class="pagination-btn" aria-label="Previous">
+          <i class="fa-solid fa-chevron-left"></i>
         </button>
+
         <div id="pagination-numbers"></div>
-        <button id="next-page" class="pagination-btn">
-          &raquo;
+
+        <button id="next-page" class="pagination-btn" aria-label="Next">
+          <i class="fa-solid fa-chevron-right"></i>
         </button>
       </div>
     </div>

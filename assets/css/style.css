@@ -938,6 +938,10 @@ img {
   border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
+.product-filter-container {
+  width: 200px;
+}
+
 .product-filter {
   display: flex;
   justify-content: start;
@@ -1332,6 +1336,10 @@ img {
   .cta-actions {
     justify-content: flex-start;
   }
+
+  .product-search {
+    width: 100% !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1378,9 +1386,58 @@ img {
     border-radius: 18px;
   }
 
+  .contact-info-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .contact-info-card span {
+    display: block;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
   .map-frame,
   .map-frame iframe {
     min-height: 280px;
+  }
+
+  .pagination-container {
+    gap: 8px;
+    margin-top: 32px;
+  }
+
+  .pagination-btn,
+  .page-number {
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+
+    font-size: 0.9rem;
+  }
+
+  #pagination-numbers {
+    gap: 6px;
+  }
+
+  .product-toolbar {
+    flex-direction: column;
+  }
+
+  .product-search {
+    width: 100% !important;
+  }
+
+  .product-filter-container {
+    width: 100%;
+  }
+
+  .filter-toggle {
+    width: 100%;
   }
 }
 
@@ -1406,6 +1463,24 @@ img {
 
   .mobile-nav a {
     padding: 13px 0;
+  }
+
+  .pagination-container {
+    gap: 8px;
+    margin-top: 32px;
+  }
+
+  .pagination-btn,
+  .page-number {
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+
+    font-size: 0.9rem;
+  }
+
+  #pagination-numbers {
+    gap: 6px;
   }
 }
 
@@ -1435,25 +1510,36 @@ img {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-top: 50px;
+  flex-wrap: nowrap;
 }
 
 #pagination-numbers {
   display: flex;
+  align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .pagination-btn,
 .page-number {
+  width: 42px;
   min-width: 42px;
   height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   border-radius: 10px;
   background: #f3f3f3;
-  cursor: pointer;
-  transition: 0.3s;
   font-weight: 600;
+  transition: 0.25s;
+}
+
+.pagination-btn i {
+  font-size: 14px;
 }
 
 .pagination-btn:hover,
@@ -1468,12 +1554,21 @@ img {
 }
 
 .pagination-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
+.pagination-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  color: var(--text-light);
+  font-weight: 700;
+  user-select: none;
+}
+
 .filter-toggle {
-  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1555,6 +1650,105 @@ img {
   display: none;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+/* Search Bar */
+.product-toolbar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 22px;
+  gap: 20px;
+}
+
+.product-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  width: 380px;
+  max-width: 100%;
+  height: 52px;
+
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+
+  transition: 0.25s ease;
+  overflow: hidden;
+}
+
+.product-search:hover {
+  border-color: #cbd5e1;
+}
+
+.product-search:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.08);
+}
+
+.product-search .fa-magnifying-glass {
+  width: 52px;
+  flex-shrink: 0;
+
+  text-align: center;
+  font-size: 15px;
+  color: #94a3b8;
+}
+
+.product-search input {
+  flex: 1;
+  height: 100%;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  padding-right: 10px;
+
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.product-search input::placeholder {
+  color: #94a3b8;
+}
+
+.product-search button {
+  width: 36px;
+  height: 36px;
+
+  margin-right: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  outline: none;
+  background: transparent;
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  color: #94a3b8;
+  transition: 0.2s ease;
+}
+
+.product-search button:hover {
+  background: #fef2f2;
+  color: var(--danger);
+}
+
+.product-search button:disabled {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+
+#clear-search {
+  display: none;
 }
 
 @keyframes badgeFade {

@@ -335,7 +335,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
     <div class="page-header">
         <div>
             <div class="page-title">Edit Product</div>
-            <div class="page-description">Ubah data produk yang sudah ada di sistem.</div>
+            <div class="page-description">Update the details of an existing product.</div>
         </div>
 
         <a href="../products.php" class="btn-back">
@@ -348,7 +348,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
             <div>
                 <div class="card-title">Product Information</div>
                 <div class="card-subtitle">
-                    Data dikelola oleh: <strong><?= htmlspecialchars($current_user_name ?: 'Current User', ENT_QUOTES, 'UTF-8'); ?></strong>
+                    This product is managed by: <strong><?= htmlspecialchars($current_user_name ?: 'Current User', ENT_QUOTES, 'UTF-8'); ?></strong>
                 </div>
             </div>
         </div>
@@ -489,11 +489,11 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                             <div class="file-dropzone-inner">
                                 <i class="fa-regular fa-image"></i>
                                 <div class="file-dropzone-title">Drag new image here or click to change</div>
-                                <div class="file-dropzone-hint">PNG, JPG, JPEG, WEBP (Leave empty to keep old image)</div>
+                                <div class="file-dropzone-hint">PNG, JPG, JPEG, WEBP</div>
                                 <div class="file-dropzone-btn">Choose File</div>
                             </div>
                         </div>
-                        <div class="form-helper">Biarkan kosong jika tidak ingin mengganti gambar produk lama.</div>
+                        <div class="form-helper">Leave empty to keep old image.</div>
                     </div>
 
                     <div class="form-group">
@@ -516,6 +516,12 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                         Save Changes
                         <i class="fa-solid fa-floppy-disk"></i>
                     </button>
+
+                    <a
+                        href="../products.php"
+                        class="btn-back"> Cancel &nbsp
+                        <i class="fas fa-times"></i>
+                    </a>
                 </div>
             </form>
         </div>

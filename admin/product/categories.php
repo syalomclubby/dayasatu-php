@@ -3,14 +3,162 @@
 require_once __DIR__ . "/../security.php";
 require_once __DIR__ . "/../../config/connection.php";
 
-$sql_category = "SELECT *,
+$search = trim($_GET['search'] ?? '');
+
+$where = '';
+
+if ($search !== '') {
+
+    $search = mysqli_real_escape_string($conn, $search);
+
+    $where = "
+        WHERE
+            categories.name LIKE '%$search%'
+            OR users.name LIKE '%$search%'
+    ";
+}
+
+$sql_category = "
+SELECT *,
 categories.name AS category_name,
 categories.created_at AS waktu,
 users.name AS user_name
 FROM categories
-INNER JOIN users ON categories.followed_up_by = users.user_id
+INNER JOIN users
+ON categories.followed_up_by = users.user_id
+$where
+ORDER BY categories.created_at ASC
 ";
+
 $query_category = mysqli_query($conn, $sql_category);
+
+function renderCategoryRows(mysqli_result $query_category): string
+{
+    $category = 1;
+
+    ob_start();
+
+    while ($result = mysqli_fetch_assoc($query_category)) {
+
+        $id = $result['category_id'];
+?>
+
+        <tr>
+
+            <td>
+                <span class="table-id">#<?= $category++; ?></span>
+            </td>
+
+            <td>
+                <div class="table-name">
+                    <?= htmlspecialchars($result['category_name']); ?>
+                </div>
+            </td>
+
+            <td class="table-muted">
+                <?= $result['user_name']; ?>
+            </td>
+
+            <td class="table-muted">
+                <?= $result['followed_up_at'] ?? '-'; ?>
+            </td>
+
+            <td class="table-muted">
+                <?= $result['waktu']; ?>
+            </td>
+
+            <td>
+                <div class="table-actions">
+
+                    <a href="edit/edit_category.php?category_id=<?= $id; ?>" class="table-action">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
+
+                    <a
+                        href="delete/delete_category.php?category_id=<?= $id; ?>"
+                        class="table-action table-action-danger btn-delete-category">
+
+                        <i class="fa-solid fa-trash"></i>
+
+                    </a>
+
+                </div>
+            </td>
+
+        </tr>
+
+    <?php
+
+    }
+
+    return ob_get_clean();
+}
+
+if (isset($_GET['ajax'])) {
+
+    header('Content-Type: application/json');
+
+    ob_start();
+
+    if (mysqli_num_rows($query_category) > 0) {
+    ?>
+
+        <div class="table-responsive table-card">
+
+            <table class="table">
+
+                <thead>
+
+                    <tr>
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>Followed Up By</th>
+                        <th>Followed Up At</th>
+                        <th>Created At</th>
+                        <th class="table-actions-head"></th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <?= renderCategoryRows($query_category); ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    <?php
+    } else {
+    ?>
+
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+
+            <h3>No Categories Found</h3>
+
+            <p>
+                We couldn't find any categories matching your search.
+            </p>
+
+        </div>
+
+<?php
+    }
+
+    $tableHtml = ob_get_clean();
+
+    echo json_encode([
+        'table' => $tableHtml
+    ]);
+
+    exit;
+}
 
 ?>
 
@@ -64,107 +212,46 @@ $query_category = mysqli_query($conn, $sql_category);
         </a>
     </div>
 
-    <div class="table-responsive table-card">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Name</th>
-                    <th>Followed Up By</th>
-                    <th>Followed Up At</th>
-                    <th>Created At</th>
-                    <th class="table-actions-head"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $category = 1;
-                while ($result = mysqli_fetch_array($query_category)) {
-                    $name = $result['category_name'];
-                    $id = $result['category_id'];
-                ?>
+    <div class="table-toolbar">
+        <form method="GET" class="table-search" id="searchForm">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    autocomplete="off"
+                    placeholder="Search category..."
+                    value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
+
+                <a
+                    id="searchClear"
+                    class="search-clear"
+                    style="<?= empty($_GET['search']) ? 'display:none' : '' ?>">
+
+                    <i class="fa-solid fa-xmark"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div id="tableContainer">
+        <div class="table-responsive table-card">
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>
-                            <span class="table-id">#<?= $category++; ?></span>
-                        </td>
-
-                        <td>
-                            <div class="table-name">
-                                <?= htmlspecialchars($name); ?>
-                            </div>
-                        </td>
-
-                        <td class="table-muted">
-                            <?= $result['user_name']; ?>
-                        </td>
-
-                        <td class="table-muted">
-                            <?= $result['followed_up_at'] ?? '-'; ?>
-                        </td>
-
-                        <td class="table-muted">
-                            <?= $result['waktu']; ?>
-                        </td>
-
-                        <td>
-                            <div class="table-actions">
-                                <a href="edit/edit_category.php?category_id=<?= $id; ?>" class="table-action" aria-label="Edit">
-                                    <i class="fa-solid fa-pen"></i>
-                                </a>
-                                <a
-                                    href="delete/delete_category.php?category_id=<?= $id; ?>"
-                                    class="table-action table-action-danger btn-delete-category"
-                                    aria-label="Delete">
-                                    <i class="fa-solid fa-trash"></i>
-                                </a>
-                            </div>
-                        </td>
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>Followed Up By</th>
+                        <th>Followed Up At</th>
+                        <th>Created At</th>
+                        <th class="table-actions-head"></th>
                     </tr>
-                <?php
-                }
-                ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?= renderCategoryRows($query_category); ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
-<script>
-    document.querySelectorAll('.btn-delete-category').forEach((button) => {
-
-        button.addEventListener('click', function(event) {
-
-            event.preventDefault();
-
-            const url = this.getAttribute('href');
-
-            Swal.fire({
-                title: 'Delete Category?',
-                text: 'Category yang dihapus tidak dapat dikembalikan.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Delete Category',
-                cancelButtonText: 'Cancel',
-                reverseButtons: true,
-
-                customClass: {
-                    popup: 'swal-popup',
-                    title: 'swal-title',
-                    htmlContainer: 'swal-text',
-                    confirmButton: 'swal-btn-delete',
-                    cancelButton: 'swal-btn-cancel'
-                },
-
-                buttonsStyling: false
-
-            }).then((result) => {
-
-                if (result.isConfirmed) {
-                    window.location.href = url;
-                }
-
-            });
-
-        });
-
-    });
-</script>

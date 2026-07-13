@@ -1,7 +1,7 @@
-<?php 
-require_once __DIR__ . "/../../config/connection.php"; 
+<?php
+require_once __DIR__ . "/../../config/connection.php";
 require_once __DIR__ . "/../security.php";
-// Cek Role buat nampilin usernyaa
+// Cek Role buat nampilin usernya
 $logged_in_id = $_SESSION['user_id'] ?? 0;
 
 $sql_check_role = "SELECT role FROM users WHERE user_id = ? LIMIT 1";
@@ -13,7 +13,7 @@ if ($stmt_check) {
     mysqli_stmt_execute($stmt_check);
     $res_check = mysqli_stmt_get_result($stmt_check);
     $data_check = mysqli_fetch_assoc($res_check);
-    
+
     if (isset($data_check['role']) && $data_check['role'] == 1) {
         $is_superadmin = true;
     }
@@ -57,21 +57,21 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_all_activities') {
         while ($row = mysqli_fetch_assoc($query_activity)) {
             $icon_class = 'fa-box';
             $bg_icon_class = '';
-            if ($row['activity_type'] == 'brand') { 
-                $icon_class = 'fa-tags'; 
-                $bg_icon_class = 'activity-brand'; 
-            } elseif ($row['activity_type'] == 'category') { 
-                $icon_class = 'fa-layer-group'; 
-                $bg_icon_class = 'activity-category'; 
+            if ($row['activity_type'] == 'brand') {
+                $icon_class = 'fa-tags';
+                $bg_icon_class = 'activity-brand';
+            } elseif ($row['activity_type'] == 'category') {
+                $icon_class = 'fa-layer-group';
+                $bg_icon_class = 'activity-category';
             }
-            
+
             $status_class = 'created';
-            if (stripos($row['activity_label'], 'Updated') !== false) { 
-                $status_class = 'updated'; 
-            } elseif (stripos($row['activity_label'], 'Deleted') !== false) { 
-                $status_class = 'deleted'; 
+            if (stripos($row['activity_label'], 'Updated') !== false) {
+                $status_class = 'updated';
+            } elseif (stripos($row['activity_label'], 'Deleted') !== false) {
+                $status_class = 'deleted';
             }
-            ?>
+?>
             <div class="notif-item" style="padding: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px;">
                 <div class="activity-icon <?= $bg_icon_class ?>" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; flex-shrink:0;">
                     <i class="fa-solid <?= $icon_class ?>"></i>
@@ -80,7 +80,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_all_activities') {
                     <div class="notif-item-label" style="font-size: 11px; font-weight:600; color:var(--text-light); text-transform:uppercase;"><?= htmlspecialchars($row['activity_label']) ?></div>
                     <div class="notif-item-name" style="font-size: 14px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?= htmlspecialchars($row['item_name']) ?></div>
                     <div class="notif-item-meta" style="font-size: 12px; color:var(--text-light); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                        <?= htmlspecialchars($row['meta_text']) ?> 
+                        <?= htmlspecialchars($row['meta_text']) ?>
                         <?= !empty($row['performed_by']) ? '• ' . htmlspecialchars($row['performed_by']) : '' ?>
                     </div>
                 </div>
@@ -90,7 +90,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_all_activities') {
                     <span><?= date('H:i', strtotime($row['activity_at'])); ?></span>
                 </div>
             </div>
-            <?php
+<?php
         }
     } else {
         echo '<div class="notif-empty" style="text-align:center; padding:20px; color:var(--text-light);"><i class="fa-solid fa-bell-slash"></i> <span>Tidak ada aktivitas terbaru</span></div>';
@@ -124,6 +124,7 @@ $logged_in_id = $_SESSION['user_id'] ?? 0;
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/admin.css">
+    <script src="<?= $base_url ?>assets/js/admin.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -132,15 +133,27 @@ $logged_in_id = $_SESSION['user_id'] ?? 0;
     <div class="admin-shell">
 
         <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <a href="<?= $base_url ?>admin/dashboard.php" class="brand">
-                <img src="<?= $base_url ?>assets/images/logo.png" alt="Logo">
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-                <div>
-                    <h1>CV Daya Satu</h1>
-                    <p>Admin Dashboard</p>
-                </div>
-            </a>
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="<?= $base_url ?>admin/dashboard.php" class="brand">
+                    <img src="<?= $base_url ?>assets/images/logo.png" alt="Logo">
+
+                    <div>
+                        <h1>CV Daya Satu</h1>
+                        <p>Admin Dashboard</p>
+                    </div>
+                </a>
+
+                <button
+                    type="button"
+                    class="sidebar-close"
+                    id="sidebarClose"
+                    aria-label="Close sidebar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
 
             <div class="menu-title">
                 Navigation
@@ -208,13 +221,13 @@ $logged_in_id = $_SESSION['user_id'] ?? 0;
                     <i class="fa-solid fa-layer-group"></i>
                     <span>Categories</span>
                 </a>
-                
-                
+
+
                 <?php if ($is_superadmin) : ?>
-                <a href="<?= $base_url ?>admin/user/users.php" class="<?= $current_menu === 'users' ? 'active' : '' ?>">
-                    <i class="fa-solid fa-user"></i>
-                    <span>User</span>
-                </a>
+                    <a href="<?= $base_url ?>admin/user/users.php" class="<?= $current_menu === 'users' ? 'active' : '' ?>">
+                        <i class="fa-solid fa-user"></i>
+                        <span>User</span>
+                    </a>
                 <?php endif; ?>
 
 
@@ -234,102 +247,7 @@ $logged_in_id = $_SESSION['user_id'] ?? 0;
         </aside>
 
         <!-- MAIN -->
-        <main class="main">
+        <main class="main" id="main">
 
             <!-- TOPBAR -->
-            <header class="topbar">
-                <div class="topbar-left">
-                    <h2>Dashboard</h2>
-
-                    <p>
-                        Overview of your system
-                    </p>
-                </div>
-
-                <div class="topbar-right">
-    <div class="notif-wrapper" id="notifWrapper" style="position: relative; display: inline-block;">
-        <button class="icon-button" id="notifBtn">
-            <i class="fa-regular fa-bell"></i>
-        </button>
-        
-        <div class="notif-panel" id="notifPanel" style="position: absolute; right: 0; top: 125%; width: 360px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); display: none; z-index: 1000; overflow: hidden;">
-            <div class="notif-header" style="padding: 15px; border-bottom: 1px solid var(--border); font-weight: 700; color: var(--text); font-size: 16px; text-align: left;">
-                Activity
-            </div>
-            <div class="notif-list" id="notifList" style="max-height: 400px; overflow-y: auto;">
-                </div>
-        </div>
-    </div>
-
-    <div class="admin-pill">
-        <?= htmlspecialchars($_SESSION['name']) ?>
-    </div>
-</div>
-
-<script>
-(function() {
-    const wrapper = document.getElementById('notifWrapper');
-    const btn = document.getElementById('notifBtn');
-    const panel = document.getElementById('notifPanel');
-    const list = document.getElementById('notifList');
-    
-    let isOpen = false;
-    let loaded = false;
-
-    function fetchNotifications() {
-        list.innerHTML = '<div class="notif-loading" style="text-align:center; padding:20px; color:var(--text-light);"><i class="fa-solid fa-spinner fa-spin"></i> <span>Loading...</span></div>';
-        
-        // Memanggil URL saat ini secara dinamis agar tidak salah path
-        const currentUrl = window.location.pathname;
-        
-        fetch('<?= $base_url ?? "" ?>admin/partials/sidebar.php?action=get_all_activities')
-            .then(response => {
-                if (!response.ok) throw new Error('Network response failed');
-                return response.text();
-            })
-            .then(html => {
-                list.innerHTML = html;
-                loaded = true;
-            })
-            .catch((err) => {
-                console.error(err);
-                list.innerHTML = '<div class="notif-empty" style="text-align:center; padding:20px; color:var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> <span>Failed to load</span></div>';
-            });
-    }
-
-    function togglePanel() {
-        if (isOpen) {
-            panel.style.display = 'none';
-            btn.classList.remove('active');
-            isOpen = false;
-        } else {
-            panel.style.display = 'block';
-            btn.classList.add('active');
-            isOpen = true;
-            if (!loaded) fetchNotifications();
-        }
-    }
-
-    btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        togglePanel();
-    });
-
-    document.addEventListener('click', function(e) {
-        if (isOpen && !wrapper.contains(e.target)) {
-            panel.style.display = 'none';
-            btn.classList.remove('active');
-            isOpen = false;
-        }
-    });
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && isOpen) {
-            panel.style.display = 'none';
-            btn.classList.remove('active');
-            isOpen = false;
-        }
-    });
-})();
-</script>
-            </header>
+            <?php require_once __DIR__ . "/topbar.php"; ?>

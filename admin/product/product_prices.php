@@ -22,12 +22,12 @@ $product_id = (int) $_GET['product_id'];
 |--------------------------------------------------------------------------
 */
 
-function formatRupiah($price)
+function formatRupiah(float|int $price): string
 {
     return 'Rp' . number_format($price, 0, ',', '.');
 }
 
-function formatDateTime($datetime)
+function formatDateTime(?string $datetime): string
 {
     if (empty($datetime)) {
         return '-';
@@ -142,7 +142,7 @@ $pageTitle = "Product Pricing";
 
     <!-- PRODUCT INFORMATION -->
 
-    <div class="card">
+    <div class="card card-info-header">
     <!-- Success Alert -->
 <?php if (isset($_GET['success'])) : ?>
 

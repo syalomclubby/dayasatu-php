@@ -113,6 +113,8 @@ $query_activity = mysqli_query($conn, $sql_activity);
 <!-- CONTENT -->
 <section class="content">
 
+    <div id="mobile-banner-slot"></div>
+
     <!-- STATS -->
     <div class="stats-grid">
         <div class="stat-card">
@@ -375,6 +377,7 @@ $query_activity = mysqli_query($conn, $sql_activity);
 </div>
 
 </div>
+
 </body>
 
 </html>

@@ -2,15 +2,172 @@
 require_once __DIR__ . "/../security.php";
 require_once __DIR__ . "/../../config/connection.php";
 
-$sql_brand = "SELECT *,
+$search = trim($_GET['search'] ?? '');
+
+$where = '';
+
+if ($search !== '') {
+
+    $search = mysqli_real_escape_string($conn, $search);
+
+    $where = "
+        WHERE
+            brands.name LIKE '%$search%'
+            OR users.name LIKE '%$search%'
+    ";
+}
+
+$sql_brand = "
+SELECT *,
 brands.name AS brand_name,
 brands.followed_up_at AS brands_at,
 brands.created_at AS waktu,
 users.name AS user_name
 FROM brands
-INNER JOIN users ON brands.followed_up_by = users.user_id
- ";
+INNER JOIN users
+ON brands.followed_up_by = users.user_id
+$where
+ORDER BY brands.name DESC
+";
+
 $query_brand = mysqli_query($conn, $sql_brand);
+
+function renderBrandRows(mysqli_result $query_brand): string
+{
+    $brand = 1;
+
+    ob_start();
+
+    while ($result = mysqli_fetch_assoc($query_brand)) {
+
+        $brand_id = $result['brand_id'];
+
+?>
+
+        <tr>
+
+            <td>
+                <span class="table-id">#<?= $brand++; ?></span>
+            </td>
+
+            <td>
+                <div class="table-name">
+                    <?= htmlspecialchars($result['brand_name']); ?>
+                </div>
+            </td>
+
+            <td class="table-muted">
+                <?= $result['user_name']; ?>
+            </td>
+
+            <td class="table-muted">
+                <?= $result['brands_at'] ?? '-'; ?>
+            </td>
+
+            <td class="table-muted">
+                <?= $result['waktu']; ?>
+            </td>
+
+            <td>
+
+                <div class="table-actions">
+
+                    <a
+                        href="edit/edit_brand.php?brand_id=<?= $brand_id; ?>"
+                        class="table-action">
+
+                        <i class="fa-solid fa-pen"></i>
+
+                    </a>
+
+                    <a
+                        href="delete/delete_brand.php?brand_id=<?= $brand_id; ?>"
+                        class="table-action table-action-danger btn-delete-brand">
+
+                        <i class="fa-solid fa-trash"></i>
+
+                    </a>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+    <?php
+
+    }
+
+    return ob_get_clean();
+}
+
+if (isset($_GET['ajax'])) {
+
+    header('Content-Type: application/json');
+
+    ob_start();
+
+    if (mysqli_num_rows($query_brand) > 0) {
+
+    ?>
+
+        <div class="table-responsive table-card">
+
+            <table class="table">
+
+                <thead>
+
+                    <tr>
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>Followed Up By</th>
+                        <th>Followed Up At</th>
+                        <th>Created At</th>
+                        <th class="table-actions-head"></th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <?= renderBrandRows($query_brand); ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    <?php
+
+    } else {
+
+    ?>
+
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-tags"></i>
+            </div>
+
+            <h3>No Brands Found</h3>
+
+            <p>
+                We couldn't find any brands matching your search.
+            </p>
+
+        </div>
+
+<?php
+
+    }
+
+    echo json_encode([
+        'table' => ob_get_clean()
+    ]);
+
+    exit;
+}
 
 ?>
 
@@ -63,107 +220,54 @@ $query_brand = mysqli_query($conn, $sql_brand);
             Add Brands <i class="fa-solid fa-plus"></i>
         </a>
     </div>
-    <div class="table-responsive table-card">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Name</th>
-                    <th>Followed Up By</th>
-                    <th>Followed Up At</th>
-                    <th>Created At</th>
-                    <th class="table-actions-head"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $brand = 1;
-                while ($result = mysqli_fetch_array($query_brand)) {
-                    $brand_name = $result['brand_name'];
-                    $brand_id = $result['brand_id'];
-                ?>
+
+    <div class="table-toolbar">
+        <form class="table-search">
+
+            <div class="search-box">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    id="searchInput"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="Search brand..."
+                    value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
+
+                <a
+                    id="searchClear"
+                    class="search-clear"
+                    style="<?= empty($_GET['search']) ? 'display:none' : '' ?>">
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                </a>
+
+            </div>
+
+        </form>
+    </div>
+
+    <div id="tableContainer">
+        <div class="table-responsive table-card">
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>
-                            <span class="table-id">#<?= $brand++; ?></span>
-                        </td>
-
-                        <td>
-                            <div class="table-name">
-                                <?= htmlspecialchars($brand_name); ?>
-                            </div>
-                        </td>
-
-                        <td class="table-muted">
-                            <?= $result['user_name']; ?>
-                        </td>
-
-                        <td class="table-muted">
-                            <?= $result['brands_at'] ?? '-'; ?>
-                        </td>
-
-                        <td class="table-muted">
-                            <?= $result['waktu']; ?>
-                        </td>
-
-                        <td>
-                            <div class="table-actions">
-                                <a href="edit/edit_brand.php?brand_id=<?= $brand_id; ?>" class="table-action" aria-label="Edit">
-                                    <i class="fa-solid fa-pen"></i>
-                                </a>
-                                <a
-                                    href="delete/delete_brand.php?brand_id=<?= $brand_id; ?>"
-                                    class="table-action table-action-danger btn-delete-brand"
-                                    aria-label="Delete">
-                                    <i class="fa-solid fa-trash"></i>
-                                </a>
-                            </div>
-                        </td>
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>Followed Up By</th>
+                        <th>Followed Up At</th>
+                        <th>Created At</th>
+                        <th class="table-actions-head"></th>
                     </tr>
-                <?php
-                }
-                ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+
+                    <?= renderBrandRows($query_brand); ?>
+
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
-<script>
-    document.querySelectorAll('.btn-delete-brand').forEach((button) => {
-
-        button.addEventListener('click', function(event) {
-
-            event.preventDefault();
-
-            const url = this.getAttribute('href');
-
-            Swal.fire({
-                title: 'Delete Brand?',
-                text: 'Brand yang dihapus tidak dapat dikembalikan.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Delete Brand',
-                cancelButtonText: 'Cancel',
-                reverseButtons: true,
-
-                customClass: {
-                    popup: 'swal-popup',
-                    title: 'swal-title',
-                    htmlContainer: 'swal-text',
-                    confirmButton: 'swal-btn-delete',
-                    cancelButton: 'swal-btn-cancel'
-                },
-
-                buttonsStyling: false
-
-            }).then((result) => {
-
-                if (result.isConfirmed) {
-                    window.location.href = url;
-                }
-
-            });
-
-        });
-
-    });
-</script>

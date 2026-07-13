@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../config/connection.php";
 
 // Mencegah file diakses langsung
 if (!defined('DAYASATU')) {

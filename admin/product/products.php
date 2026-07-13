@@ -12,8 +12,35 @@ if ($page < 1) {
 
 $offset = ($page - 1) * $limit;
 
+$search = trim($_GET['search'] ?? '');
+
+$where = '';
+
+if ($search !== '') {
+
+    $search = mysqli_real_escape_string($conn, $search);
+
+    $where = "
+    WHERE
+        products.name LIKE '%$search%'
+        OR brands.name LIKE '%$search%'
+        OR categories.name LIKE '%$search%'
+        OR users.name LIKE '%$search%'
+    ";
+}
+
 // Hitung total data
-$total_query = mysqli_query($conn, "SELECT COUNT(*) AS total FROM products");
+$total_query = mysqli_query($conn, "
+SELECT COUNT(*) AS total
+FROM products
+INNER JOIN brands
+ON products.brand_id = brands.brand_id
+INNER JOIN users
+ON products.followed_up_by = users.user_id
+INNER JOIN categories
+ON products.category_id = categories.category_id
+$where
+");
 $total_data = mysqli_fetch_assoc($total_query)['total'];
 $total_pages = ceil($total_data / $limit);
 
@@ -31,10 +58,245 @@ FROM products
 INNER JOIN users ON products.followed_up_by = users.user_id
 INNER JOIN brands ON products.brand_id = brands.brand_id
 INNER JOIN categories ON products.category_id = categories.category_id
+$where
 LIMIT $limit OFFSET $offset
 ";
 
 $query_product = mysqli_query($conn, $sql_products);
+
+function renderProductRows(mysqli_result $query_product, int $offset): string
+{
+    $i = $offset + 1;
+
+    ob_start();
+
+    while ($result = mysqli_fetch_assoc($query_product)) {
+        $brand_folder = strtolower(trim($result['brand_name']));
+?>
+        <tr>
+            <td>
+                <span class="table-id">#<?= $i++; ?></span>
+            </td>
+
+            <td class="table-muted">
+                <?= $result['brand_name']; ?>
+            </td>
+
+            <td class="table-muted">
+                <?= $result['category_name']; ?>
+            </td>
+
+            <td>
+                <div class="table-name">
+                    <?= $result['products_name']; ?>
+                </div>
+            </td>
+
+            <td>
+                <?php
+                if ($result['min_price'] !== null && $result['max_price'] !== null) {
+
+                    if ($result['min_price'] == $result['max_price']) {
+
+                        echo "Rp " . number_format($result['min_price'], 0, ',', '.');
+                    } else {
+
+                        echo "Rp " . number_format($result['min_price'], 0, ',', '.') .
+                            " - Rp " .
+                            number_format($result['max_price'], 0, ',', '.');
+                    }
+                } else {
+
+                    echo "<em>Belum ada harga</em>";
+                }
+                ?>
+            </td>
+
+            <td>
+                <div class="table-description">
+                    <?= $result['description']; ?>
+                </div>
+            </td>
+
+            <td>
+                <img
+                    src="../../assets/images/products/<?= htmlspecialchars($brand_folder) ?>/<?= htmlspecialchars($result['image']) ?>.png"
+                    class="table-image">
+            </td>
+
+            <td class="table-muted">
+                <?= $result['user_name']; ?>
+            </td>
+
+            <td class="table-muted">
+                <?= $result['products_at'] ?? '-'; ?>
+            </td>
+
+            <td class="table-muted">
+                <?= $result['waktu']; ?>
+            </td>
+
+            <td>
+                <div class="table-actions">
+
+                    <a href="edit/edit_product.php?product_id=<?= $result['product_id']; ?>" class="table-action">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
+
+                    <a href="product_prices.php?product_id=<?= $result['product_id']; ?>" class="table-action">
+                        <i class="fa-solid fa-tag"></i>
+                    </a>
+
+                    <a
+                        href="delete/delete_product.php?product_id=<?= $result['product_id']; ?>"
+                        class="table-action table-action-danger btn-delete-product">
+
+                        <i class="fa-solid fa-trash"></i>
+
+                    </a>
+
+                </div>
+            </td>
+
+        </tr>
+
+    <?php
+
+
+    }
+
+    return ob_get_clean();
+}
+function renderPagination(int $page, int $total_pages): string
+{
+    ob_start();
+    ?>
+
+    <div class="pagination">
+
+        <?php if ($page > 1): ?>
+            <a href="#" class="page-link" data-page="<?= $page - 1 ?>">
+                <i class="fa-solid fa-angle-left"></i>
+            </a>
+        <?php endif; ?>
+
+        <?php
+
+        $range = 1;
+        $last_page = null;
+
+        for ($p = 1; $p <= $total_pages; $p++) {
+
+            if (
+                $p == 1 ||
+                $p == $total_pages ||
+                ($p >= $page - $range && $p <= $page + $range)
+            ) {
+
+                if (isset($last_page) && $last_page + 1 < $p) {
+                    echo '<span class="pagination-dots">...</span>';
+                }
+
+        ?>
+
+                <a
+                    href="#"
+                    class="page-link <?= $p == $page ? 'active' : '' ?>"
+                    data-page="<?= $p ?>">
+
+                    <?= $p ?>
+
+                </a>
+
+        <?php
+
+                $last_page = $p;
+            }
+        }
+
+        ?>
+
+        <?php if ($page < $total_pages): ?>
+            <a href="#" class="page-link" data-page="<?= $page + 1 ?>">
+                <i class="fa-solid fa-angle-right"></i>
+            </a>
+        <?php endif; ?>
+
+    </div>
+
+    <?php
+
+    return ob_get_clean();
+}
+
+// AJAX REQUEST
+if (isset($_GET['ajax'])) {
+
+    header('Content-Type: application/json');
+
+    ob_start();
+
+    if (mysqli_num_rows($query_product) > 0) {
+    ?>
+
+        <div class="table-responsive">
+            <table class="table">
+
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Brand</th>
+                        <th>Cateory</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Description</th>
+                        <th>Image</th>
+                        <th>Followed Up By</th>
+                        <th>Followed Up At</th>
+                        <th>Created At</th>
+                        <th class="table-actions-head"></th>
+                    </tr>
+                </thead>
+
+                <tbody id="productTableBody">
+                    <?= renderProductRows($query_product, $offset); ?>
+                </tbody>
+
+            </table>
+        </div>
+
+    <?php
+    } else {
+    ?>
+
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+
+            <h3>No Products Found</h3>
+
+            <p>
+                We couldn't find any products matching your search.
+            </p>
+
+        </div>
+
+<?php
+    }
+
+    $tableHtml = ob_get_clean();
+
+    echo json_encode([
+        'table' => $tableHtml,
+        'pagination' => renderPagination($page, $total_pages)
+    ]);
+
+    exit;
+
+}
+
 ?>
 
 <?php include '../partials/sidebar.php' ?>
@@ -63,7 +325,7 @@ $query_product = mysqli_query($conn, $sql_products);
         <div class="alert alert-success">
             <i class="fa-solid fa-circle-check"></i>
             <span>
-                Product berhasil dihapus.
+                Product successfully deleted.
             </span>
         </div>
     <?php endif; ?>
@@ -78,179 +340,66 @@ $query_product = mysqli_query($conn, $sql_products);
         </a>
     </div>
 
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Brand</th>
-                    <th>Cateory</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Description</th>
-                    <th>Image</th>
-                    <th>Followed Up By</th>
-                    <th>Followed Up At</th>
-                    <th>Created At</th>
-                    <th class="table-actions-head"></th>
-                </tr>
-            </thead>
+    <div class="table-toolbar">
+        <form method="GET" class="table-search" id="searchForm">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
 
-            <tbody>
-                <?php
-                $i = $offset + 1;
-                while ($result = mysqli_fetch_array($query_product)) {
-                ?>
-                    <tr>
-                        <td>
-                            <span class="table-id">#<?= $i++; ?></span>
-                        </td>
+                <input
+                    type="text"
+                    id="searchInput"
+                    autocomplete="off"
+                    placeholder="Search product, brand, category..."
+                    value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
 
-                        <td class="table-muted">
-                            <?= $result['brand_name']; ?>
-                        </td>
+                <a
+                    id="searchClear"
+                    class="search-clear"
+                    style="<?= empty($_GET['search']) ? 'display:none' : '' ?>">
 
-                        <td class="table-muted">
-                            <?= $result['category_name']; ?>
-                        </td>
-
-                        <td>
-                            <div class="table-name">
-                                <?= $result['products_name']; ?>
-                            </div>
-                        </td>
-
-                        <td>
-                            <?php 
-                                if ($result['min_price'] !== null && $result['max_price'] !== null) {
-                                    if ($result['min_price'] == $result['max_price']) {
-                                        echo "Rp " . number_format($result['min_price'], 0, ',', '.');
-                                    } else {
-                                        echo "Rp " . number_format($result['min_price'], 0, ',', '.') . " - Rp " . number_format($result['max_price'], 0, ',', '.');
-                                    }
-                            } else {
-                            echo "<em>Belum ada harga</em>";
-                            }
-                            ?>
-                        </td>
-
-                        <td>
-                            <div class="table-description">
-                                <?= $result['description']; ?>
-                            </div>
-                        </td>
-
-
-                        <td>
-                            <?php
-                            $brand_folder = strtolower(trim($result['brand_name']));
-                            ?>
-
-                            <img
-                                src="../../assets/images/products/<?= htmlspecialchars($brand_folder); ?>/<?= htmlspecialchars($result['image']); ?>.png"
-                                alt="<?= htmlspecialchars($result['products_name']); ?>"
-                                class="table-image">
-                        </td>
-
-                        <td class="table-muted">
-                            <?= $result['user_name']; ?>
-                        </td>
-
-                        <td class="table-muted">
-                            <?= $result['products_at'] ?? '-'; ?>
-                        </td>
-
-                        <td class="table-muted">
-                            <?= $result['waktu']; ?>
-                        </td>
-
-                        <td>
-                            <div class="table-actions">
-                                <a href="edit/edit_product.php?product_id=<?= $result['product_id']; ?>" class="table-action" aria-label="Edit">
-                                    <i class="fa-solid fa-pen"></i>
-                                </a>
-                                <a href="product_prices.php?product_id=<?= $result['product_id'] ?>" class="table-action" aria-label="Pricing">
-                                    <i class="fa-solid fa-tag"></i>
-                                </a>
-                                <a
-                                    href="delete/delete_product.php?product_id=<?= $result['product_id']; ?>"
-                                    class="table-action table-action-danger btn-delete-product"
-                                    aria-label="Delete">
-                                    <i class="fa-solid fa-trash"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                <?php } ?>
-            </tbody>
-        </table>
+                    <i class="fa-solid fa-xmark"></i>
+                </a>
+            </div>
+        </form>
     </div>
 
-    
+    <div id="tableContainer">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Brand</th>
+                        <th>Cateory</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Description</th>
+                        <th>Image</th>
+                        <th>Followed Up By</th>
+                        <th>Followed Up At</th>
+                        <th>Created At</th>
+                        <th class="table-actions-head"></th>
+                    </tr>
+                </thead>
 
-    <div style="display:flex; justify-content:center; margin-top:24px;">
-        <div class="pagination">
+                <tbody id="productTableBody">
 
-            <?php if ($page > 1): ?>
-                <a href="?page=<?= $page-1 ?>" class="page-link">
-                    <i class="fa-solid fa-angle-left"></i>
-                </a>
-            <?php endif; ?>
+                    <?= renderProductRows($query_product, $offset); ?>
 
-            <?php for ($p = 1; $p <= $total_pages; $p++): ?>
-                <a
-                    href="?page=<?= $p ?>"
-                    class="page-link <?= ($p == $page) ? 'active' : '' ?>">
-                    <?= $p ?>
-                </a>
-            <?php endfor; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-            <?php if ($page < $total_pages): ?>
-                <a href="?page=<?= $page+1 ?>" class="page-link">
-                    <i class="fa-solid fa-angle-right"></i>
-                </a>
-            <?php endif; ?>
+    <div class="pagination-wrapper">
+
+        <div id="paginationContainer">
+
+            <?= renderPagination($page, $total_pages); ?>
 
         </div>
+
     </div>
 
 
 </div>
-
-<script>
-    document.querySelectorAll('.btn-delete-product').forEach((button) => {
-
-        button.addEventListener('click', function(event) {
-
-            event.preventDefault();
-
-            const url = this.getAttribute('href');
-
-            Swal.fire({
-                title: 'Delete Product?',
-                text: 'Produk yang dihapus tidak dapat dikembalikan.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Delete Product',
-                cancelButtonText: 'Cancel',
-                reverseButtons: true,
-
-                customClass: {
-                    popup: 'swal-popup',
-                    title: 'swal-title',
-                    htmlContainer: 'swal-text',
-                    confirmButton: 'swal-btn-delete',
-                    cancelButton: 'swal-btn-cancel'
-                },
-
-                buttonsStyling: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = url;
-                }
-            });
-
-        });
-
-    });
-</script>

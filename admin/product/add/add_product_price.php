@@ -241,7 +241,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
 
         <!-- PRODUCT INFORMATION -->
 
-        <div class="card">
+        <div class="card card-info-header">
             <div class="card-header">
                 <h2>Product Information</h2>
             </div>
