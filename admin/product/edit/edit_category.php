@@ -67,6 +67,41 @@ if (isset($_POST['save'])) {
 
     if (empty($errors)) {
 
+        $sql_check = "
+        SELECT 1
+        FROM categories
+        WHERE LOWER(category_name) = LOWER(?)
+          AND category_id <> ?
+        LIMIT 1
+    ";
+
+        $stmt_check = mysqli_prepare($conn, $sql_check);
+
+        if ($stmt_check) {
+
+            mysqli_stmt_bind_param(
+                $stmt_check,
+                "si",
+                $name,
+                $category_id
+            );
+
+            mysqli_stmt_execute($stmt_check);
+
+            $result_check = mysqli_stmt_get_result($stmt_check);
+
+            if (mysqli_fetch_assoc($result_check)) {
+                $errors[] = 'Category name already exists.';
+            }
+
+            mysqli_stmt_close($stmt_check);
+        } else {
+            $errors[] = 'Failed to validate category.';
+        }
+    }
+
+    if (empty($errors)) {
+
         $sql = "
             UPDATE categories 
             SET category_name = ?,
@@ -86,14 +121,13 @@ if (isset($_POST['save'])) {
                 $category_id
             );
 
-            if (mysqli_stmt_execute($stmt)) { 
+            if (mysqli_stmt_execute($stmt)) {
                 header("Location: ../categories.php?success=updated");
                 exit;
             }
 
             $errors[] = 'Data failed to update.';
             mysqli_stmt_close($stmt);
-           
         } else {
             $errors[] = 'Query failed to prepare.';
         }

@@ -27,6 +27,39 @@ if (isset($_POST['save'])) {
 
     if (empty($errors)) {
 
+        $sql_check = "
+        SELECT 1
+        FROM users
+        WHERE LOWER(username) = LOWER(?)
+        LIMIT 1
+    ";
+
+        $stmt_check = mysqli_prepare($conn, $sql_check);
+
+        if ($stmt_check) {
+
+            mysqli_stmt_bind_param(
+                $stmt_check,
+                "s",
+                $name
+            );
+
+            mysqli_stmt_execute($stmt_check);
+
+            $result_check = mysqli_stmt_get_result($stmt_check);
+
+            if (mysqli_fetch_assoc($result_check)) {
+                $errors[] = 'User name already exists.';
+            }
+
+            mysqli_stmt_close($stmt_check);
+        } else {
+            $errors[] = 'Failed to validate user.';
+        }
+    }
+
+    if (empty($errors)) {
+
         $sql = "
             INSERT INTO users
             (
@@ -49,7 +82,7 @@ if (isset($_POST['save'])) {
                 $role
             );
 
-            if (mysqli_stmt_execute($stmt)) {   
+            if (mysqli_stmt_execute($stmt)) {
                 mysqli_stmt_close($stmt);
                 header("Location: users.php?success=added");
                 exit;
@@ -201,7 +234,7 @@ require_once __DIR__ . "/../partials/sidebar.php";
 </div>
 
 <script>
-(() => {
+    (() => {
         document.querySelectorAll('[data-custom-select]').forEach((customSelect) => {
             const trigger = customSelect.querySelector('[data-custom-select-trigger]');
             const hiddenInput = customSelect.querySelector('input[type="hidden"]');
@@ -239,4 +272,4 @@ require_once __DIR__ . "/../partials/sidebar.php";
             });
         });
     })();
-    </script>
+</script>

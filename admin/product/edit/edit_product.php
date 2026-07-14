@@ -585,6 +585,17 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                                 <div class="file-dropzone-btn">Choose File</div>
                             </div>
                         </div>
+
+                        <div
+                            id="clientAlert"
+                            class="alert alert-danger"
+                            style="display: none; margin-top: 20px;">
+
+                            <i class="fa-solid fa-circle-exclamation"></i>
+
+                            <div id="clientAlertMessage"></div>
+                        </div>
+
                         <div class="form-helper">Leave empty to keep old image.</div>
                     </div>
 
@@ -665,6 +676,51 @@ require_once __DIR__ . "/../../partials/sidebar.php";
         const imageInput = document.getElementById('image_file');
         const preview = document.getElementById('imagePreview');
         const previewImg = document.getElementById('imagePreviewImg');
+        const dropzone = document.getElementById('fileDropzone');
+
+        const clientAlert = document.getElementById('clientAlert');
+        const clientAlertMessage = document.getElementById('clientAlertMessage');
+
+        const allowedTypes = [
+            'image/png',
+            'image/jpeg',
+            'image/jpg',
+            'image/webp'
+        ];
+
+        function showError(message) {
+
+            clientAlertMessage.innerHTML = `<div>${message}</div>`;
+            clientAlert.style.display = 'flex';
+
+        }
+
+        function hideError() {
+
+            clientAlert.style.display = 'none';
+            clientAlertMessage.innerHTML = '';
+
+        }
+
+        function validateImage(file) {
+
+            if (!file) {
+                return false;
+            }
+
+            if (!allowedTypes.includes(file.type)) {
+
+                showError('Only PNG, JPG, JPEG, or WEBP images are allowed.');
+
+                imageInput.value = '';
+
+                return false;
+            }
+
+            hideError();
+
+            return true;
+        }
 
         if (!imageInput || !preview || !previewImg) {
             return;
@@ -674,7 +730,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
 
             const file = this.files[0];
 
-            if (!file) {
+            if (!validateImage(file)) {
                 return;
             }
 
@@ -683,6 +739,61 @@ require_once __DIR__ . "/../../partials/sidebar.php";
             reader.onload = function(e) {
                 previewImg.src = e.target.result;
                 preview.classList.remove('is-hidden');
+            };
+
+            reader.readAsDataURL(file);
+
+        });
+
+        ['dragenter', 'dragover'].forEach((eventName) => {
+
+            dropzone.addEventListener(eventName, (event) => {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                dropzone.classList.add('dragover');
+
+            });
+
+        });
+
+        ['dragleave', 'drop'].forEach((eventName) => {
+
+            dropzone.addEventListener(eventName, (event) => {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                dropzone.classList.remove('dragover');
+
+            });
+
+        });
+
+        dropzone.addEventListener('drop', (event) => {
+
+            const files = event.dataTransfer.files;
+
+            if (!files.length) {
+                return;
+            }
+
+            const file = files[0];
+
+            if (!validateImage(file)) {
+                return;
+            }
+
+            imageInput.files = files;
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+
+                previewImg.src = e.target.result;
+                preview.classList.remove('is-hidden');
+
             };
 
             reader.readAsDataURL(file);

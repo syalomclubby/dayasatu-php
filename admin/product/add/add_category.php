@@ -40,6 +40,39 @@ if (isset($_POST['save'])) {
 
     if (empty($errors)) {
 
+        $sql_check = "
+        SELECT 1
+        FROM categories
+        WHERE LOWER(category_name) = LOWER(?)
+        LIMIT 1
+    ";
+
+        $stmt_check = mysqli_prepare($conn, $sql_check);
+
+        if ($stmt_check) {
+
+            mysqli_stmt_bind_param(
+                $stmt_check,
+                "s",
+                $name
+            );
+
+            mysqli_stmt_execute($stmt_check);
+
+            $result_check = mysqli_stmt_get_result($stmt_check);
+
+            if (mysqli_fetch_assoc($result_check)) {
+                $errors[] = 'Category name already exists.';
+            }
+
+            mysqli_stmt_close($stmt_check);
+        } else {
+            $errors[] = 'Failed to validate category.';
+        }
+    }
+
+    if (empty($errors)) {
+
         $sql = "
             INSERT INTO categories
             (
@@ -62,7 +95,7 @@ if (isset($_POST['save'])) {
                 $current_user_id
             );
 
-            if (mysqli_stmt_execute($stmt)) {   
+            if (mysqli_stmt_execute($stmt)) {
                 mysqli_stmt_close($stmt);
                 header("Location: ../categories.php?success=added");
                 exit;
@@ -70,8 +103,6 @@ if (isset($_POST['save'])) {
 
             $errors[] = 'Data failed to save.';
             mysqli_stmt_close($stmt);
-
-           
         } else {
             $errors[] = 'Query failed to prepare.';
         }
