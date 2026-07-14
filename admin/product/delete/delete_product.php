@@ -43,12 +43,15 @@ if (!$product) {
 
 $brand_folder = strtolower(trim($product['brand_name']));
 
+$brand_folder = preg_replace('/[\\\\\/:*?"<>|]/', '', $brand_folder);
+$brand_folder = preg_replace('/\s+/', ' ', trim($brand_folder));
+
 $image_path =
     __DIR__
     . "/../../../assets/images/products/"
     . $brand_folder
     . "/"
-    . $product['image']
+    . $product['product_image']
     . ".png";
 
 $sql_delete = "DELETE FROM products WHERE product_id = ?";
@@ -61,7 +64,7 @@ if ($stmt_delete) {
     if (mysqli_stmt_execute($stmt_delete)) {
 
         if (
-            !empty($product['image']) &&
+            !empty($product['product_image']) &&
             file_exists($image_path)
         ) {
             unlink($image_path);

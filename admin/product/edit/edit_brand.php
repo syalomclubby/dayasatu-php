@@ -34,6 +34,7 @@ if ($current_user_id > 0) {
 
 $name = '';
 $description = '';
+$brand_data = null;
 
 $sql_get_brand = "SELECT * FROM brands WHERE brand_id = ? LIMIT 1";
 $stmt_get_brand = mysqli_prepare($conn, $sql_get_brand);
@@ -49,6 +50,8 @@ if ($stmt_get_brand) {
         header("Location: ../brands.php?error=not_found");
         exit;
     }
+
+    $oldBrandName = $brand_data['brand_name'];
 
     if (!isset($_POST['save'])) {
         $name        = $brand_data['brand_name'];
@@ -84,7 +87,33 @@ if (isset($_POST['save'])) {
             );
 
             if (mysqli_stmt_execute($stmt)) {
+
+                // Nama folder lama
+                $oldFolderName = strtolower($oldBrandName);
+                $oldFolderName = preg_replace('/[\\\\\/:*?"<>|]/', '', $oldFolderName);
+                $oldFolderName = preg_replace('/\s+/', ' ', trim($oldFolderName));
+
+                // Nama folder baru
+                $newFolderName = strtolower($name);
+                $newFolderName = preg_replace('/[\\\\\/:*?"<>|]/', '', $newFolderName);
+                $newFolderName = preg_replace('/\s+/', ' ', trim($newFolderName));
+
+                $basePath = __DIR__ . "/../../../assets/images/products/";
+
+                $oldFolderPath = $basePath . $oldFolderName;
+                $newFolderPath = $basePath . $newFolderName;
+
+                // Rename hanya jika nama berubah
+                if (
+                    $oldFolderName !== $newFolderName &&
+                    is_dir($oldFolderPath) &&
+                    !is_dir($newFolderPath)
+                ) {
+                    rename($oldFolderPath, $newFolderPath);
+                }
+
                 mysqli_stmt_close($stmt);
+
                 header("Location: ../brands.php?success=updated");
                 exit;
             }

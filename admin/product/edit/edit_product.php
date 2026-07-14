@@ -48,6 +48,7 @@ $name = '';
 $description = '';
 $old_image = '';
 $old_brand_folder = '';
+$old_brand_id = '';
 $brand_name_label = 'Select brand';
 
 $category_name_label = 'Select category';
@@ -68,7 +69,8 @@ if ($stmt_get_product) {
     }
 
     if (!isset($_POST['save'])) {
-        $brand_id    = $product_data['brand_id'];
+        $brand_id = $product_data['brand_id'];
+        $old_brand_id = $product_data['brand_id'];
         $category_id = $product_data['category_id'];
         $sql_old_category = "SELECT category_name FROM categories WHERE category_id = ? LIMIT 1";
         $stmt_old_category = mysqli_prepare($conn, $sql_old_category);
@@ -99,6 +101,8 @@ if ($stmt_get_product) {
             if ($row_ob = mysqli_fetch_assoc($res_ob)) {
                 $brand_name_label = $row_ob['brand_name'];
                 $old_brand_folder = strtolower(trim($row_ob['brand_name']));
+                $old_brand_folder = preg_replace('/[\\\\\/:*?"<>|]/', '', $old_brand_folder);
+                $old_brand_folder = preg_replace('/\s+/', ' ', trim($old_brand_folder));
             }
             mysqli_stmt_close($stmt_old_brand);
         }
@@ -257,6 +261,42 @@ if (isset($_POST['save'])) {
     $image_base = $product_data['product_image'];
     $has_new_image = isset($_FILES['image_file']) && !empty($_FILES['image_file']['name']);
 
+
+    // Ambil brand lama saat submit
+    $old_brand_id = $product_data['brand_id'];
+    $old_brand_folder = '';
+
+    $sqlOldBrand = "
+    SELECT brand_name 
+    FROM brands 
+    WHERE brand_id = ?
+    LIMIT 1
+";
+
+    $stmtOldBrand = mysqli_prepare($conn, $sqlOldBrand);
+
+    if ($stmtOldBrand) {
+
+        mysqli_stmt_bind_param(
+            $stmtOldBrand,
+            "i",
+            $old_brand_id
+        );
+
+        mysqli_stmt_execute($stmtOldBrand);
+
+        $resultOldBrand = mysqli_stmt_get_result($stmtOldBrand);
+
+        if ($rowOldBrand = mysqli_fetch_assoc($resultOldBrand)) {
+
+            $old_brand_folder = strtolower(trim($rowOldBrand['brand_name']));
+            $old_brand_folder = preg_replace('/[\\\\\/:*?"<>|]/', '', $old_brand_folder);
+            $old_brand_folder = preg_replace('/\s+/', ' ', trim($old_brand_folder));
+        }
+
+        mysqli_stmt_close($stmtOldBrand);
+    }
+
     if (empty($errors)) {
         $sqlBrandName = "SELECT brand_name FROM brands WHERE brand_id = ? LIMIT 1";
         $stmtBrandName = mysqli_prepare($conn, $sqlBrandName);
@@ -268,26 +308,78 @@ if (isset($_POST['save'])) {
 
         if (!$brandData) {
             $errors[] = 'Brand not found.';
-        } elseif ($has_new_image) {
+        } else {
+
             $brandFolder = strtolower(trim($brandData['brand_name']));
+            $brandFolder = preg_replace('/[\\\\\/:*?"<>|]/', '', $brandFolder);
+            $brandFolder = preg_replace('/\s+/', ' ', trim($brandFolder));
+
             $uploadDir = __DIR__ . '/../../../assets/images/products/' . $brandFolder . '/';
 
-            [$ok, $savedBaseName, $uploadError] = save_product_image(
-                $_FILES['image_file'],
-                $name,
-                $uploadDir
-            );
 
-            if (!$ok) {
-                $errors[] = $uploadError;
-            } else {
-                $image_base = $savedBaseName;
+            // Pindahkan gambar jika brand berubah dan tidak upload gambar baru
+            if (
+                $old_brand_id != $brand_id &&
+                !$has_new_image &&
+                !empty($product_data['product_image'])
+            ) {
 
-                if (!empty($product_data['image'])) {
-                    $oldBrandFolder = strtolower(trim($brandData['brand_name']));
-                    $oldFilePath = __DIR__ . '/../../../assets/images/products/' . $oldBrandFolder . '/' . $product_data['image'] . '.png';
-                    if (file_exists($oldFilePath)) {
-                        @unlink($oldFilePath);
+                $oldPath =
+                    __DIR__ .
+                    '/../../../assets/images/products/' .
+                    $old_brand_folder .
+                    '/' .
+                    $product_data['product_image'] .
+                    '.png';
+
+
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+
+
+                $newPath =
+                    $uploadDir .
+                    $product_data['product_image'] .
+                    '.png';
+
+
+                if (file_exists($oldPath)) {
+                    rename($oldPath, $newPath);
+                }
+            }
+
+
+            // Upload gambar baru
+            if ($has_new_image) {
+
+                [$ok, $savedBaseName, $uploadError] = save_product_image(
+                    $_FILES['image_file'],
+                    $name,
+                    $uploadDir
+                );
+
+                if (!$ok) {
+
+                    $errors[] = $uploadError;
+                } else {
+
+                    $image_base = $savedBaseName;
+
+                    if (!empty($product_data['product_image'])) {
+
+                        $oldFilePath =
+                            __DIR__ .
+                            '/../../../assets/images/products/' .
+                            $old_brand_folder .
+                            '/' .
+                            $product_data['product_image'] .
+                            '.png';
+
+
+                        if (file_exists($oldFilePath)) {
+                            unlink($oldFilePath);
+                        }
                     }
                 }
             }

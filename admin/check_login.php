@@ -16,7 +16,7 @@ if ($name === '' || $password === '') {
     exit;
 }
 
-$stmt = mysqli_prepare($conn, "SELECT user_id, name, password FROM users WHERE name = ? LIMIT 1");
+$stmt = mysqli_prepare($conn, "SELECT user_id, username, password FROM users WHERE username = ? LIMIT 1");
 mysqli_stmt_bind_param($stmt, "s", $name);
 mysqli_stmt_execute($stmt);
 
@@ -26,7 +26,7 @@ $user = mysqli_fetch_assoc($result);
 if ($user && ($user['password'] === md5($password) || password_verify($password, $user['password']))) {
     session_regenerate_id(true);
     $_SESSION['user_id'] = $user['user_id'];
-    $_SESSION['name'] = $user['name'];
+    $_SESSION['username'] = $user['username'];
     unset($_SESSION['login_error']);
     header("Location: dashboard.php");
     exit;

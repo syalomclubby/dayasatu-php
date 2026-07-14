@@ -24,6 +24,7 @@ if ($stmt = mysqli_prepare($conn, $sqlProducts)) {
     mysqli_stmt_close($stmt);
 }
 
+$count = 0;
 $sqlBrands = "SELECT COUNT(*) FROM brands WHERE followed_up_by = ?";
 if ($stmt = mysqli_prepare($conn, $sqlBrands)) {
     mysqli_stmt_bind_param($stmt, "i", $user_id);
@@ -36,6 +37,7 @@ if ($stmt = mysqli_prepare($conn, $sqlBrands)) {
     mysqli_stmt_close($stmt);
 }
 
+$count = 0;
 $sqlCategories = "SELECT COUNT(*) FROM categories WHERE followed_up_by = ?";
 if ($stmt = mysqli_prepare($conn, $sqlCategories)) {
     mysqli_stmt_bind_param($stmt, "i", $user_id);

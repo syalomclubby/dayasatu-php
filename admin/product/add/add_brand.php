@@ -64,6 +64,20 @@ if (isset($_POST['save'])) {
             );
 
             if (mysqli_stmt_execute($stmt)) {
+                $folderName = strtolower($name);
+
+                // Hapus karakter yang tidak valid untuk nama folder
+                $folderName = preg_replace('/[\\\\\/:*?"<>|]/', '', $folderName);
+
+                // Hilangkan spasi berlebih di awal/akhir dan jadikan satu spasi
+                $folderName = preg_replace('/\s+/', ' ', trim($folderName));
+
+                $folderPath = __DIR__ . "/../../../assets/images/products/" . $folderName;
+
+                if (!is_dir($folderPath)) {
+                    mkdir($folderPath, 0755, true);
+                }
+
                 header("Location: ../brands.php?success=added");
                 exit;
             }

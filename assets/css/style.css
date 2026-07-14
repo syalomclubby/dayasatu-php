@@ -939,7 +939,7 @@ img {
 }
 
 .product-filter-container {
-  width: 200px;
+  width: 100%;
 }
 
 .product-filter {
@@ -1579,8 +1579,13 @@ img {
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
+  border: 2px solid rgba(214, 31, 39, 0.14);
   transition: 0.3s;
+}
+
+.filter-toggle .filter-header i {
+  color: var(--red);
 }
 
 .filter-toggle:hover {
@@ -1604,6 +1609,7 @@ img {
 }
 
 #filter-arrow {
+  margin-left: 5px;
   transition: 0.35s ease;
 }
 
@@ -1656,7 +1662,7 @@ img {
 .product-toolbar {
   display: flex;
   justify-content: flex-start;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 22px;
   gap: 20px;
 }

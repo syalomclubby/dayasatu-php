@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . "/../../config/connection.php";
 require_once __DIR__ . "/../security.php";
-// Cek Role buat nampilin usernya
+
 $logged_in_id = $_SESSION['user_id'] ?? 0;
 
 $sql_check_role = "SELECT role FROM users WHERE user_id = ? LIMIT 1";
@@ -21,7 +21,7 @@ if ($stmt_check) {
 }
 
 if (isset($_GET['action']) && $_GET['action'] === 'get_all_activities') {
-    // Kita buat query murni mengambil semua log aktivitas TANPA LIMIT 5 seperti didashboard
+    
     $sql_activity = "SELECT
         activity_type, item_id, item_name, meta_text, performed_by, activity_at, activity_label
     FROM (
@@ -95,12 +95,10 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_all_activities') {
     } else {
         echo '<div class="notif-empty" style="text-align:center; padding:20px; color:var(--text-light);"><i class="fa-solid fa-bell-slash"></i> <span>Tidak ada aktivitas terbaru</span></div>';
     }
-    exit; // Menghentikan sistem agar sisa kode HTML tidak ikut ter-render masuk ke AJAX
+    exit;
 }
 
-// Cek Role buat nampilin usernyaa (Kode asli bawaan Anda)
 $logged_in_id = $_SESSION['user_id'] ?? 0;
-// ... (Sisa kode bawaan tetap sama di bawahnya)
 
 ?>
 
@@ -173,6 +171,9 @@ $logged_in_id = $_SESSION['user_id'] ?? 0;
                 'add_product.php',
                 'edit_product.php',
                 'delete_product.php',
+                'product_prices.php',
+                'add_product_price.php',
+                'edit_product_price.php',
             ])) {
                 $current_menu = 'products';
             } elseif (in_array($current_page, [

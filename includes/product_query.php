@@ -15,9 +15,9 @@ if (!defined('DAYASATU')) {
 $sql_brands = "
     SELECT
         brand_id,
-        name
+        brand_name
     FROM brands
-    ORDER BY name ASC
+    ORDER BY brand_name ASC
 ";
 
 $query_brands = mysqli_query($conn, $sql_brands);
@@ -36,9 +36,9 @@ if (!$query_brands) {
 $sql_categories = "
     SELECT
         category_id,
-        name
+        category_name
     FROM categories
-    ORDER BY name ASC
+    ORDER BY category_name ASC
 ";
 
 $query_categories = mysqli_query($conn, $sql_categories);
@@ -57,28 +57,38 @@ $sql_products = "
 SELECT
 
     products.product_id,
-    products.name,
-    products.description,
-    products.image,
+    products.product_name,
+    products.product_description,
+    products.product_image,
     products.created_at,
 
     brands.brand_id,
-    brands.name AS brand_name,
+    brands.brand_name,
 
     categories.category_id,
-    categories.name AS category_name,
+    categories.category_name,
 
     (
-        SELECT MIN(price)
+        SELECT MIN(product_price)
         FROM product_prices
         WHERE product_prices.product_id = products.product_id
     ) AS min_price,
 
     (
-        SELECT MAX(price)
+        SELECT MAX(product_price)
         FROM product_prices
         WHERE product_prices.product_id = products.product_id
-    ) AS max_price
+    ) AS max_price,
+
+    (
+        SELECT GROUP_CONCAT(
+            product_price
+            ORDER BY product_price ASC
+            SEPARATOR ','
+        )
+        FROM product_prices
+        WHERE product_prices.product_id = products.product_id
+    ) AS prices
 
 FROM products
 
@@ -90,7 +100,7 @@ ON products.category_id = categories.category_id
 
 ORDER BY
 products.created_at DESC,
-products.name ASC
+products.product_name ASC
 ";
 
 $query_products = mysqli_query($conn, $sql_products);

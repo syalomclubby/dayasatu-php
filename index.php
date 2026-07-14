@@ -187,27 +187,28 @@ require_once 'includes/product_query.php';
           pengecatan dan finishing. <br><br>
         </p>
 
-        <div class="product-toolbar">
-          <div class="product-search">
+        <section class="product-filter-container">
 
-            <i class="fa-solid fa-magnifying-glass"></i>
+          <div class="product-toolbar">
 
-            <input
-              type="text"
-              id="product-search"
-              placeholder="Search product...">
+            <div class="product-search">
 
-            <button
-              id="clear-search"
-              type="button">
+              <i class="fa-solid fa-magnifying-glass"></i>
 
-              <i class="fa-solid fa-xmark"></i>
+              <input
+                type="text"
+                id="product-search"
+                placeholder="Search product...">
 
-            </button>
+              <button
+                id="clear-search"
+                type="button">
 
-          </div>
+                <i class="fa-solid fa-xmark"></i>
 
-          <section class="product-filter-container">
+              </button>
+
+            </div>
 
             <button
               id="filter-toggle"
@@ -229,66 +230,67 @@ require_once 'includes/product_query.php';
               </i>
             </button>
 
-            <div
-              id="filter-content"
-              class="filter-content collapsed">
+          </div>
 
-              <div class="filter-group">
+          <div
+            id="filter-content"
+            class="filter-content collapsed">
 
-                <h3>Brand</h3>
+            <div class="filter-group">
 
-                <div
-                  class="product-filter"
-                  id="brand-filter">
+              <h3>Brand</h3>
 
-                  <button
-                    class="filter-btn active"
-                    data-brand="all">
-                    Semua
-                  </button>
+              <div
+                class="product-filter"
+                id="brand-filter">
 
-                  <?php while ($brand = mysqli_fetch_assoc($query_brands)): ?>
+                <button
+                  class="filter-btn active"
+                  data-brand="all">
+                  Semua
+                </button>
 
-                    <button
-                      class="filter-btn"
-                      data-brand="<?= strtolower(htmlspecialchars($brand['name'])) ?>">
-
-                      <?= htmlspecialchars($brand['name']) ?>
-                    </button>
-                  <?php endwhile; ?>
-                </div>
-              </div>
-
-              <br>
-
-              <div class="filter-group">
-
-                <h3>Kategori</h3>
-
-                <div
-                  class="product-filter"
-                  id="category-filter">
+                <?php while ($brand = mysqli_fetch_assoc($query_brands)): ?>
 
                   <button
-                    class="filter-btn active"
-                    data-category="all">
-                    Semua
+                    class="filter-btn"
+                    data-brand="<?= strtolower(htmlspecialchars($brand['brand_name'])) ?>">
+
+                    <?= htmlspecialchars($brand['brand_name']) ?>
                   </button>
-
-                  <?php while ($category = mysqli_fetch_assoc($query_categories)): ?>
-
-                    <button
-                      class="filter-btn"
-                      data-category="<?= strtolower(htmlspecialchars($category['name'])) ?>">
-
-                      <?= htmlspecialchars($category['name']) ?>
-                    </button>
-                  <?php endwhile; ?>
-                </div>
+                <?php endwhile; ?>
               </div>
             </div>
-          </section>
-        </div>
+
+            <br>
+
+            <div class="filter-group">
+
+              <h3>Kategori</h3>
+
+              <div
+                class="product-filter"
+                id="category-filter">
+
+                <button
+                  class="filter-btn active"
+                  data-category="all">
+                  Semua
+                </button>
+
+                <?php while ($category = mysqli_fetch_assoc($query_categories)): ?>
+
+                  <button
+                    class="filter-btn"
+                    data-category="<?= strtolower(htmlspecialchars($category['category_name'])) ?>">
+
+                    <?= htmlspecialchars($category['category_name']) ?>
+                  </button>
+                <?php endwhile; ?>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
 
       <div class="product-grid hidden-left">
@@ -297,12 +299,7 @@ require_once 'includes/product_query.php';
 
           <?php
           $brandFolder = strtolower(trim($product['brand_name']));
-          $brandFolder = str_replace(' ', '_', $brandFolder);
-          $imagePath = "assets/images/products/$brandFolder/" . $product['image'] . ".png";
-
-          if (!file_exists($imagePath)) {
-            $imagePath = "assets/images/products/no_brand/" . $product['image'];
-          }
+          $imagePath = "assets/images/products/$brandFolder/" . $product['product_image'] . ".png";
           ?>
 
           <article
@@ -313,18 +310,18 @@ require_once 'includes/product_query.php';
             <div class="product-image">
               <img
                 src="<?= $imagePath ?>"
-                alt="<?= htmlspecialchars($product['name']) ?>">
+                alt="<?= htmlspecialchars($product['product_name']) ?>">
             </div>
 
             <div class="product-body">
 
               <h3>
-                <?= htmlspecialchars($product['name']) ?>
+                <?= htmlspecialchars($product['product_name']) ?>
               </h3>
 
               <div class="product-description">
                 <p>
-                  <?= nl2br(htmlspecialchars($product['description'])) ?>
+                  <?= nl2br(htmlspecialchars($product['product_description'])) ?>
                 </p>
 
                 <button class="see-more-btn" type="button">
@@ -336,7 +333,17 @@ require_once 'includes/product_query.php';
               <?php if ($product['min_price']): ?>
 
                 <div class="product-price">
-                  Rp <?= number_format($product['min_price'], 0, ',', '.') ?>
+                  <?php if ($product['min_price'] == $product['max_price']): ?>
+
+                    Rp <?= number_format($product['min_price'], 0, ',', '.') ?>
+
+                  <?php else: ?>
+
+                    Rp <?= number_format($product['min_price'], 0, ',', '.') ?>
+                    -
+                    Rp <?= number_format($product['max_price'], 0, ',', '.') ?>
+
+                  <?php endif; ?>
                 </div>
 
               <?php endif; ?>

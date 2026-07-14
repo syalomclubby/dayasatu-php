@@ -205,7 +205,7 @@ if (isset($_GET['ajax'])) {
         <div class="alert alert-success">
             <i class="fa-solid fa-circle-check"></i>
             <span>
-                Brand berhasil dihapus.
+                Brand successfully deleted.
             </span>
         </div>
     <?php endif; ?>

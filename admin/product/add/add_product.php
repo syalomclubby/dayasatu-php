@@ -171,7 +171,7 @@ if (isset($_POST['save'])) {
 
     if (empty($errors) && isset($_FILES['image_file'])) {
 
-        $sqlBrandName = "SELECT name FROM brands WHERE brand_id = ? LIMIT 1";
+        $sqlBrandName = "SELECT brand_name FROM brands WHERE brand_id = ? LIMIT 1";
         $stmtBrandName = mysqli_prepare($conn, $sqlBrandName);
 
         mysqli_stmt_bind_param($stmtBrandName, "i", $brand_id);
@@ -186,7 +186,7 @@ if (isset($_POST['save'])) {
             $errors[] = 'Brand not found.';
         } else {
 
-            $brandFolder = strtolower(trim($brandData['name']));
+            $brandFolder = strtolower(trim($brandData['brand_name']));
 
             $uploadDir = __DIR__
                 . '/../../../assets/images/products/'
@@ -208,7 +208,7 @@ if (isset($_POST['save'])) {
     }
 
     if (empty($errors)) {
-        $sql = "INSERT INTO products (brand_id, category_id, name, description, image, followed_up_by)
+        $sql = "INSERT INTO products (brand_id, category_id, product_name, product_description, product_image, followed_up_by)
                 VALUES (?, ?, ?, ?, ?, ?)";
 
         $stmt = mysqli_prepare($conn, $sql);
@@ -299,8 +299,8 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                                             type="button"
                                             class="custom-select-option"
                                             data-value="<?= (int) $brand['brand_id']; ?>"
-                                            data-label="<?= htmlspecialchars($brand['name'], ENT_QUOTES, 'UTF-8'); ?>">
-                                            <?= htmlspecialchars($brand['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                            data-label="<?= htmlspecialchars($brand['brand_name'], ENT_QUOTES, 'UTF-8'); ?>">
+                                            <?= htmlspecialchars($brand['brand_name'], ENT_QUOTES, 'UTF-8'); ?>
                                         </button>
                                     <?php endwhile; ?>
                                 <?php endif; ?>
@@ -354,9 +354,9 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                                         type="button"
                                         class="custom-select-option"
                                         data-value="<?= $category['category_id']; ?>"
-                                        data-label="<?= htmlspecialchars($category['name']); ?>">
+                                        data-label="<?= htmlspecialchars($category['category_name']); ?>">
 
-                                        <?= htmlspecialchars($category['name']); ?>
+                                        <?= htmlspecialchars($category['category_name']); ?>
 
                                     </button>
 
