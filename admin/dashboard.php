@@ -30,9 +30,9 @@ $query_brand = mysqli_query($conn, $sql_brand);
 
 $sql_products = "SELECT
 products.*,
-products.name AS product_name,
-brands.name AS brand_name,
-categories.name AS category_name
+products.product_name AS product_name,
+brands.brand_name AS brand_name,
+categories.category_name AS category_name
 FROM products
 INNER JOIN brands
 ON products.brand_id = brands.brand_id
@@ -55,9 +55,9 @@ FROM (
     SELECT
         'product' AS activity_type,
         p.product_id AS item_id,
-        p.name AS item_name,
-        CONCAT(b.name, ' • ', c.name) AS meta_text,
-        u.name AS performed_by,
+        p.product_name AS item_name,
+        CONCAT(b.brand_name, ' • ', c.category_name) AS meta_text,
+        u.username AS performed_by,
         COALESCE(p.followed_up_at, p.created_at) AS activity_at,
         CASE
             WHEN p.followed_up_at IS NULL THEN 'Product Added'
@@ -73,9 +73,9 @@ FROM (
     SELECT
         'brand' AS activity_type,
         b.brand_id AS item_id,
-        b.name AS item_name,
+        b.brand_name AS item_name,
         'Brand' AS meta_text,
-        u.name AS performed_by,
+        u.username AS performed_by,
         COALESCE(b.followed_up_at, b.created_at) AS activity_at,
         CASE
             WHEN b.followed_up_at IS NULL THEN 'Brand Added'
@@ -89,9 +89,9 @@ FROM (
     SELECT
         'category' AS activity_type,
         c.category_id AS item_id,
-        c.name AS item_name,
+        c.category_name AS item_name,
         'Category' AS meta_text,
-        u.name AS performed_by,
+        u.username AS performed_by,
         COALESCE(c.followed_up_at, c.created_at) AS activity_at,
         CASE
             WHEN c.followed_up_at IS NULL THEN 'Category Added'
@@ -192,7 +192,7 @@ $query_activity = mysqli_query($conn, $sql_activity);
                         <span class="banner-badge"><i class="fa-solid fa-sparkles"></i> Admin overview</span>
                         <span class="banner-date"><?= date("l, d M Y") ?></span>
                     </div>
-                    <h3 class="welcome-title">Welcome back, <?= ($_SESSION['name'] ?? 'Admin') ?>.</h3>
+                    <h3 class="welcome-title">Welcome back, <?= ($_SESSION['username'] ?? 'Admin') ?>.</h3>
                     <p class="welcome-text">Monitor products, brands, categories, and system activity from one dashboard.</p>
                 </div>
             </div>
@@ -220,7 +220,7 @@ $query_activity = mysqli_query($conn, $sql_activity);
                                 $brand_folder = strtolower(trim($row['brand_name']));
                                 ?>
                                 <img
-                                    src="../assets/images/products/<?= ($brand_folder) ?>/<?= $row['image'] ?>.png"
+                                    src="../assets/images/products/<?= ($brand_folder) ?>/<?= $row['product_image'] ?>.png"
                                     alt="<?= $row['product_name'] ?>">
                             </div>
 

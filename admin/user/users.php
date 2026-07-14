@@ -13,7 +13,7 @@ if ($search !== '') {
 
     $where = "
         WHERE
-            name LIKE '%$search%'
+            username LIKE '%$search%'
             OR role LIKE '%$search%'
     ";
 }
@@ -45,7 +45,7 @@ function renderUserRows(mysqli_result $query_user): string
 
             <td>
                 <div class="table-name">
-                    <?= htmlspecialchars($result['name']); ?>
+                    <?= htmlspecialchars($result['username']); ?>
                 </div>
             </td>
 

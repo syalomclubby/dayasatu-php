@@ -12,22 +12,21 @@ if ($search !== '') {
 
     $where = "
         WHERE
-            brands.name LIKE '%$search%'
-            OR users.name LIKE '%$search%'
+            brands.brand_name LIKE '%$search%'
+            OR users.username LIKE '%$search%'
     ";
 }
 
 $sql_brand = "
 SELECT *,
-brands.name AS brand_name,
 brands.followed_up_at AS brands_at,
 brands.created_at AS waktu,
-users.name AS user_name
+users.username AS user_name
 FROM brands
 INNER JOIN users
 ON brands.followed_up_by = users.user_id
 $where
-ORDER BY brands.name DESC
+ORDER BY brands.brand_name DESC
 ";
 
 $query_brand = mysqli_query($conn, $sql_brand);

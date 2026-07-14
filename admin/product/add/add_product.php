@@ -9,7 +9,7 @@ $current_user_id = (int) ($_SESSION['user_id'] ?? 0);
 $current_user_name = '';
 
 if ($current_user_id > 0) {
-    $sql_current_user = "SELECT name FROM users WHERE user_id = ? LIMIT 1";
+    $sql_current_user = "SELECT username FROM users WHERE user_id = ? LIMIT 1";
     $stmt_current_user = mysqli_prepare($conn, $sql_current_user);
 
     if ($stmt_current_user) {
@@ -18,17 +18,17 @@ if ($current_user_id > 0) {
         $result_current_user = mysqli_stmt_get_result($stmt_current_user);
 
         if ($row_current_user = mysqli_fetch_assoc($result_current_user)) {
-            $current_user_name = $row_current_user['name'] ?? '';
+            $current_user_name = $row_current_user['username'] ?? '';
         }
 
         mysqli_stmt_close($stmt_current_user);
     }
 }
 
-$sql_categories = "SELECT * FROM categories ORDER BY name ASC";
+$sql_categories = "SELECT * FROM categories ORDER BY category_name ASC";
 $query_categories = mysqli_query($conn, $sql_categories);
 
-$sql_brand = "SELECT brand_id, name FROM brands ORDER BY name ASC";
+$sql_brand = "SELECT brand_id, brand_name FROM brands ORDER BY brand_name ASC";
 $query_brand = mysqli_query($conn, $sql_brand);
 
 $brand_id = '';

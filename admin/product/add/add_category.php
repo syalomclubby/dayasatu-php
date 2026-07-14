@@ -10,7 +10,7 @@ $current_user_id = (int) ($_SESSION['user_id'] ?? 0);
 $current_user_name = '';
 
 if ($current_user_id > 0) {
-    $sql_current_user = "SELECT name FROM users WHERE user_id = ? LIMIT 1";
+    $sql_current_user = "SELECT username FROM users WHERE user_id = ? LIMIT 1";
     $stmt_current_user = mysqli_prepare($conn, $sql_current_user);
 
     if ($stmt_current_user) {
@@ -19,7 +19,7 @@ if ($current_user_id > 0) {
         $result_current_user = mysqli_stmt_get_result($stmt_current_user);
 
         if ($row_current_user = mysqli_fetch_assoc($result_current_user)) {
-            $current_user_name = $row_current_user['name'] ?? '';
+            $current_user_name = $row_current_user['username'] ?? '';
         }
 
         mysqli_stmt_close($stmt_current_user);
@@ -28,7 +28,7 @@ if ($current_user_id > 0) {
 
 if (isset($_POST['save'])) {
 
-    $name = trim($_POST['name'] ?? '');
+    $name = trim($_POST['category_name'] ?? '');
 
     if ($name === '') {
         $errors[] = 'Category name is required.';
@@ -43,7 +43,7 @@ if (isset($_POST['save'])) {
         $sql = "
             INSERT INTO categories
             (
-                name, followed_up_by
+                category_name, followed_up_by
             )
             VALUES
             (
@@ -142,7 +142,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
 
                     <input
                         type="text"
-                        name="name"
+                        name="category_name"
                         class="form-control"
                         value="<?= htmlspecialchars($name); ?>"
                         placeholder="Enter category name"

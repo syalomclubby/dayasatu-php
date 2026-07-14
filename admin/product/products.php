@@ -22,10 +22,10 @@ if ($search !== '') {
 
     $where = "
     WHERE
-        products.name LIKE '%$search%'
-        OR brands.name LIKE '%$search%'
-        OR categories.name LIKE '%$search%'
-        OR users.name LIKE '%$search%'
+        products.product_name LIKE '%$search%'
+        OR brands.brand_name LIKE '%$search%'
+        OR categories.category_name LIKE '%$search%'
+        OR users.username LIKE '%$search%'
     ";
 }
 
@@ -45,15 +45,15 @@ $total_data = mysqli_fetch_assoc($total_query)['total'];
 $total_pages = ceil($total_data / $limit);
 
 $sql_products = "SELECT *, 
-products.name AS products_name,
+products.product_name AS products_name,
 products.followed_up_at AS products_at,
 products.created_at AS waktu,
-brands.name AS brand_name,
-users.name AS user_name,
-categories.name AS category_name,
-(SELECT MIN(price) FROM product_prices WHERE product_id = products.product_id) AS min_price,
-(SELECT MAX(price) FROM product_prices WHERE product_id = products.product_id) AS max_price,
-products.description
+brands.brand_name AS brand_name,
+users.username AS user_name,
+categories.category_name AS category_name,
+(SELECT MIN(product_price) FROM product_prices WHERE product_id = products.product_id) AS min_price,
+(SELECT MAX(product_price) FROM product_prices WHERE product_id = products.product_id) AS max_price,
+products.product_description
 FROM products 
 INNER JOIN users ON products.followed_up_by = users.user_id
 INNER JOIN brands ON products.brand_id = brands.brand_id
@@ -114,13 +114,13 @@ function renderProductRows(mysqli_result $query_product, int $offset): string
 
             <td>
                 <div class="table-description">
-                    <?= $result['description']; ?>
+                    <?= $result['product_description']; ?>
                 </div>
             </td>
 
             <td>
                 <img
-                    src="../../assets/images/products/<?= htmlspecialchars($brand_folder) ?>/<?= htmlspecialchars($result['image']) ?>.png"
+                    src="../../assets/images/products/<?= htmlspecialchars($brand_folder) ?>/<?= htmlspecialchars($result['product_image']) ?>.png"
                     class="table-image">
             </td>
 

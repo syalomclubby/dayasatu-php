@@ -30,7 +30,7 @@ if ($stmt_get_user) {
     }
 
     if (!isset($_POST['save'])) {
-        $name = $user_data['name'];
+        $name = $user_data['username'];
         $password = $user_data['password'];
         $role = $user_data['role'];
     }
@@ -38,7 +38,7 @@ if ($stmt_get_user) {
 
 if (isset($_POST['save'])) {
 
-    $name     = trim($_POST['name'] ?? '');
+    $name     = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     $role     = trim($_POST['role'] ?? '');
 
@@ -55,7 +55,7 @@ if (isset($_POST['save'])) {
 
         $sql = "
             UPDATE users 
-            SET name = ?, password = MD5(?), role = role
+            SET username = ?, password = MD5(?), role = role
             WHERE user_id = ?
         ";
 
@@ -142,7 +142,7 @@ require_once __DIR__ . "/../partials/sidebar.php";
                     </label>
                     <input
                         type="text"
-                        name="name"
+                        name="username"
                         class="form-control"
                         value="<?= htmlspecialchars($name); ?>"
                         placeholder="Enter user name"

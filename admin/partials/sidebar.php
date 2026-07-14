@@ -25,8 +25,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_all_activities') {
     $sql_activity = "SELECT
         activity_type, item_id, item_name, meta_text, performed_by, activity_at, activity_label
     FROM (
-        SELECT 'product' AS activity_type, p.product_id AS item_id, p.name AS item_name,
-            CONCAT(b.name, ' • ', c.name) AS meta_text, u.name AS performed_by,
+        SELECT 'product' AS activity_type, p.product_id AS item_id, p.product_name AS item_name,
+            CONCAT(b.brand_name, ' • ', c.category_name) AS meta_text, u.username AS performed_by,
             COALESCE(p.followed_up_at, p.created_at) AS activity_at,
             CASE WHEN p.followed_up_at IS NULL THEN 'Product Added' ELSE 'Product Updated' END AS activity_label
         FROM products p
@@ -36,15 +36,15 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_all_activities') {
 
         UNION ALL
 
-        SELECT 'brand' AS activity_type, b.brand_id AS item_id, b.name AS item_name, 'Brand' AS meta_text,
-            u.name AS performed_by, COALESCE(b.followed_up_at, b.created_at) AS activity_at,
+        SELECT 'brand' AS activity_type, b.brand_id AS item_id, b.brand_name AS item_name, 'Brand' AS meta_text,
+            u.username AS performed_by, COALESCE(b.followed_up_at, b.created_at) AS activity_at,
             CASE WHEN b.followed_up_at IS NULL THEN 'Brand Added' ELSE 'Brand Updated' END AS activity_label
         FROM brands b LEFT JOIN users u ON b.followed_up_by = u.user_id
 
         UNION ALL
 
-        SELECT 'category' AS activity_type, c.category_id AS item_id, c.name AS item_name, 'Category' AS meta_text,
-            u.name AS performed_by, COALESCE(c.followed_up_at, c.created_at) AS activity_at,
+        SELECT 'category' AS activity_type, c.category_id AS item_id, c.category_name AS item_name, 'Category' AS meta_text,
+            u.username AS performed_by, COALESCE(c.followed_up_at, c.created_at) AS activity_at,
             CASE WHEN c.followed_up_at IS NULL THEN 'Category Added' ELSE 'Category Updated' END AS activity_label
         FROM categories c LEFT JOIN users u ON c.followed_up_by = u.user_id
     ) AS all_activity 

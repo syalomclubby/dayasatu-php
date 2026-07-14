@@ -30,14 +30,14 @@ SELECT
 
     pp.price_id,
     pp.product_id,
-    pp.size,
-    pp.price,
+    pp.product_size,
+    pp.product_price,
 
-    p.name AS product_name,
+    p.product_name AS product_name,
 
-    b.name AS brand_name,
+    b.brand_name AS brand_name,
 
-    c.name AS category_name
+    c.category_name AS category_name
 
 FROM product_prices pp
 
@@ -55,6 +55,7 @@ WHERE pp.price_id = ?
 LIMIT 1
 
 ";
+
 
 $stmtPrice = mysqli_prepare($conn, $sqlPrice);
 
@@ -85,10 +86,10 @@ $data = mysqli_fetch_assoc($resultPrice);
 
 $product_id = $data['product_id'];
 
-$size = $data['size'];
+$size = $data['product_size'];
 
 $price_display = number_format(
-    $data['price'],
+    $data['product_price'],
     0,
     ',',
     '.'
@@ -104,9 +105,9 @@ $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $size = trim($_POST['size']);
+    $size = trim($_POST['product_size']);
 
-    $price_display = trim($_POST['price']);
+    $price_display = trim($_POST['product_price']);
 
     /*
     |--------------------------------------------------------------------------
@@ -160,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             WHERE product_id = ?
 
-            AND LOWER(TRIM(size)) = LOWER(TRIM(?))
+            AND LOWER(TRIM(product_size)) = LOWER(TRIM(?))
 
             AND price_id <> ?
 
@@ -212,9 +213,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             SET
 
-                size = ?,
+                product_size = ?,
 
-                price = ?,
+                product_price = ?,
 
                 followed_up_by = ?,
 
@@ -385,7 +386,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                             type="text"
 
-                            name="size"
+                            name="product_size"
 
                             class="form-control"
 
@@ -421,7 +422,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                             id="price"
 
-                            name="price"
+                            name="product_price"
 
                             class="form-control"
 
@@ -463,7 +464,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <script>
 
-    const priceInput = document.getElementById('price');
+    const priceInput = document.getElementById('product_price');
 
     function formatPrice(value)
     {

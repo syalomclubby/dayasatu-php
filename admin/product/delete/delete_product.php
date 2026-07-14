@@ -12,8 +12,8 @@ if (!$product_id) {
 
 $sql_product = "
     SELECT
-        products.image,
-        brands.name AS brand_name
+        products.product_image,
+        brands.brand_name AS brand_name
     FROM products
     LEFT JOIN brands
         ON products.brand_id = brands.brand_id

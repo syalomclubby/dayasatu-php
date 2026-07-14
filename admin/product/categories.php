@@ -13,16 +13,16 @@ if ($search !== '') {
 
     $where = "
         WHERE
-            categories.name LIKE '%$search%'
-            OR users.name LIKE '%$search%'
+            categories.category_name LIKE '%$search%'
+            OR users.username LIKE '%$search%'
     ";
 }
 
 $sql_category = "
 SELECT *,
-categories.name AS category_name,
+categories.category_name AS category_name,
 categories.created_at AS waktu,
-users.name AS user_name
+users.username AS user_name
 FROM categories
 INNER JOIN users
 ON categories.followed_up_by = users.user_id

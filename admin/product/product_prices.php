@@ -45,9 +45,9 @@ function formatDateTime(?string $datetime): string
 $sqlProduct = "
 SELECT
     p.product_id,
-    p.name AS product_name,
-    b.name AS brand_name,
-    c.name AS category_name
+    p.product_name AS product_name,
+    b.brand_name AS brand_name,
+    c.category_name AS category_name
 
 FROM products p
 
@@ -86,12 +86,12 @@ $sqlPrices = "
 SELECT
 
     pp.price_id,
-    pp.size,
-    pp.price,
+    pp.product_size,
+    pp.product_price,
     pp.followed_up_at,
     pp.created_at AS waktu,
 
-    u.name AS admin_name
+    u.username AS admin_name
 
 FROM product_prices pp
 
@@ -101,8 +101,8 @@ LEFT JOIN users u
 WHERE pp.product_id = ?
 
 ORDER BY
-    pp.price ASC,
-    pp.size ASC
+    pp.product_price ASC,
+    pp.product_size ASC
 ";
 
 $stmtPrices = mysqli_prepare($conn, $sqlPrices);
@@ -266,10 +266,10 @@ $pageTitle = "Product Pricing";
                         <?= $no++; ?>
                     </td>
                     <td>
-                        <?= htmlspecialchars($row['size']); ?>
+                        <?= htmlspecialchars($row['product_size']); ?>
                     </td>
                     <td>
-                        <?= formatRupiah($row['price']); ?>
+                        <?= formatRupiah($row['product_price']); ?>
                     </td>
                     <td>
                         <?= htmlspecialchars($row['admin_name'] ?? '-'); ?>

@@ -9,7 +9,7 @@ $role = '';
 
 if (isset($_POST['save'])) {
 
-    $name     = trim($_POST['name'] ?? '');
+    $name     = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     $role     = trim($_POST['role'] ?? '');
 
@@ -30,7 +30,7 @@ if (isset($_POST['save'])) {
         $sql = "
             INSERT INTO users
             (
-                name, password, role, created_at
+                username, password, role, created_at
             )
             VALUES
             (
@@ -122,7 +122,7 @@ require_once __DIR__ . "/../partials/sidebar.php";
                     </label>
                     <input
                         type="text"
-                        name="name"
+                        name="username"
                         class="form-control"
                         value="<?= htmlspecialchars($name); ?>"
                         placeholder="Enter user name"

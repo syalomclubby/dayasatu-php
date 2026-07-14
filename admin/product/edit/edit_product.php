@@ -6,7 +6,7 @@ require_once __DIR__ . "/../../../config/connection.php";
 $errors = [];
 $success = false;
 
-$sql_categories = "SELECT category_id, name FROM categories ORDER BY name ASC";
+$sql_categories = "SELECT category_id, category_name FROM categories ORDER BY category_name ASC";
 $query_categories = mysqli_query($conn, $sql_categories);
 
 $category_id = '';
@@ -24,7 +24,7 @@ $current_user_id = (int) ($_SESSION['user_id'] ?? 0);
 $current_user_name = '';
 
 if ($current_user_id > 0) {
-    $sql_current_user = "SELECT name FROM users WHERE user_id = ? LIMIT 1";
+    $sql_current_user = "SELECT username FROM users WHERE user_id = ? LIMIT 1";
     $stmt_current_user = mysqli_prepare($conn, $sql_current_user);
 
     if ($stmt_current_user) {
@@ -33,14 +33,14 @@ if ($current_user_id > 0) {
         $result_current_user = mysqli_stmt_get_result($stmt_current_user);
 
         if ($row_current_user = mysqli_fetch_assoc($result_current_user)) {
-            $current_user_name = $row_current_user['name'] ?? '';
+            $current_user_name = $row_current_user['username'] ?? '';
         }
 
         mysqli_stmt_close($stmt_current_user);
     }
 }
 
-$sql_brand = "SELECT brand_id, name FROM brands ORDER BY name ASC";
+$sql_brand = "SELECT brand_id, brand_name FROM brands ORDER BY brand_name ASC";
 $query_brand = mysqli_query($conn, $sql_brand);
 
 $brand_id = '';
@@ -70,7 +70,7 @@ if ($stmt_get_product) {
     if (!isset($_POST['save'])) {
         $brand_id    = $product_data['brand_id'];
         $category_id = $product_data['category_id'];
-        $sql_old_category = "SELECT name FROM categories WHERE category_id = ? LIMIT 1";
+        $sql_old_category = "SELECT category_name FROM categories WHERE category_id = ? LIMIT 1";
         $stmt_old_category = mysqli_prepare($conn, $sql_old_category);
 
         if ($stmt_old_category) {
@@ -80,25 +80,25 @@ if ($stmt_get_product) {
             $res_oc = mysqli_stmt_get_result($stmt_old_category);
 
             if ($row_oc = mysqli_fetch_assoc($res_oc)) {
-                $category_name_label = $row_oc['name'];
+                $category_name_label = $row_oc['category_name'];
             }
 
             mysqli_stmt_close($stmt_old_category);
         }
 
-        $name        = $product_data['name'];
-        $description = $product_data['description'];
-        $old_image   = $product_data['image'];
+        $name        = $product_data['product_name'];
+        $description = $product_data['product_description'];
+        $old_image   = $product_data['product_image'];
 
-        $sql_old_brand = "SELECT name FROM brands WHERE brand_id = ? LIMIT 1";
+        $sql_old_brand = "SELECT brand_name FROM brands WHERE brand_id = ? LIMIT 1";
         $stmt_old_brand = mysqli_prepare($conn, $sql_old_brand);
         if ($stmt_old_brand) {
             mysqli_stmt_bind_param($stmt_old_brand, "i", $brand_id);
             mysqli_stmt_execute($stmt_old_brand);
             $res_ob = mysqli_stmt_get_result($stmt_old_brand);
             if ($row_ob = mysqli_fetch_assoc($res_ob)) {
-                $brand_name_label = $row_ob['name'];
-                $old_brand_folder = strtolower(trim($row_ob['name']));
+                $brand_name_label = $row_ob['brand_name'];
+                $old_brand_folder = strtolower(trim($row_ob['brand_name']));
             }
             mysqli_stmt_close($stmt_old_brand);
         }
@@ -195,7 +195,7 @@ if (isset($_POST['save'])) {
     if ($category_id !== '') {
 
         $sql_category_name = "
-        SELECT name
+        SELECT category_name
         FROM categories
         WHERE category_id = ?
         LIMIT 1
@@ -224,15 +224,15 @@ if (isset($_POST['save'])) {
             ) {
 
                 $category_name_label =
-                    $row_category_name['name'];
+                    $row_category_name['category_name'];
             }
 
             mysqli_stmt_close($stmt_category_name);
         }
     }
 
-    $name        = trim($_POST['name'] ?? '');
-    $description = trim($_POST['description'] ?? '');
+    $name        = trim($_POST['product_name'] ?? '');
+    $description = trim($_POST['product_description'] ?? '');
 
     if ($brand_id === '') {
         $errors[] = 'Brand is required.';
@@ -254,11 +254,11 @@ if (isset($_POST['save'])) {
         $errors[] = 'Logged in user not found.';
     }
 
-    $image_base = $product_data['image'];
+    $image_base = $product_data['product_image'];
     $has_new_image = isset($_FILES['image_file']) && !empty($_FILES['image_file']['name']);
 
     if (empty($errors)) {
-        $sqlBrandName = "SELECT name FROM brands WHERE brand_id = ? LIMIT 1";
+        $sqlBrandName = "SELECT brand_name FROM brands WHERE brand_id = ? LIMIT 1";
         $stmtBrandName = mysqli_prepare($conn, $sqlBrandName);
         mysqli_stmt_bind_param($stmtBrandName, "i", $brand_id);
         mysqli_stmt_execute($stmtBrandName);
@@ -269,7 +269,7 @@ if (isset($_POST['save'])) {
         if (!$brandData) {
             $errors[] = 'Brand not found.';
         } elseif ($has_new_image) {
-            $brandFolder = strtolower(trim($brandData['name']));
+            $brandFolder = strtolower(trim($brandData['brand_name']));
             $uploadDir = __DIR__ . '/../../../assets/images/products/' . $brandFolder . '/';
 
             [$ok, $savedBaseName, $uploadError] = save_product_image(
@@ -284,7 +284,7 @@ if (isset($_POST['save'])) {
                 $image_base = $savedBaseName;
 
                 if (!empty($product_data['image'])) {
-                    $oldBrandFolder = strtolower(trim($brandData['name']));
+                    $oldBrandFolder = strtolower(trim($brandData['brand_name']));
                     $oldFilePath = __DIR__ . '/../../../assets/images/products/' . $oldBrandFolder . '/' . $product_data['image'] . '.png';
                     if (file_exists($oldFilePath)) {
                         @unlink($oldFilePath);
@@ -296,7 +296,7 @@ if (isset($_POST['save'])) {
 
     if (empty($errors)) {
         $sql = "UPDATE products 
-                SET brand_id = ?, category_id = ?, name = ?, description = ?, image = ?, followed_up_at = NOW(), followed_up_by = ?
+                SET brand_id = ?, category_id = ?, product_name = ?, product_description = ?, product_image = ?, followed_up_at = NOW(), followed_up_by = ?
                 WHERE product_id = ?";
 
         $stmt = mysqli_prepare($conn, $sql);
@@ -394,8 +394,8 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                                             type="button"
                                             class="custom-select-option <?= $selected_class; ?>"
                                             data-value="<?= (int) $brand['brand_id']; ?>"
-                                            data-label="<?= htmlspecialchars($brand['name'], ENT_QUOTES, 'UTF-8'); ?>">
-                                            <?= htmlspecialchars($brand['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                            data-label="<?= htmlspecialchars($brand['brand_name'], ENT_QUOTES, 'UTF-8'); ?>">
+                                            <?= htmlspecialchars($brand['brand_name'], ENT_QUOTES, 'UTF-8'); ?>
                                         </button>
                                     <?php endwhile; ?>
                                 <?php endif; ?>
@@ -441,8 +441,8 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                                             type="button"
                                             class="custom-select-option <?= $selected_class; ?>"
                                             data-value="<?= $category['category_id']; ?>"
-                                            data-label="<?= htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>">
-                                            <?= htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                            data-label="<?= htmlspecialchars($category['category_name'], ENT_QUOTES, 'UTF-8'); ?>">
+                                            <?= htmlspecialchars($category['category_name'], ENT_QUOTES, 'UTF-8'); ?>
                                         </button>
                                     <?php endwhile; ?>
                                 <?php endif; ?>
@@ -457,7 +457,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                     <label for="name" class="form-label">Name</label>
                     <input
                         type="text"
-                        name="name"
+                        name="product_name"
                         id="name"
                         class="form-control"
                         value="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>"
@@ -468,7 +468,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                 <div class="form-group">
                     <label for="description" class="form-label">Description</label>
                     <textarea
-                        name="description"
+                        name="product_description"
                         id="description"
                         class="form-control"
                         placeholder="Enter product description"

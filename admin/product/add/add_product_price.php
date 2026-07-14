@@ -8,7 +8,7 @@ $current_user_id = (int) ($_SESSION['user_id'] ?? 0);
 $current_user_name = '';
 
 if ($current_user_id > 0) {
-    $sql_current_user = "SELECT name FROM users WHERE user_id = ? LIMIT 1";
+    $sql_current_user = "SELECT username FROM users WHERE user_id = ? LIMIT 1";
     $stmt_current_user = mysqli_prepare($conn, $sql_current_user);
 
     if ($stmt_current_user) {
@@ -17,7 +17,7 @@ if ($current_user_id > 0) {
         $result_current_user = mysqli_stmt_get_result($stmt_current_user);
 
         if ($row_current_user = mysqli_fetch_assoc($result_current_user)) {
-            $current_user_name = $row_current_user['name'] ?? '';
+            $current_user_name = $row_current_user['username'] ?? '';
         }
 
         mysqli_stmt_close($stmt_current_user);
@@ -50,11 +50,11 @@ $sqlProduct = "
 SELECT
 
     p.product_id,
-    p.name AS product_name,
+    p.product_name AS product_name,
 
-    b.name AS brand_name,
+    b.brand_name AS brand_name,
 
-    c.name AS category_name
+    c.category_name AS category_name
 
 FROM products p
 
@@ -106,8 +106,8 @@ $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-        $size = trim($_POST['size']);
-        $price = trim($_POST['price']);
+        $size = trim($_POST['product_size']);
+        $price = trim($_POST['product_price']);
 
        // VALIDATION
 
@@ -141,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 SELECT price_id
                 FROM product_prices
                 WHERE product_id = ?
-                AND LOWER(TRIM(size)) = LOWER(TRIM(?))
+                AND LOWER(TRIM(product_size)) = LOWER(TRIM(?))
                 LIMIT 1
             ";
 
@@ -174,8 +174,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 INSERT INTO product_prices
                 (
                     product_id,
-                    size,
-                    price,
+                    product_size,
+                    product_price,
                     followed_up_by,
                     followed_up_at,
                     created_at
@@ -302,7 +302,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
 
                         <input
                             type="text"
-                            name="size"
+                            name="product_size"
                             class="form-control"
                             placeholder="Example : 5 Kg"
                             value="<?= htmlspecialchars($size); ?>"
@@ -323,7 +323,7 @@ require_once __DIR__ . "/../../partials/sidebar.php";
                         <input
                             type="text"
                             id="price"
-                            name="price"
+                            name="product_price"
                             class="form-control"
                             placeholder="70.000"
                             autocomplete="off"
