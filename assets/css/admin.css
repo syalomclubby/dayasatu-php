@@ -2109,6 +2109,10 @@ body.sidebar-open {
 }
 
 @media (max-width: 768px) {
+  .table td {
+    width: 1% !important;
+  }
+
   .grid-2 > * {
     min-width: 0;
   }
@@ -2234,7 +2238,7 @@ body.sidebar-open {
   }
 
   .table {
-    width: max-content;
+    width: 100%;
     min-width: 1200px;
     border-collapse: separate;
   }

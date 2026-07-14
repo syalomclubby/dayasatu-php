@@ -13,7 +13,11 @@ require_once __DIR__ . "/../../config/connection.php";
         </button>
 
         <div class="topbar-title">
-            <h2>Dashboard</h2>
+            <?= $current_menu === 'dashboard' ? '<h2> Dashboard </h2>' : '' ?>
+            <?= $current_menu === 'products' ? '<h2> Products </h2>' : '' ?>
+            <?= $current_menu === 'brands' ? '<h2> Brands </h2>' : '' ?>
+            <?= $current_menu === 'categories' ? '<h2> Categories </h2>' : '' ?>
+            <?= $current_menu === 'users' ? '<h2> Users </h2>' : '' ?>
             <p>Overview of your system</p>
         </div>
     </div>
